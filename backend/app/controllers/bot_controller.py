@@ -15,18 +15,29 @@ logger = logging.getLogger(__name__)
 
 class BotController:
     async def handle_message(self, phone_number: str, message_body: dict):
+        print(f"DEBUG: Handling message from {phone_number}", flush=True)
         # Get user state
-        state_data = await redis_service.get_user_state(phone_number)
+        try:
+            state_data = await redis_service.get_user_state(phone_number)
+            print(f"DEBUG: User state data: {state_data}", flush=True)
+        except Exception as e:
+            print(f"ERROR: Failed to get user state: {e}", flush=True)
+            state_data = None
+
         state = state_data["state"] if state_data else "INIT"
         lang = state_data.get("data", {}).get("lang", "ar") if state_data else "ar"
+        print(f"DEBUG: Current State: {state}, Lang: {lang}", flush=True)
 
         message_type = message_body.get("type")
+        print(f"DEBUG: Message Type: {message_type}", flush=True)
         
         # Handle Text Messages
         if message_type == "text":
             text = message_body["text"]["body"]
+            print(f"DEBUG: Text Body: {text}", flush=True)
             
             if state == "INIT":
+                print("DEBUG: State is INIT, sending language buttons...", flush=True)
                 # Start Flow: Ask for Language
                 await whatsapp_service.send_interactive_buttons(
                     phone_number,
@@ -36,6 +47,7 @@ class BotController:
                         {"id": "lang_en", "title": "English 🇺🇸"}
                     ]
                 )
+                print("DEBUG: Language buttons sent.", flush=True)
                 await redis_service.set_user_state(phone_number, "AWAITING_LANG")
                 
             elif state == "MAIN_MENU":
