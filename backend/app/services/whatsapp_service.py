@@ -29,14 +29,16 @@ class WhatsAppService:
 
         async with httpx.AsyncClient() as client:
             try:
+                print(f"DEBUG: Sending WhatsApp message to {to}...", flush=True)
                 response = await client.post(self.base_url, headers=self.headers, json=payload)
+                print(f"DEBUG: WhatsApp API Response Status: {response.status_code}", flush=True)
+                print(f"DEBUG: WhatsApp API Response Body: {response.text}", flush=True)
                 response.raise_for_status()
-                logger.info(f"Message sent to {to}: {response.json()}")
                 return response.json()
             except httpx.HTTPError as e:
-                logger.error(f"Failed to send WhatsApp message: {e}")
+                print(f"ERROR: Failed to send WhatsApp message: {e}", flush=True)
                 if hasattr(e, 'response'):
-                    logger.error(f"Response: {e.response.text}")
+                    print(f"ERROR: Response: {e.response.text}", flush=True)
                 return None
 
     async def send_text(self, to: str, text: str):
