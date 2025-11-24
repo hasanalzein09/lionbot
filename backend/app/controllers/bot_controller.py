@@ -49,6 +49,17 @@ class BotController:
                 )
                 print("DEBUG: Language buttons sent.", flush=True)
                 await redis_service.set_user_state(phone_number, "AWAITING_LANG")
+
+            elif state == "AWAITING_LANG":
+                print("DEBUG: State is AWAITING_LANG, re-sending buttons...", flush=True)
+                await whatsapp_service.send_interactive_buttons(
+                    phone_number,
+                    "Please select your language / الرجاء اختيار اللغة",
+                    [
+                        {"id": "lang_ar", "title": "العربية 🇸🇦"},
+                        {"id": "lang_en", "title": "English 🇺🇸"}
+                    ]
+                )
                 
             elif state == "MAIN_MENU":
                 # AI Processing for text orders
