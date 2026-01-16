@@ -1040,7 +1040,7 @@ class BotController:
                 {
                     "id": f"edit_item_{item.get('menu_item_id', 0)}",
                     "title": f"{item.get('name', 'Item')[:20]} x{item.get('quantity', 1)}",
-                    "description": f"${lbp_to_usd(item.get('price', 0) * item.get('quantity', 1)):.2f}"
+                    "description": f"${float(item.get('price', 0) * item.get('quantity', 1)):.2f}"
                 }
                 for item in cart
             ]
@@ -1175,18 +1175,21 @@ class BotController:
             await redis_service.clear_cart(phone_number)
 
             # Build items list for confirmation message
+            # Note: prices in DB are already in USD
             items_text = []
             for item in cart:
                 item_name = item.get("name", item.get("name_ar", "Item"))
                 item_qty = item.get("quantity", 1)
-                item_price = lbp_to_usd(item.get("price", 0))
+                item_price = float(item.get("price", 0))  # Already USD
                 item_total = item_price * item_qty
                 items_text.append(f"• {item_qty}x {item_name} - ${item_total:.2f}")
             items_str = "\n".join(items_text)
 
-            # Send confirmation (convert to USD for display)
-            subtotal_usd = lbp_to_usd(total_amount)
-            delivery_usd = lbp_to_usd(delivery_fee)
+            # Send confirmation
+            # total_amount is already in USD (from cart prices)
+            # delivery_fee is in LBP (from _calculate_delivery_fee)
+            subtotal_usd = float(total_amount)  # Already USD
+            delivery_usd = lbp_to_usd(delivery_fee)  # Convert LBP to USD
             order_msg = get_text("order_confirmed", lang).format(
                 order_id=order.id,
                 items=items_str,
@@ -1242,8 +1245,8 @@ class BotController:
 
             # Prepare order summary
             items_text = "\n".join([f"• {item['name']} x{item['quantity']}" for item in cart])
-            total_usd = lbp_to_usd(order.total_amount or 0)
-            delivery_usd = lbp_to_usd(order.delivery_fee or 0)
+            total_usd = float(order.total_amount or 0)  # Already USD
+            delivery_usd = lbp_to_usd(order.delivery_fee or 0)  # Convert LBP to USD
             grand_total_usd = total_usd + delivery_usd
             notification = f"""🔔 *طلب جديد #{order.id}*
 
@@ -1290,7 +1293,7 @@ https://maps.google.com/?q={lat},{lng}
                 await fcm_service.send_to_topic(
                     topic="admin_orders",
                     title="🛒 طلب جديد!",
-                    body=f"طلب #{order.id} من {restaurant.name} - ${lbp_to_usd(order.total_amount):.2f}",
+                    body=f"طلب #{order.id} من {restaurant.name} - ${float(order.total_amount or 0):.2f}",
                     data={
                         "type": "new_order",
                         "order_id": str(order.id),
@@ -1474,7 +1477,7 @@ https://maps.google.com/?q={lat},{lng}
             msg = get_text("item_not_found_suggestions", lang).format(
                 query=original_text,
                 suggestions="\n".join([
-                    f"{i+1}. {s['name']} @ {s['restaurant']} (${lbp_to_usd(s['price']):.2f})"
+                    f"{i+1}. {s['name']} @ {s['restaurant']} (${float(s['price']):.2f})"
                     for i, s in enumerate(suggestions)
                 ])
             )
@@ -1602,7 +1605,7 @@ https://maps.google.com/?q={lat},{lng}
         response = f"{header}\n\n"
         response += "🛒 *الأصناف المضافة:*\n"
         response += "\n".join([f"  • {item}" for item in added_items])
-        cart_total_usd = lbp_to_usd(cart_total)
+        cart_total_usd = float(cart_total)  # Already USD
         response += f"\n\n💰 *المجموع:* ${cart_total_usd:.2f}"
         response += f"\n📦 *عدد الأصناف:* {cart_count}"
         
@@ -1644,7 +1647,7 @@ https://maps.google.com/?q={lat},{lng}
             
             # Show as buttons (max 3)
             buttons = [
-                {"id": f"qty_1_{item['id']}", "title": f"{item['name'][:15]} ${lbp_to_usd(item['price']):.1f}"}
+                {"id": f"qty_1_{item['id']}", "title": f"{item['name'][:15]} ${float(item['price']):.1f}"}
                 for item in upsell_items[:2]
             ]
             buttons.append({"id": "skip_upsell", "title": "✅ لا شكراً" if lang == "ar" else "No thanks"})
@@ -1785,7 +1788,7 @@ https://maps.google.com/?q={lat},{lng}
             rest_name = restaurant.name if restaurant else "Unknown"
 
         # Build preview
-        total_usd = lbp_to_usd(total)
+        total_usd = float(total)  # Already USD
         items_list = "\n".join(items_text)
 
         # If address provided, show order preview
@@ -1861,7 +1864,7 @@ https://maps.google.com/?q={lat},{lng}
             for order in orders:
                 restaurant_name = order.restaurant.name if order.restaurant else "Unknown"
                 items_count = len(order.items) if order.items else 0
-                total_usd = lbp_to_usd(order.total_amount or 0)
+                total_usd = float(order.total_amount or 0)  # Already USD
                 date_str = order.created_at.strftime("%d/%m") if order.created_at else ""
 
                 sections[0]["rows"].append({
@@ -1914,7 +1917,7 @@ https://maps.google.com/?q={lat},{lng}
                 items_text.append(f"• {order_item.quantity}x {item_data['name']}")
 
             # Show confirmation
-            total_usd = lbp_to_usd(total)
+            total_usd = float(total)  # Already USD
             msg = get_text("reorder_added", lang).format(
                 items="\n".join(items_text),
                 total=total_usd
@@ -2041,7 +2044,7 @@ https://maps.google.com/?q={lat},{lng}
                 return
 
             # Calculate points (10 points per $1)
-            order_usd = lbp_to_usd(order.total_amount or 0)
+            order_usd = float(order.total_amount or 0)  # Already USD
             base_points = int(order_usd * 10)
 
             # Tier multipliers
