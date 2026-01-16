@@ -161,18 +161,20 @@ PASSWORD_REQUIRE_DIGIT: bool = True
 
 
 # ==================== Helper Functions ====================
-def lbp_to_usd(amount_lbp: float) -> float:
+def lbp_to_usd(amount_lbp) -> float:
     """Convert LBP to USD"""
     if amount_lbp is None or amount_lbp == 0:
         return 0.0
-    return amount_lbp / LBP_TO_USD_RATE
+    # Convert Decimal to float if needed
+    return float(amount_lbp) / LBP_TO_USD_RATE
 
 
-def usd_to_lbp(amount_usd: float) -> float:
+def usd_to_lbp(amount_usd) -> float:
     """Convert USD to LBP"""
     if amount_usd is None or amount_usd == 0:
         return 0.0
-    return amount_usd * LBP_TO_USD_RATE
+    # Convert Decimal to float if needed
+    return float(amount_usd) * LBP_TO_USD_RATE
 
 
 def format_price_usd(amount_lbp: float) -> str:
