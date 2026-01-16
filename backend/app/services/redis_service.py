@@ -6,12 +6,26 @@ from app.core.constants import (
     ANALYTICS_RETENTION_SECONDS, AI_MAX_CONVERSATION_MESSAGES
 )
 import json
+from decimal import Decimal
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from collections import OrderedDict
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+class DecimalEncoder(json.JSONEncoder):
+    """Custom JSON encoder that handles Decimal types"""
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
+
+
+def json_dumps(obj):
+    """JSON dumps with Decimal support"""
+    return json.dumps(obj, cls=DecimalEncoder)
 
 # Maximum size for in-memory fallback store (LRU eviction)
 MAX_MEMORY_STORE_SIZE = 10000
@@ -123,7 +137,7 @@ class RedisService:
             if isinstance(hash_data, str):
                 hash_data = json.loads(hash_data)
             hash_data[field] = hash_data.get(field, 0) + increment
-            self._memory_store.set(key, json.dumps(hash_data))
+            self._memory_store.set(key, json_dumps(hash_data))
             return hash_data[field]
         elif command == "HGETALL":
             key = args[1]
@@ -138,7 +152,7 @@ class RedisService:
             if isinstance(set_data, str):
                 set_data = set(json.loads(set_data))
             set_data.add(value)
-            self._memory_store.set(key, json.dumps(list(set_data)))
+            self._memory_store.set(key, json_dumps(list(set_data)))
             return 1
         elif command == "SCARD":
             key = args[1]
@@ -158,7 +172,7 @@ class RedisService:
     async def set_user_state(self, phone_number: str, state: str, data: dict = None):
         key = f"user:{phone_number}"
         value = {"state": state, "data": data or {}}
-        await self._execute("SET", key, json.dumps(value), "EX", USER_STATE_EXPIRY_SECONDS)
+        await self._execute("SET", key, json_dumps(value), "EX", USER_STATE_EXPIRY_SECONDS)
 
     async def get_user_state(self, phone_number: str) -> Optional[Dict]:
         key = f"user:{phone_number}"
@@ -198,7 +212,7 @@ class RedisService:
             # Add new item
             cart_items.append(item)
         
-        await self._execute("SET", key, json.dumps(cart_items), "EX", CART_EXPIRY_SECONDS)
+        await self._execute("SET", key, json_dumps(cart_items), "EX", CART_EXPIRY_SECONDS)
 
     async def get_cart(self, phone_number: str) -> List[Dict]:
         key = f"cart:{phone_number}"
@@ -217,7 +231,7 @@ class RedisService:
                     item["quantity"] = quantity
                 
                 key = f"cart:{phone_number}"
-                await self._execute("SET", key, json.dumps(cart_items), "EX", CART_EXPIRY_SECONDS)
+                await self._execute("SET", key, json_dumps(cart_items), "EX", CART_EXPIRY_SECONDS)
                 return True
         
         return False
@@ -231,7 +245,7 @@ class RedisService:
         
         if len(cart_items) < original_length:
             key = f"cart:{phone_number}"
-            await self._execute("SET", key, json.dumps(cart_items), "EX", CART_EXPIRY_SECONDS)
+            await self._execute("SET", key, json_dumps(cart_items), "EX", CART_EXPIRY_SECONDS)
             return True
         
         return False
@@ -254,17 +268,17 @@ class RedisService:
     async def publish_order_update(self, order_id: int, data: dict):
         """Publish order update for real-time notifications"""
         channel = f"order:{order_id}"
-        await self._execute("PUBLISH", channel, json.dumps(data))
+        await self._execute("PUBLISH", channel, json_dumps(data))
 
     async def publish_restaurant_notification(self, restaurant_id: int, data: dict):
         """Publish notification to restaurant"""
         channel = f"restaurant:{restaurant_id}:orders"
-        await self._execute("PUBLISH", channel, json.dumps(data))
+        await self._execute("PUBLISH", channel, json_dumps(data))
 
     async def publish_driver_notification(self, driver_id: int, data: dict):
         """Publish notification to driver"""
         channel = f"driver:{driver_id}:deliveries"
-        await self._execute("PUBLISH", channel, json.dumps(data))
+        await self._execute("PUBLISH", channel, json_dumps(data))
 
     # ==================== Conversation Memory ====================
     async def save_conversation_message(self, phone_number: str, role: str, content: str, context: dict = None):
@@ -292,7 +306,7 @@ class RedisService:
             conv["context"].update(context)
 
         # Save with 30 min expiry
-        await self._execute("SET", key, json.dumps(conv), "EX", CONVERSATION_EXPIRY_SECONDS)
+        await self._execute("SET", key, json_dumps(conv), "EX", CONVERSATION_EXPIRY_SECONDS)
 
     async def get_conversation(self, phone_number: str) -> Optional[Dict]:
         """Get conversation history"""
@@ -313,7 +327,7 @@ class RedisService:
             conv = {"messages": [], "context": {}}
 
         conv["context"].update(context)
-        await self._execute("SET", key, json.dumps(conv), "EX", CONVERSATION_EXPIRY_SECONDS)
+        await self._execute("SET", key, json_dumps(conv), "EX", CONVERSATION_EXPIRY_SECONDS)
 
     async def clear_conversation(self, phone_number: str):
         """Clear conversation history"""
@@ -325,7 +339,7 @@ class RedisService:
         """Set a pending review request"""
         key = f"pending_review:{phone_number}"
         data = {"order_id": order_id, "restaurant_name": restaurant_name}
-        await self._execute("SET", key, json.dumps(data), "EX", PENDING_REVIEW_EXPIRY_SECONDS)
+        await self._execute("SET", key, json_dumps(data), "EX", PENDING_REVIEW_EXPIRY_SECONDS)
 
     async def get_pending_review(self, phone_number: str) -> Optional[Dict]:
         """Get pending review if exists"""
