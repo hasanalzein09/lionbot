@@ -1174,12 +1174,24 @@ class BotController:
             # Clear cart
             await redis_service.clear_cart(phone_number)
 
+            # Build items list for confirmation message
+            items_text = []
+            for item in cart:
+                item_name = item.get("name", item.get("name_ar", "Item"))
+                item_qty = item.get("quantity", 1)
+                item_price = lbp_to_usd(item.get("price", 0))
+                item_total = item_price * item_qty
+                items_text.append(f"• {item_qty}x {item_name} - ${item_total:.2f}")
+            items_str = "\n".join(items_text)
+
             # Send confirmation (convert to USD for display)
-            total_usd = lbp_to_usd(total_amount)
+            subtotal_usd = lbp_to_usd(total_amount)
             delivery_usd = lbp_to_usd(delivery_fee)
             order_msg = get_text("order_confirmed", lang).format(
                 order_id=order.id,
-                total=total_usd + delivery_usd,
+                items=items_str,
+                subtotal=subtotal_usd,
+                total=subtotal_usd + delivery_usd,
                 delivery_fee=delivery_usd
             )
             await whatsapp_service.send_text(phone_number, f"🎉 {order_msg}")

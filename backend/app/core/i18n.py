@@ -55,7 +55,7 @@ TRANSLATIONS = {
         "btn_use_previous": "✅ Previous Info",
         "btn_enter_new": "🔄 New Info",
         "location_not_expected": "We weren't expecting a location. Please start a new order.",
-        "order_confirmed": "Order #{order_id} confirmed!\n\n💰 Total: ${total:.2f}\n🚗 Delivery Fee: ${delivery_fee:.2f}\n\nWe'll notify you when your order is accepted!",
+        "order_confirmed": "Order #{order_id} confirmed!\n\n📦 *Your Order:*\n{items}\n\n💰 Subtotal: ${subtotal:.2f}\n🚗 Delivery: ${delivery_fee:.2f}\n💵 *Total: ${total:.2f}*\n\nWe'll notify you when your order is accepted!",
         "order_cancelled": "Your order has been cancelled.",
         
         # Order Status
@@ -174,7 +174,7 @@ TRANSLATIONS = {
         "btn_use_previous": "✅ البيانات السابقة",
         "btn_enter_new": "🔄 بيانات جديدة",
         "location_not_expected": "لم نكن نتوقع موقعاً. الرجاء بدء طلب جديد.",
-        "order_confirmed": "تم تأكيد الطلب #{order_id}!\n\n💰 المجموع: ${total:.2f}\n🚗 رسوم التوصيل: ${delivery_fee:.2f}\n\nسنعلمك عند قبول طلبك!",
+        "order_confirmed": "تم تأكيد الطلب #{order_id}!\n\n📦 *طلبك:*\n{items}\n\n💰 المجموع الفرعي: ${subtotal:.2f}\n🚗 التوصيل: ${delivery_fee:.2f}\n💵 *الإجمالي: ${total:.2f}*\n\nسنعلمك عند قبول طلبك!",
         "order_cancelled": "تم إلغاء طلبك.",
         
         # Order Status
