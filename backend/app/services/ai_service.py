@@ -529,10 +529,13 @@ class AIService:
                                 break
                     
                     if matched:
+                        # Convert Decimal price to float for JSON serialization
+                        price = float(matched.price) if matched.price else 0.0
+                        logger.info(f"Matched item: {matched.name_ar} with price: {price}")
                         matched_items.append({
                             "menu_item_id": matched.id,
                             "name": matched.name_ar or matched.name,
-                            "price": matched.price,
+                            "price": price,
                             "quantity": quantity,
                             "restaurant_id": restaurant_id  # Required for order creation
                         })
