@@ -35,21 +35,36 @@ def get_client_ip(request: Request) -> str:
 def get_limiter_storage():
     """
     Get appropriate storage backend for rate limiting.
-    Uses Redis in production, memory storage for development.
+    Uses Redis in production, memory storage for development/serverless.
+
+    Note: Upstash Redis REST API is not compatible with the limits library
+    which expects standard Redis protocol. For serverless environments with
+    Upstash, we fall back to memory storage which works fine for single
+    instance deployments like Cloud Run.
     """
     try:
         from app.core.config import settings
-        if settings.UPSTASH_REDIS_REST_URL:
-            # Use Upstash for serverless
-            return f"redis+upstash://{settings.UPSTASH_REDIS_REST_URL}"
-        elif settings.REDIS_URL:
+
+        # Standard Redis URL (e.g., redis://localhost:6379)
+        if settings.REDIS_URL and settings.REDIS_URL.startswith("redis://"):
+            logger.info("Using Redis for rate limiting")
             return settings.REDIS_URL
-        elif settings.REDIS_HOST:
-            return f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}"
+
+        # Redis host/port configuration
+        if settings.REDIS_HOST and not settings.UPSTASH_REDIS_REST_URL:
+            redis_url = f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}"
+            logger.info(f"Using Redis at {settings.REDIS_HOST} for rate limiting")
+            return redis_url
+
+        # Upstash REST API is HTTP-based, not compatible with limits library
+        # Fall through to memory storage
+        if settings.UPSTASH_REDIS_REST_URL:
+            logger.info("Upstash REST API detected - using memory storage for rate limiting (REST API not compatible with limits library)")
+
     except Exception as e:
         logger.warning(f"Failed to configure Redis for rate limiting: {e}")
 
-    # Fall back to in-memory storage
+    # Fall back to in-memory storage (works for single instance deployments)
     logger.info("Using in-memory storage for rate limiting")
     return "memory://"
 
