@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core import security
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.schemas.user import TokenPayload
 from sqlalchemy import select
 
@@ -47,7 +47,7 @@ def get_current_active_user(
 def get_current_active_superuser(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if current_user.role != "super_admin":
+    if current_user.role != UserRole.SUPER_ADMIN:
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"
         )

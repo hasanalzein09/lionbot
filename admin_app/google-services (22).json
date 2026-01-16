@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1039841478220",
+    "project_id": "lionbot-6d4c1",
+    "storage_bucket": "lionbot-6d4c1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1039841478220:android:39cb0b3cfd248f109ed6e9",
+        "android_client_info": {
+          "package_name": "lionbotadmin.hmztechnology.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJxS5GXj23Ez47Yp7Mfj1MvXU-oqb-xL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

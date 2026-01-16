@@ -19,11 +19,12 @@ async def init_db():
         # For now, we just try to create one
         
         # Create Super User
+        from app.core.config import settings
         superuser = User(
             full_name="Super Admin",
-            email="admin@lionbot.com",
-            phone_number="+1234567890",
-            hashed_password=get_password_hash("admin123"),
+            email=settings.FIRST_SUPERUSER_EMAIL,
+            phone_number=settings.FIRST_SUPERUSER_PHONE,
+            hashed_password=get_password_hash(settings.FIRST_SUPERUSER_PASSWORD),
             role=UserRole.SUPER_ADMIN,
             is_active=True
         )

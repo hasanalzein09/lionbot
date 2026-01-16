@@ -2,29 +2,42 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 from app.models.user import UserRole
 
-# Shared properties
 class UserBase(BaseModel):
+    full_name: str
     email: Optional[EmailStr] = None
     phone_number: str
-    full_name: Optional[str] = None
     is_active: Optional[bool] = True
-    role: UserRole = UserRole.CUSTOMER
+    role: Optional[UserRole] = UserRole.CUSTOMER
+    restaurant_id: Optional[int] = None
 
-# Properties to receive via API on creation
 class UserCreate(UserBase):
-    password: str
+    password: Optional[str] = None
 
-# Properties to return via API
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone_number: Optional[str] = None
+    is_active: Optional[bool] = None
+    role: Optional[UserRole] = None
+    restaurant_id: Optional[int] = None
+    password: Optional[str] = None
+
 class User(UserBase):
     id: int
 
     class Config:
         from_attributes = True
 
-# Token schemas
 class Token(BaseModel):
     access_token: str
     token_type: str
 
 class TokenPayload(BaseModel):
     sub: Optional[int] = None
+
+class DriverLocationUpdate(BaseModel):
+    latitude: float
+    longitude: float
+
+class DriverStatusUpdate(BaseModel):
+    is_active: bool

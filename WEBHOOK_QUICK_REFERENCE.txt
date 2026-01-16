@@ -1,0 +1,46 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                    🦁 LION BOT - WEBHOOK INFO                         ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📍 WEBHOOK URL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+https://lionbot-backend-426202982674.me-west1.run.app/webhook
+
+
+🔑 VERIFICATION TOKEN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+lion_verify_2024
+
+
+✅ STATUS: الـ Webhook شغّال ومجرب!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+📝 خطوات الإعداد في Meta Developer Console:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. فوت على: https://developers.facebook.com/
+2. اختر تطبيقك
+3. WhatsApp → Configuration
+4. في قسم Webhook:
+   
+   Callback URL: 
+   https://lionbot-backend-426202982674.me-west1.run.app/webhook
+   
+   Verify Token:
+   lion_verify_2024
+
+5. اضغط "Verify and Save"
+6. اشترك في "messages" webhook field
+
+
+📲 معلومات إضافية:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WhatsApp Business Account ID: 1064117252451978
+Cloud Run Region: me-west1 (Middle East)
+
+
+⚠️ ملاحظة مهمة:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+تأكد من إضافة WHATSAPP_PHONE_NUMBER_ID في Cloud Run Environment Variables!
+اطلع على ملف WEBHOOK_CREDENTIALS.md للتفاصيل الكاملة.
