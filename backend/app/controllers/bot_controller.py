@@ -319,6 +319,13 @@ class BotController:
             page = int(parts[3])
             await self._show_restaurants_by_category(phone_number, category_id, lang, page)
 
+        # Menu items pagination (menu_page_categoryId_page)
+        elif list_id.startswith("menu_page_"):
+            parts = list_id.split("_")
+            category_id = int(parts[2])
+            page = int(parts[3])
+            await self._show_menu_items(phone_number, category_id, lang, user_data, page)
+
         # Main Menu Options (from list)
         elif list_id == "menu_browse":
             await self._show_restaurant_categories(phone_number, lang)
@@ -714,8 +721,10 @@ class BotController:
                 "restaurant_name": rest_name
             })
 
-    async def _show_menu_items(self, phone_number: str, category_id: int, lang: str, user_data: dict):
-        """Show menu items in a category"""
+    async def _show_menu_items(self, phone_number: str, category_id: int, lang: str, user_data: dict, page: int = 0):
+        """Show menu items in a category with pagination (max 10 items per page)"""
+        ITEMS_PER_PAGE = 8  # Leave room for navigation buttons
+
         async with AsyncSessionLocal() as db:
             # Get category with items
             result = await db.execute(
@@ -736,12 +745,21 @@ class BotController:
                 await whatsapp_service.send_text(phone_number, get_text("no_items_available", lang))
                 return
 
+            # Calculate pagination
+            total_items = len(available_items)
+            total_pages = (total_items + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
+            start_idx = page * ITEMS_PER_PAGE
+            end_idx = min(start_idx + ITEMS_PER_PAGE, total_items)
+
+            # Get items for current page
+            page_items = available_items[start_idx:end_idx]
+
             # Get display names based on language
             cat_name = category.name_ar if lang == 'ar' and category.name_ar else category.name
-            
+
             def get_item_name(item):
                 return (item.name_ar if lang == 'ar' and item.name_ar else item.name)[:24]
-            
+
             def get_item_desc(item):
                 desc = item.description_ar if lang == 'ar' and hasattr(item, 'description_ar') and item.description_ar else item.description
                 # Handle variant items with price range
@@ -753,33 +771,53 @@ class BotController:
                     price_str = "$0.00"
                 return f"💰 {price_str}" + (f" | {desc[:30]}" if desc else "")
 
-            # Split into sections of 10 (WhatsApp limit per section, up to 30 total)
-            items_to_show = available_items[:30]
-            sections = []
-            for i in range(0, len(items_to_show), 10):
-                section_items = items_to_show[i:i+10]
-                section_num = (i // 10) + 1
-                section_title = cat_name if section_num == 1 else f"{cat_name} ({section_num})"
-                sections.append({
-                    "title": section_title[:24],
-                    "rows": [
-                        {
-                            "id": f"item_{item.id}",
-                            "title": get_item_name(item),
-                            "description": get_item_desc(item)
-                        }
-                        for item in section_items
-                    ]
+            # Build rows for current page items
+            rows = [
+                {
+                    "id": f"item_{item.id}",
+                    "title": get_item_name(item),
+                    "description": get_item_desc(item)
+                }
+                for item in page_items
+            ]
+
+            # Add navigation rows
+            if page > 0:
+                rows.append({
+                    "id": f"menu_page_{category_id}_{page - 1}",
+                    "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
+                    "description": f"صفحة {page}" if lang == 'ar' else f"Page {page}"
                 })
+
+            if page < total_pages - 1:
+                rows.append({
+                    "id": f"menu_page_{category_id}_{page + 1}",
+                    "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
+                    "description": f"صفحة {page + 2}" if lang == 'ar' else f"Page {page + 2}"
+                })
+
+            # Build section
+            page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
+            sections = [{
+                "title": f"{cat_name}{page_info}"[:24],
+                "rows": rows
+            }]
+
+            # Build message with page info
+            if total_pages > 1:
+                body_text = f"🍽️ {cat_name}\n📄 {page + 1}/{total_pages} | {total_items} {'صنف' if lang == 'ar' else 'items'}\n{get_text('select_item', lang)}"
+            else:
+                body_text = f"🍽️ {cat_name}\n{get_text('select_item', lang)}"
 
             await whatsapp_service.send_interactive_list(
                 phone_number,
-                f"🍽️ {cat_name}\n{get_text('select_item', lang)}",
+                body_text,
                 get_text("view_items", lang),
                 sections
             )
-            
+
             user_data["category_id"] = category_id
+            user_data["menu_page"] = page
             await redis_service.set_user_state(phone_number, "BROWSING_ITEMS", user_data)
 
     async def _show_item_details(self, phone_number: str, item_id: int, lang: str, user_data: dict):
