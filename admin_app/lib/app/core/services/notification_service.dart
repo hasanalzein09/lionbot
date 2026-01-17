@@ -62,6 +62,9 @@ class NotificationService {
   StreamSubscription? _messageOpenedSubscription;
   StreamSubscription? _webSocketSubscription;
 
+  // Navigation callback for handling notification taps
+  void Function(String type, Map<String, dynamic> data)? _navigationCallback;
+
   final StreamController<OrderNotification> _orderController =
       StreamController<OrderNotification>.broadcast();
   final StreamController<int> _newOrderCountController =
@@ -74,6 +77,11 @@ class NotificationService {
   Stream<int> get onNewOrderCount => _newOrderCountController.stream;
   int get newOrderCount => _newOrderCount;
   String? get fcmToken => _fcmToken;
+
+  /// Set navigation callback for handling notification taps
+  void setNavigationCallback(void Function(String type, Map<String, dynamic> data) callback) {
+    _navigationCallback = callback;
+  }
 
   /// Initialize notification service
   Future<void> init() async {
@@ -135,8 +143,17 @@ class NotificationService {
     await _localNotifications.initialize(
       settings,
       onDidReceiveNotificationResponse: (response) {
-        debugPrint('Notification tapped: ${response.payload}');
-        // Handle navigation to order details
+        debugPrint('📬 Local notification tapped: ${response.payload}');
+        // Handle navigation using callback
+        if (response.payload != null && _navigationCallback != null) {
+          try {
+            final data = jsonDecode(response.payload!) as Map<String, dynamic>;
+            final type = data['type'] as String? ?? 'new_order';
+            _navigationCallback!(type, data);
+          } catch (e) {
+            debugPrint('Error parsing notification payload: $e');
+          }
+        }
       },
     );
   }
@@ -201,11 +218,13 @@ class NotificationService {
   /// Handle notification tap
   void _handleMessageTap(RemoteMessage message) {
     final data = message.data;
-    final orderId = data['order_id'];
+    final type = data['type'] as String? ?? 'new_order';
 
-    if (orderId != null) {
-      // Navigate to order details (handled by the app)
-      debugPrint('Navigate to order: $orderId');
+    debugPrint('📬 Notification tapped: type=$type, data=$data');
+
+    // Use navigation callback if set
+    if (_navigationCallback != null) {
+      _navigationCallback!(type, Map<String, dynamic>.from(data));
     }
   }
 
@@ -215,7 +234,7 @@ class NotificationService {
     required String body,
     String? payload,
   }) async {
-    final androidDetails = AndroidNotificationDetails(
+    const androidDetails = AndroidNotificationDetails(
       AppConfig.notificationChannelId,
       'Orders',
       channelDescription: 'New order notifications',
@@ -278,7 +297,7 @@ class NotificationService {
 
     // Poll at configured interval
     _pollingTimer = Timer.periodic(
-      Duration(seconds: AppConfig.pollingIntervalSeconds),
+      const Duration(seconds: AppConfig.pollingIntervalSeconds),
       (_) => _checkNewOrders(),
     );
 

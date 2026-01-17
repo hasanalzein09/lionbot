@@ -1225,6 +1225,17 @@ class BotController:
             except:
                 pass
 
+            # Send push notification to admin app
+            try:
+                await fcm_service.notify_admins_new_order(
+                    order_id=order.id,
+                    restaurant_name=restaurant_name or "مطعم",
+                    total_amount=float(total_amount),
+                    restaurant_id=restaurant_id,
+                )
+            except Exception as e:
+                logger.error(f"Failed to send push notification: {e}")
+
             await redis_service.set_user_state(phone_number, "ORDER_PLACED", {
                 "lang": lang,
                 "order_id": order.id,
@@ -1576,7 +1587,7 @@ https://maps.google.com/?q={lat},{lng}
         ai_message = ai_result.get("message", "")
         restaurant_id = ai_result.get("restaurant_id")
         upsell_suggestions = ai_result.get("upsell_suggestions", [])
-        
+
         if not items:
             # No items matched - redirect to search
             if ai_result.get("matching_restaurants"):
@@ -1586,10 +1597,36 @@ https://maps.google.com/?q={lat},{lng}
                 await whatsapp_service.send_text(phone_number, error)
                 await self._show_restaurant_categories(phone_number, lang)
             return
-        
-        # Add items to cart
-        added_items = []
+
+        # Validate items - must have menu_item_id and price > 0
+        valid_items = []
+        invalid_items = []
         for item in items:
+            if item.get("menu_item_id") and item.get("price", 0) > 0:
+                valid_items.append(item)
+            else:
+                invalid_items.append(item.get("name", ""))
+
+        # If no valid items, show error and alternatives
+        if not valid_items:
+            product_query = items[0].get("name", "") if items else ""
+            restaurants = await ai_service._find_restaurants_with_product(product_query)
+
+            if restaurants:
+                # Show restaurants that have this product
+                error_msg = f"⚠️ ما لقيت '{product_query}' بالمطعم المطلوب\n\n🔍 بس لقيتو بهالمطاعم:"
+                await whatsapp_service.send_text(phone_number, error_msg)
+                ai_result["matching_restaurants"] = restaurants
+                ai_result["product_query"] = product_query
+                await self._handle_product_search(phone_number, ai_result, lang)
+            else:
+                await whatsapp_service.send_text(phone_number, f"⚠️ ما لقيت '{product_query}' بأي مطعم 🤔\nجرب شي تاني!")
+                await self._show_restaurant_categories(phone_number, lang)
+            return
+
+        # Add only valid items to cart
+        added_items = []
+        for item in valid_items:
             await redis_service.add_to_cart(phone_number, item)
             added_items.append(f"{item['quantity']}x {item['name']}")
         
@@ -1691,6 +1728,48 @@ https://maps.google.com/?q={lat},{lng}
         for mod_item in items:
             action = mod_item.get("action", "remove")
             item_name = mod_item.get("name", "").lower()
+            new_size = mod_item.get("size", "").lower() if mod_item.get("size") else None
+
+            # Handle replace action (size or type change)
+            replace_type = mod_item.get("replace_type", "").lower() if mod_item.get("replace_type") else None
+
+            if action == "replace" and (new_size or replace_type):
+                target_item = None
+                # If name is generic (آخر صنف), get last item in cart
+                if "آخر" in item_name or not item_name or item_name == "آخر صنف مضاف":
+                    target_item = cart[-1] if cart else None
+                else:
+                    for cart_item in cart:
+                        cart_item_name = cart_item.get("name", "").lower()
+                        if item_name in cart_item_name or cart_item_name in item_name:
+                            target_item = cart_item
+                            break
+
+                if target_item:
+                    old_name = target_item.get("name", "")
+                    old_menu_item_id = target_item.get("menu_item_id")
+                    restaurant_id = target_item.get("restaurant_id")
+                    quantity = target_item.get("quantity", 1)
+
+                    new_item = None
+                    if new_size:
+                        # Find item with new size
+                        new_item = await self._find_item_with_size(old_name, new_size, restaurant_id)
+                    elif replace_type:
+                        # Find item with different type (e.g., chicken → meat)
+                        new_item = await self._find_item_with_type(old_name, replace_type, restaurant_id)
+
+                    if new_item:
+                        await redis_service.remove_from_cart(phone_number, old_menu_item_id)
+                        new_item["quantity"] = quantity
+                        await redis_service.add_to_cart(phone_number, new_item)
+                        modifications_made.append(f"🔄 غيرنا {old_name} ← {new_item['name']}")
+                    else:
+                        search_term = new_size if new_size else replace_type
+                        modifications_made.append(f"⚠️ ما لقيت {search_term} بدل {old_name}")
+                        # Clear AI message on failure so we show the actual error
+                        ai_message = None
+                continue
 
             for cart_item in cart:
                 cart_item_name = cart_item.get("name", "").lower()
@@ -1723,6 +1802,86 @@ https://maps.google.com/?q={lat},{lng}
             await whatsapp_service.send_text(phone_number, "ما لقيت هالصنف بالسلة 🤔")
 
         await self._show_cart(phone_number, lang)
+
+    async def _find_item_with_size(self, current_name: str, target_size: str, restaurant_id: int) -> Optional[dict]:
+        """Find a menu item with different size (e.g., small → large)"""
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(MenuItem)
+                    .join(Category)
+                    .join(Menu)
+                    .where(Menu.restaurant_id == restaurant_id)
+                    .where(MenuItem.is_available == True)
+                )
+                menu_items = result.scalars().all()
+
+                # Size words to strip for base name comparison
+                size_words = ["صغير", "كبير", "وسط", "small", "medium", "large", "صغيرة", "كبيرة", "وسطى"]
+                base_name = current_name.lower()
+                for sw in size_words:
+                    base_name = base_name.replace(sw, "").strip()
+
+                # Find matching item with target size
+                for item in menu_items:
+                    item_name = (item.name_ar or item.name or "").lower()
+                    item_base = item_name
+                    for sw in size_words:
+                        item_base = item_base.replace(sw, "").strip()
+
+                    # Check if same base name and has target size
+                    if base_name in item_base or item_base in base_name:
+                        if target_size in item_name:
+                            return {
+                                "menu_item_id": item.id,
+                                "name": item.name_ar or item.name,
+                                "price": float(item.price) if item.price else 0.0,
+                                "quantity": 1,
+                                "restaurant_id": restaurant_id
+                            }
+        except Exception as e:
+            logger.error(f"Error finding item with size: {e}")
+        return None
+
+    async def _find_item_with_type(self, current_name: str, target_type: str, restaurant_id: int) -> Optional[dict]:
+        """Find a menu item with different type (e.g., chicken → meat)"""
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(MenuItem)
+                    .join(Category)
+                    .join(Menu)
+                    .where(Menu.restaurant_id == restaurant_id)
+                    .where(MenuItem.is_available == True)
+                )
+                menu_items = result.scalars().all()
+
+                # Type words to strip for base name comparison
+                type_words = ["دجاج", "لحمة", "لحم", "خضار", "جبنة", "chicken", "meat", "beef", "vegetarian", "cheese"]
+                base_name = current_name.lower()
+                for tw in type_words:
+                    base_name = base_name.replace(tw, "").strip()
+
+                # Find matching item with target type
+                for item in menu_items:
+                    item_name = (item.name_ar or item.name or "").lower()
+                    item_base = item_name
+                    for tw in type_words:
+                        item_base = item_base.replace(tw, "").strip()
+
+                    # Check if same base name and has target type
+                    if base_name in item_base or item_base in base_name:
+                        if target_type in item_name:
+                            return {
+                                "menu_item_id": item.id,
+                                "name": item.name_ar or item.name,
+                                "price": float(item.price) if item.price else 0.0,
+                                "quantity": 1,
+                                "restaurant_id": restaurant_id
+                            }
+        except Exception as e:
+            logger.error(f"Error finding item with type: {e}")
+        return None
 
     # ==================== One-Shot Order Feature ====================
     async def _handle_one_shot_order(self, phone_number: str, ai_result: dict, lang: str, user_data: dict):

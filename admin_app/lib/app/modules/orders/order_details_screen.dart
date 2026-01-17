@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/services/api_service.dart';
 
@@ -62,6 +63,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       _buildInfoCard(),
                       const SizedBox(height: 16),
                       _buildItemsCard(),
+                      const SizedBox(height: 16),
+                      _buildWhatsAppCard(),
                       const SizedBox(height: 16),
                       _buildDriverCard(),
                       const SizedBox(height: 16),
@@ -334,6 +337,141 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         );
       }
     }
+  }
+
+  /// Build order items text for WhatsApp sharing
+  String _buildItemsText() {
+    final items = _order!['items'] as List<dynamic>? ?? [];
+    final buffer = StringBuffer();
+
+    buffer.writeln('*طلب #${widget.orderId}*');
+    buffer.writeln('');
+    buffer.writeln('*الأصناف:*');
+
+    for (final item in items) {
+      final qty = item['quantity'] ?? 1;
+      final name = item['name'] ?? item['name_ar'] ?? 'صنف';
+      final variant = item['variant_name'] ?? item['variant_name_ar'];
+      final price = (item['total_price'] ?? item['unit_price'] ?? 0).toStringAsFixed(2);
+
+      if (variant != null && variant.toString().isNotEmpty) {
+        buffer.writeln('• $qty x $name ($variant) - \$$price');
+      } else {
+        buffer.writeln('• $qty x $name - \$$price');
+      }
+    }
+
+    buffer.writeln('');
+    buffer.writeln('*المجموع: \$${(_order!['total_amount'] ?? 0).toStringAsFixed(2)}*');
+
+    return buffer.toString();
+  }
+
+  /// Share items only via WhatsApp
+  Future<void> _shareItemsOnly() async {
+    final text = _buildItemsText();
+    final encoded = Uri.encodeComponent(text);
+    final url = 'https://wa.me/?text=$encoded';
+
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('فشل فتح WhatsApp'), backgroundColor: AppTheme.errorColor),
+        );
+      }
+    }
+  }
+
+  /// Share complete order via WhatsApp (items + restaurant + customer + phone + address)
+  Future<void> _shareComplete() async {
+    final buffer = StringBuffer();
+
+    // Items
+    buffer.write(_buildItemsText());
+    buffer.writeln('');
+    buffer.writeln('---');
+    buffer.writeln('');
+
+    // Restaurant
+    final restaurant = _order!['restaurant_name'] ?? _order!['restaurant_name_ar'] ?? 'غير محدد';
+    buffer.writeln('*المطعم:* $restaurant');
+
+    // Customer
+    final customer = _order!['customer_name'] ?? 'غير محدد';
+    buffer.writeln('*الزبون:* $customer');
+
+    // Phone
+    final phone = _order!['customer_phone'] ?? 'غير محدد';
+    buffer.writeln('*الهاتف:* $phone');
+
+    // Address
+    final address = _order!['address'] ?? 'غير محدد';
+    buffer.writeln('*العنوان:* $address');
+
+    final text = buffer.toString();
+    final encoded = Uri.encodeComponent(text);
+    final url = 'https://wa.me/?text=$encoded';
+
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('فشل فتح WhatsApp'), backgroundColor: AppTheme.errorColor),
+        );
+      }
+    }
+  }
+
+  Widget _buildWhatsAppCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: AppTheme.cardDark, borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.share, color: Color(0xFF25D366), size: 20),
+              SizedBox(width: 8),
+              Text('مشاركة عبر WhatsApp', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _shareItemsOnly,
+                  icon: const Icon(Icons.list_alt, size: 18),
+                  label: const Text('الأصناف فقط'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF25D366).withOpacity(0.15),
+                    foregroundColor: const Color(0xFF25D366),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _shareComplete,
+                  icon: const Icon(Icons.description, size: 18),
+                  label: const Text('الطلب كامل'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF25D366),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildActionsCard() {

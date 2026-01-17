@@ -8,6 +8,31 @@ import 'app/core/theme/app_theme.dart';
 import 'app/core/services/notification_service.dart';
 import 'app/routes/app_routes.dart';
 
+/// Global navigator key for accessing navigator from anywhere
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+/// Handle navigation from notification tap
+void _handleNotificationNavigation(String type, Map<String, dynamic> data) {
+  final navigator = navigatorKey.currentState;
+  if (navigator == null) return;
+
+  switch (type) {
+    case 'new_order':
+    case 'order_update':
+      final orderId = int.tryParse(data['order_id']?.toString() ?? '');
+      if (orderId != null) {
+        navigator.pushNamed(
+          AppRoutes.orderDetails,
+          arguments: {'orderId': orderId},
+        );
+      }
+      break;
+    default:
+      // Navigate to orders list for unknown types
+      navigator.pushNamed(AppRoutes.orders);
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -17,8 +42,10 @@ void main() async {
   // Initialize Hive for local storage
   await Hive.initFlutter();
 
-  // Initialize notifications with FCM
-  await NotificationService().init();
+  // Initialize notifications with FCM and navigation callback
+  final notificationService = NotificationService();
+  await notificationService.init();
+  notificationService.setNavigationCallback(_handleNotificationNavigation);
   
   // Lock orientation (optional for desktop)
   await SystemChrome.setPreferredOrientations([
@@ -47,6 +74,7 @@ class LionAdminApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Lion Admin',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,

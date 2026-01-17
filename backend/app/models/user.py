@@ -24,3 +24,6 @@ class User(Base):
     default_address = Column(String, nullable=True)
     last_latitude = Column(Float, nullable=True)
     last_longitude = Column(Float, nullable=True)
+
+    # FCM token for push notifications
+    fcm_token = Column(String, nullable=True)
