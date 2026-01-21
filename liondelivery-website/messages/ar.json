@@ -1,0 +1,233 @@
+{
+  "common": {
+    "appName": "Lion Delivery",
+    "home": "الرئيسية",
+    "restaurants": "المطاعم",
+    "cart": "السلة",
+    "checkout": "إتمام الطلب",
+    "orders": "طلباتي",
+    "search": "بحث",
+    "about": "عن الموقع",
+    "contact": "تواصل معنا",
+    "language": "اللغة",
+    "arabic": "العربية",
+    "english": "English",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "viewAll": "عرض الكل",
+    "seeMore": "عرض المزيد",
+    "noResults": "لا توجد نتائج",
+    "currency": "$",
+    "categories": "التصنيفات"
+  },
+  "home": {
+    "hero": {
+      "title": "أطلب من أفضل مطاعم صيدا",
+      "subtitle": "توصيل سريع لباب منزلك",
+      "searchPlaceholder": "ابحث عن مطعم أو طبق...",
+      "stats": {
+        "restaurants": "مطعم",
+        "dishes": "طبق",
+        "delivery": "توصيل سريع"
+      }
+    },
+    "categories": {
+      "title": "تصنيفات المطاعم",
+      "all": "الكل"
+    },
+    "featured": {
+      "title": "المطاعم المميزة"
+    },
+    "howItWorks": {
+      "title": "كيف يعمل Lion Delivery؟",
+      "step1": {
+        "title": "اختر مطعمك",
+        "description": "تصفح قائمة المطاعم واختر المفضل لديك"
+      },
+      "step2": {
+        "title": "أضف للسلة",
+        "description": "اختر الأطباق التي تريدها وأضفها للسلة"
+      },
+      "step3": {
+        "title": "استلم طلبك",
+        "description": "أكمل الطلب واستلمه عند باب منزلك"
+      }
+    },
+    "whatsapp": {
+      "title": "اطلب عبر واتساب أيضاً!",
+      "subtitle": "تواصل معنا مباشرة عبر واتساب",
+      "button": "راسلنا على واتساب"
+    }
+  },
+  "restaurants": {
+    "title": "المطاعم",
+    "subtitle": "اكتشف أفضل المطاعم في صيدا",
+    "searchPlaceholder": "ابحث عن مطعم...",
+    "filters": {
+      "all": "الكل",
+      "sortBy": "ترتيب حسب",
+      "newest": "الأحدث",
+      "rating": "التقييم",
+      "mostOrdered": "الأكثر طلباً"
+    },
+    "results": "{count} مطعم",
+    "loadMore": "تحميل المزيد",
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "openNow": "مفتوح الآن",
+    "deliveryTime": "{min}-{max} دقيقة",
+    "reviews": "{count} تقييم"
+  },
+  "restaurant": {
+    "menu": "القائمة",
+    "searchMenu": "ابحث في القائمة...",
+    "categories": "الأقسام",
+    "items": "{count} أصناف",
+    "popular": "الأكثر طلباً",
+    "call": "اتصل",
+    "location": "الموقع",
+    "share": "مشاركة",
+    "workingHours": "ساعات العمل"
+  },
+  "menu": {
+    "addToCart": "أضف للسلة",
+    "selectSize": "اختر الحجم",
+    "selectOptions": "إضافات (اختياري)",
+    "specialInstructions": "ملاحظات خاصة",
+    "specialInstructionsPlaceholder": "مثال: بدون بصل، بدون صوص...",
+    "quantity": "الكمية",
+    "total": "المجموع"
+  },
+  "cart": {
+    "title": "سلة المشتريات",
+    "empty": "السلة فارغة",
+    "emptyDescription": "أضف بعض الأطباق اللذيذة لسلتك",
+    "browseRestaurants": "تصفح المطاعم",
+    "from": "من",
+    "clearAll": "مسح الكل",
+    "notes": "ملاحظات للمطعم",
+    "notesPlaceholder": "مثال: الرجاء عدم الطرق على الباب...",
+    "promoCode": "كود خصم",
+    "promoCodePlaceholder": "أدخل كود الخصم",
+    "apply": "تطبيق",
+    "subtotal": "المجموع الفرعي",
+    "delivery": "التوصيل",
+    "deliveryFee": "رسوم التوصيل",
+    "discount": "الخصم",
+    "total": "المجموع",
+    "checkout": "إتمام الطلب",
+    "continueShopping": "متابعة التسوق",
+    "addMore": "أضف المزيد من {restaurant}",
+    "itemAdded": "تمت الإضافة للسلة",
+    "categories": "التصنيفات"
+  },
+  "checkout": {
+    "title": "إتمام الطلب",
+    "steps": {
+      "delivery": "معلومات التوصيل",
+      "payment": "الدفع",
+      "confirm": "تأكيد"
+    },
+    "deliveryInfo": {
+      "title": "معلومات التوصيل",
+      "name": "الاسم الكامل",
+      "namePlaceholder": "أدخل اسمك",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "71 XXX XXX",
+      "address": "العنوان بالتفصيل",
+      "addressPlaceholder": "المدينة، الشارع، البناية، الطابق..."
+    },
+    "payment": {
+      "title": "طريقة الدفع",
+      "cash": "الدفع عند الاستلام (نقداً)",
+      "card": "بطاقة ائتمان",
+      "cardComingSoon": "قريباً"
+    },
+    "summary": {
+      "title": "ملخص الطلب"
+    },
+    "placeOrder": "تأكيد الطلب",
+    "processing": "جاري إرسال الطلب...",
+    "errors": {
+      "nameRequired": "الاسم مطلوب",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "رقم الهاتف غير صحيح",
+      "addressRequired": "العنوان مطلوب",
+      "orderFailed": "فشل إرسال الطلب، حاول مرة أخرى"
+    }
+  },
+  "order": {
+    "success": {
+      "title": "تم استلام طلبك!",
+      "orderNumber": "رقم الطلب",
+      "estimatedTime": "الوقت المتوقع",
+      "minutes": "دقيقة"
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "confirmed": "تم التأكيد",
+      "preparing": "قيد التحضير",
+      "ready": "جاهز",
+      "delivering": "قيد التوصيل",
+      "delivered": "تم التوصيل",
+      "cancelled": "ملغي"
+    },
+    "details": {
+      "title": "تفاصيل الطلب",
+      "deliveryAddress": "عنوان التوصيل"
+    },
+    "track": "تتبع الطلب",
+    "contactWhatsapp": "تواصل عبر واتساب",
+    "backHome": "العودة للرئيسية",
+    "reorder": "إعادة الطلب"
+  },
+  "search": {
+    "title": "نتائج البحث",
+    "placeholder": "ابحث عن مطعم أو طبق...",
+    "recent": "عمليات البحث الأخيرة",
+    "popular": "الأكثر بحثاً",
+    "clear": "مسح",
+    "noResults": {
+      "title": "لا توجد نتائج",
+      "subtitle": "جرب البحث بكلمات مختلفة"
+    },
+    "tabs": {
+      "all": "الكل",
+      "restaurants": "المطاعم",
+      "items": "الأطباق"
+    }
+  },
+  "footer": {
+    "description": "أفضل خدمة توصيل طعام في صيدا",
+    "quickLinks": "روابط سريعة",
+    "contactUs": "تواصل معنا",
+    "phone": "الهاتف",
+    "email": "الإيميل",
+    "address": "العنوان",
+    "socialMedia": "تابعنا",
+    "copyright": "© {year} Lion Delivery. جميع الحقوق محفوظة"
+  },
+  "errors": {
+    "notFound": {
+      "title": "الصفحة غير موجودة",
+      "subtitle": "عذراً، الصفحة التي تبحث عنها غير موجودة",
+      "button": "العودة للرئيسية"
+    },
+    "general": {
+      "title": "حدث خطأ",
+      "subtitle": "عذراً، حدث خطأ غير متوقع",
+      "button": "إعادة المحاولة"
+    }
+  }
+}

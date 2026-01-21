@@ -15,6 +15,11 @@ from app.models.menu import Menu, Category, MenuItem, MenuItemVariant
 router = APIRouter()
 
 
+def slugify(text: str) -> str:
+    """Generate a slug from text"""
+    return text.lower().replace(" ", "-").replace("&", "and")
+
+
 # ==================== PUBLIC RESTAURANT ENDPOINTS ====================
 
 @router.get("/restaurants/")
@@ -22,7 +27,7 @@ async def get_public_restaurants(
     db: AsyncSession = Depends(get_db),
     category_id: Optional[int] = Query(None, description="Filter by category ID"),
     search: Optional[str] = Query(None, description="Search by name"),
-    sort: str = Query("newest", description="Sort by: newest, rating, name"),
+    sort: str = Query("newest", description="Sort by: newest, name"),
     limit: int = Query(50, le=100),
     offset: int = Query(0),
 ) -> Any:
@@ -30,7 +35,7 @@ async def get_public_restaurants(
     Get all active restaurants for the public website.
     No authentication required.
     """
-    query = select(Restaurant).where(Restaurant.is_active == True)
+    query = select(Restaurant).options(selectinload(Restaurant.category)).where(Restaurant.is_active == True)
 
     # Filter by category
     if category_id:
@@ -45,12 +50,10 @@ async def get_public_restaurants(
         )
 
     # Sort
-    if sort == "rating":
-        query = query.order_by(Restaurant.rating.desc().nullslast())
-    elif sort == "name":
+    if sort == "name":
         query = query.order_by(Restaurant.name)
-    else:  # newest
-        query = query.order_by(Restaurant.created_at.desc())
+    else:  # newest (default) - use id as proxy for creation time
+        query = query.order_by(Restaurant.id.desc())
 
     # Pagination
     query = query.offset(offset).limit(limit)
@@ -65,22 +68,14 @@ async def get_public_restaurants(
                 "id": r.id,
                 "name": r.name,
                 "name_ar": r.name_ar,
-                "slug": r.slug or f"restaurant-{r.id}",
+                "slug": slugify(r.name),
                 "description": r.description,
                 "description_ar": r.description_ar,
                 "image": r.logo_url,
-                "cover_image": r.cover_image_url,
                 "category": r.category.name if r.category else None,
                 "category_ar": r.category.name_ar if r.category else None,
                 "category_id": r.category_id,
-                "rating": float(r.rating) if r.rating else None,
-                "review_count": r.review_count or 0,
-                "delivery_time": {"min": r.delivery_time_min or 25, "max": r.delivery_time_max or 45},
-                "delivery_fee": float(r.delivery_fee) if r.delivery_fee else 2.0,
-                "is_open": r.is_open,
-                "is_featured": r.is_featured,
-                "phone": r.phone,
-                "address": r.address,
+                "phone": r.phone_number,
             }
             for r in restaurants
         ],
@@ -112,23 +107,14 @@ async def get_public_restaurant(
         "id": restaurant.id,
         "name": restaurant.name,
         "name_ar": restaurant.name_ar,
-        "slug": restaurant.slug or f"restaurant-{restaurant.id}",
+        "slug": slugify(restaurant.name),
         "description": restaurant.description,
         "description_ar": restaurant.description_ar,
         "image": restaurant.logo_url,
-        "cover_image": restaurant.cover_image_url,
         "category": restaurant.category.name if restaurant.category else None,
         "category_ar": restaurant.category.name_ar if restaurant.category else None,
         "category_id": restaurant.category_id,
-        "rating": float(restaurant.rating) if restaurant.rating else None,
-        "review_count": restaurant.review_count or 0,
-        "delivery_time": {"min": restaurant.delivery_time_min or 25, "max": restaurant.delivery_time_max or 45},
-        "delivery_fee": float(restaurant.delivery_fee) if restaurant.delivery_fee else 2.0,
-        "is_open": restaurant.is_open,
-        "is_featured": restaurant.is_featured,
-        "phone": restaurant.phone,
-        "address": restaurant.address,
-        "working_hours": restaurant.working_hours,
+        "phone": restaurant.phone_number,
     }
 
 
@@ -141,12 +127,20 @@ async def get_public_restaurant_by_slug(
     Get a single restaurant by slug for the public website.
     No authentication required.
     """
+    # Since we don't have a slug column, we search by name matching the slug pattern
     result = await db.execute(
         select(Restaurant)
         .options(selectinload(Restaurant.category))
-        .where(Restaurant.slug == slug, Restaurant.is_active == True)
+        .where(Restaurant.is_active == True)
     )
-    restaurant = result.scalars().first()
+    restaurants = result.scalars().all()
+
+    # Find restaurant whose slugified name matches the slug
+    restaurant = None
+    for r in restaurants:
+        if slugify(r.name) == slug:
+            restaurant = r
+            break
 
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
@@ -155,23 +149,14 @@ async def get_public_restaurant_by_slug(
         "id": restaurant.id,
         "name": restaurant.name,
         "name_ar": restaurant.name_ar,
-        "slug": restaurant.slug,
+        "slug": slugify(restaurant.name),
         "description": restaurant.description,
         "description_ar": restaurant.description_ar,
         "image": restaurant.logo_url,
-        "cover_image": restaurant.cover_image_url,
         "category": restaurant.category.name if restaurant.category else None,
         "category_ar": restaurant.category.name_ar if restaurant.category else None,
         "category_id": restaurant.category_id,
-        "rating": float(restaurant.rating) if restaurant.rating else None,
-        "review_count": restaurant.review_count or 0,
-        "delivery_time": {"min": restaurant.delivery_time_min or 25, "max": restaurant.delivery_time_max or 45},
-        "delivery_fee": float(restaurant.delivery_fee) if restaurant.delivery_fee else 2.0,
-        "is_open": restaurant.is_open,
-        "is_featured": restaurant.is_featured,
-        "phone": restaurant.phone,
-        "address": restaurant.address,
-        "working_hours": restaurant.working_hours,
+        "phone": restaurant.phone_number,
     }
 
 
@@ -198,7 +183,7 @@ async def get_public_categories(
             "name": c.name,
             "name_ar": c.name_ar,
             "icon": c.icon,
-            "slug": c.slug or c.name.lower().replace(" ", "-"),
+            "slug": slugify(c.name),
         }
         for c in categories
     ]
@@ -289,12 +274,13 @@ async def get_featured_restaurants(
     """
     Get featured restaurants for the homepage.
     No authentication required.
+    Since we don't have is_featured column, return the first N restaurants.
     """
     result = await db.execute(
         select(Restaurant)
         .options(selectinload(Restaurant.category))
-        .where(Restaurant.is_active == True, Restaurant.is_featured == True)
-        .order_by(Restaurant.rating.desc().nullslast())
+        .where(Restaurant.is_active == True)
+        .order_by(Restaurant.id)
         .limit(limit)
     )
     restaurants = result.scalars().all()
@@ -304,14 +290,11 @@ async def get_featured_restaurants(
             "id": r.id,
             "name": r.name,
             "name_ar": r.name_ar,
-            "slug": r.slug or f"restaurant-{r.id}",
+            "slug": slugify(r.name),
             "image": r.logo_url,
             "category": r.category.name if r.category else None,
             "category_ar": r.category.name_ar if r.category else None,
-            "rating": float(r.rating) if r.rating else None,
-            "review_count": r.review_count or 0,
-            "delivery_time": {"min": r.delivery_time_min or 25, "max": r.delivery_time_max or 45},
-            "is_open": r.is_open,
+            "phone": r.phone_number,
         }
         for r in restaurants
     ]
@@ -361,7 +344,7 @@ async def public_search(
                 "id": r.id,
                 "name": r.name,
                 "name_ar": r.name_ar,
-                "slug": r.slug or f"restaurant-{r.id}",
+                "slug": slugify(r.name),
                 "image": r.logo_url,
                 "category": r.category.name if r.category else None,
                 "category_ar": r.category.name_ar if r.category else None,

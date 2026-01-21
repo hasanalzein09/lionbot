@@ -1,0 +1,695 @@
+قائمة جميع الأصناف (categories) مع أصحابها
+======================================================================
+
+من res.md:
+----------------------------------------------------------------------
+1. King Croissant:
+   - كعكة طرابلسية
+   - Tripoli Kaak
+   - كرواسون بيتزا
+   - Croissant Pizza
+   - كرواسون محشي
+   - Stuffed Croissant
+   - كرواسون حلو
+   - Sweet Croissant
+   - كنافة
+   - Knefeh
+   - صاج
+   - Saj
+   - أطباق وسندويشات متنوعة
+   - Plates & Various Sandwiches
+   - كرواسون سي فود
+   - Croissant Sea Food
+   - ساندويش عربي
+   - Arabi Sandwich
+   - ساندويش إفرنجي
+   - Ifranji Sandwich
+   - بطاطا
+   - Potatoes
+
+6. Foul w Trawiqa:
+   - Sandwiches
+   - Burgers
+   - Meals
+   - Salads
+   - Starters
+   - Breakfast
+   - Drinks
+   - Manakeesh & Savory Pastries
+   - Chicken Manakeesh
+   - Kaaki
+   - Pizza
+   - Breakfast
+   - Appetizers
+   - Wraps
+   - Pasta
+   - Panouzzo (Salty)
+   - Salads
+   - Sweets
+   - Drinks
+   - BURGERS
+   - SANDWICHES
+   - PLATES
+   - PASTA & PLATES
+   - APPETIZERS
+   - ADD-ONS
+
+7. Spuntino:
+   - Salad Shakers
+   - Starters
+   - Sandwiches
+   - Burgers
+   - Mix
+   - Fried Chicken
+   - Crispy
+   - Sauces
+   - PLATES
+   - PASTA
+   - ADD's
+   - FRIES
+   - SOFT DRINKS
+   - BURGERS
+   - SANDWICHES
+   - Appetizers
+   - Salads
+   - Papa Mimi (Sandwiches)
+   - Chicago Pizza
+   - Classic Pizza
+   - Chicken Pizza
+   - Beef Pizza
+   - Sea Food Pizza
+   - Pasta
+   - Baked Pasta
+   - Make it Special
+   - Kids Meals
+   - Desserts
+   - Dips
+   - Drinks
+
+8. Linguine Menu:
+   - Pasta
+   - Wraps
+   - Appetizers
+   - Add-Ons
+   - Drinks
+   - Delux Pizza
+   - Premium Chicken Pizza
+   - Supreme Pizza (Beef)
+   - Supreme Pizza (Shrimp)
+   - Penne Pasta
+   - Appetizers
+   - Dips
+   - Salads
+   - Nachos
+   - Burgers
+   - Dessert
+   - Drinks
+   - Pizza Add-ons & Customization
+   - Meals (Al Wajbat)
+   - الوجبات
+   - Frozen Items (Al Mufarrazat)
+   - المفرزات
+   - Burger
+   - Sandwiches & Snacks
+   - Shawarma
+   - Hot Dog
+   - Meals
+   - French Fries
+   - Add-ons
+
+9. Hayat Doner:
+   - The Doner
+   - الدونر
+   - Lebanese Shawarma
+   - الشاورما اللبناني
+   - Markouk
+   - المرقوق
+   - Tortilla
+   - التورتيا
+   - Plates (Al Sahoun)
+   - الصحون
+   - Burgers
+   - البرغر
+   - Potatoes
+   - البطاطا
+   - Appetizers
+   - المقبلات
+   - Salads
+   - السلطات
+   - Kids
+   - للأطفال
+   - Desserts
+   - الحلويات
+   - Beverages & Shisha
+   - المشروبات و الأركيلة
+
+10. Popeyes:
+   - Sandwiches
+   - الساندويشات
+   - Seafood
+   - مأكولات بحرية
+   - Tenders
+   - تندرز
+   - Chicken Combos
+   - كومبو الدجاج
+   - Mixed Combo Meals
+   - وجبات كومبو المختلطة
+   - Family Meals
+   - وجبات عائلية
+   - Signature Sides
+   - طلبات جانبية مميزة
+   - Popeyes Kids
+   - وجبات الأطفال
+
+15. Smoking Hub:
+   - Appetizers
+   - Fries
+   - Salads
+   - Shawarma
+   - Big Soubra's Meal
+   - Beef Burger
+   - Grilled Chicken Burgers
+   - Fried Chicken Burgers
+   - Sandwiches
+   - Wraps
+   - Platters
+   - Kids Meal
+   - Drinks
+   - Add Ons
+   - Burgers & Sandwiches
+   - Wraps
+   - Wings (Buffalo, BBQ, or Plain)
+   - Crispy Meals
+   - Singles (Mini)
+   - Combos
+   - Platters / Special
+   - Sides & Appetizers
+   - Drinks
+   - Chicken & Sandwiches
+   - Appetizers
+   - Refreshments
+   - Sandwiches
+   - Grill Sandwiches (Mashawi)
+   - Shawarma
+   - Charcoal Burgers
+   - Sandwiches (Arabic & Markouk)
+   - Combos (2 Sandwiches \+ Fries \+ Pepsi)
+   - Kilos (Sold in USD)
+   - Fries Plates
+   - Manaqish (Classic)
+   - Manaqish with Kashkaval Mix
+   - Pizza
+   - Loaf (Ragheef)
+   - Fatayer (Pastries)
+   - Misc
+   - معجنات (دزينة)
+   - Pastries (Dozen)
+   - فطاير
+   - Fatayer (Pies)
+   - مرطبات
+   - Refreshments
+   - إضافات
+   - Extras
+   - عجين
+   - Dough
+
+16. Heartache:
+   - Appetizers
+   - Sandwiches
+   - Burgers
+   - Meals
+   - Drinks
+   - Add On
+
+17. Sandwich Abou Afif:
+   - Sandwiches
+   - Burgers
+   - Fries
+   - Sweet Sandwiches
+   - Beverages
+
+18. Shawarma Abul El Oud:
+   - Chicken Shawarma
+   - شاورما دجاج
+   - Beef Shawarma
+   - شاورما لحمة
+   - Turkish Items
+   - أصناف تركية
+   - Fries
+   - بطاطا
+   - Salads
+   - سلطات
+   - Offers
+   - عروضات
+   - Drinks
+   - مشروبات
+   - شاورما دجاج (Chicken Shawarma)
+   - شاورما لحمة (Meat Shawarma)
+   - برغر (Burgers)
+
+
+من rest2.md:
+----------------------------------------------------------------------
+1. Al Abdalla:
+   - BBQ Chicken
+   - Specialty Bread
+   - Sandwiches
+   - Combos
+   - Sides & Appetizers
+   - Salads
+   - Beverage
+   - Hot Coffee & Espresso
+   - Hot Non-Coffee Drinks
+   - Iced Coffee & Cold Drinks
+   - Frappuccino (Blended)
+   - Tea (Hot)
+   - Water & Refreshments
+   - Sandwiches & Salads
+   - Bakery & Sweets
+   - Frozen Yogurt
+
+3. Aura:
+   -  بوظة (Ice Cream)
+   - كريب (Crepe)
+   - وافل (Waffle)
+   - بانكيك (Pancake)
+   - سموزي (Smoothies)
+
+6. French Fries:
+   - Sandwiches
+   - Burgers
+   - Appetizers
+   - Drinks
+   - Appetizers
+   - Bagels
+   - Flat Bread \
+   - Salad
+   - Dips
+   - Desserts
+   - Hot Drinks
+   - Iced Drinks
+   - Milkshakes
+   - Iced Tea
+   - Appetizer
+   - Burger
+   - Sandwiches
+   - Fried (Ma2ali)
+   - Meal
+   - Offers
+   - Drink
+   - Pizza
+   - Sweet Pizza
+   - Starters & Sides
+   - Drinks
+   - Add-ons
+   - Salads Go Green
+   - Our Starters & Appetizers
+   - Fries Selection
+   - Classic Sandwiches
+   - Kids Corner
+   - Beef Burgers
+   - Grilled Chicken Burgers
+   - Fried Chicken Burgers
+   - Dessert
+   - Cool Beverages
+   - Milkshake (Ice Cream)
+   - Shisha
+   - Appetizers
+   - Salads
+   - Burgers
+   - Sandwishes
+   - Meat Plates
+   - Sauce
+   - Appetizers
+   - Salads
+   - Cold Pasta Salads
+   - Baked Tortilla Wrap Sandwiches
+   - Specialty Pizza
+   - Gourmet Pizza
+   - Chicken Pizza
+   - Shrimp Pizza
+   - Fettuccine Pasta
+   - Appetizers
+   - Salads
+   - Cold Pasta Salads
+   - Baked Tortilla Wrap Sandwiches
+   - Specialty Pizza
+   - Gourmet Pizza
+   - Chicken Pizza
+   - Shrimp Pizza
+   - Fettuccine Pasta
+
+7. Qarmash (Super Bits):
+   - Chicken Broasted
+   - Crispy Chicken
+   - Boneless Chicken Meals
+   - Mix Meals
+   - Sea Meals
+   - Combo Meals
+   - Sandwiches
+   - Burgers
+   - Charcoal Grill
+   - Kids Meal
+   - Appetizers & Sides
+   - Sauces
+   - Drinks
+
+8. Qarmash (Super Bits):
+   - Chicken Broasted
+   - Crispy Chicken
+   - Boneless Chicken Meals
+   - Mix Meals
+   - Sea Meals
+   - Combo Meals
+   - Sandwiches
+   - Burgers
+   - Charcoal Grill
+   - Kids Meal
+   - Appetizers & Sides
+   - Sauces
+   - Drinks
+
+9. Baba Ghanouj:
+   - Breakfast
+   - Manakish
+   - Baba Ghanouj Breakfast Set
+   - Pizza
+   - Burgers
+   - Steak and Roast Sandwiches
+   - Western Plates
+   - Shawarma
+   - Snack
+   - Chicken Breast Sandwich
+   - Chicken Burger
+   - Salads
+   - Mezza & Starters
+   - Steak Plates & Smoked
+   - BBQ / Grills
+   - Butchery (Raw)
+   - Hot Drinks
+   - Cold Drinks & Juices
+   - Desserts & Milkshakes
+   - Argileh
+   - Kids
+
+10. Adi's:
+   - Chicken Burger
+   - Beef Burger
+   - Sandwiches
+   - Sea Food
+   - Pasta (Penne)
+   - Pizza
+   - Combo
+   - Meals
+   - Kids Meal
+   - Sides
+   - Salad
+   - Adds
+
+
+من Document (4).docx:
+----------------------------------------------------------------------
+1. Moghrabi Cakes & More:
+   - اسعار قوالب الكيك
+   - Whole Cake Prices
+   - أسعار قطع الكيك
+   - Cake Slice Prices
+
+2. Jarish Ibn Al Balad:
+   - الجريش والمعجنات
+   - Jarish & Manakish
+   - البيتزا
+   - Pizza
+   - دزينة / ربطات
+   - Dozen / Bundles
+   - أصناف أخرى
+   - Others
+
+3. Marinade:
+   - Marinated
+   - Raw Chicken
+   - Sauces
+   - Frozen
+   - Pantry
+   - Cakes (Whole)
+   - Pieces & Pastries
+   - Bento Cake In A Cup
+   - Dried Pieces
+   - Cookies
+   - Tarts (Whole)
+   - Dried Cakes
+   - English Cake Pieces
+   - English Cake (Whole)
+   - Donuts
+   - Boxes
+   - Ice-Cream
+   - Breakfast 1
+   - Breakfast 2
+   - Breakfast 3
+   - Salad
+   - Cold Meza
+   - Hot Meza
+   - Appetizers & Soup
+   - Pizza
+   - Pasta
+   - Sandwish
+   - Main Dishes
+   - Grills
+   - Out Sales
+
+4. Majed Zuheir:
+   - Barista - Cold Drinks
+   - Barista - Hot Drinks
+   - Barista - Frappe
+   - Barista - Milk Shakes
+   - Barista - Smoothies
+   - Barista - Fresh Juice
+   - Barista - Special Drinks
+   - Barista - Ice Cream
+   - Bread, Sweets & More - Croissant & Donuts
+   - Bread, Sweets & More - Special Items
+   - Bread, Sweets & More - Cup
+   - Bread, Sweets & More - Patissiere
+   - Cake
+   - Crepe & Waffle
+   - Can
+   - Soiree
+   - Sweets - Ice Cream & Bulk
+
+5. Hamada Bakery:
+   - Manakish
+   - Pizza
+   - Sandwiches
+   - Drinks
+   - Miscellaneous
+   - Variety Bucket
+   - Kentucky Buckets
+   - Kentucky Buckets
+   - Kentucky Buckets
+   - Kentucky Buckets
+   - Kentucky Buckets
+   - Kentucky Buckets
+   - Kentucky Buckets
+   - Colonel's Chicken Meals
+   - Colonel's Chicken Meals
+   - Colonel's Chicken Meals
+   - Colonel's Chicken Meals
+   - Colonel's Chicken Meals
+   - Epic Burgers
+   - Epic Burgers
+   - Epic Burgers
+   - Epic Burgers
+   - Epic Burgers
+   - Epic Burgers
+   - Epic Burgers
+   - Epic Burgers
+   - Epic Burgers
+   - Combo Meals
+   - Combo Meals
+   - Combo Meals
+   - Combo Meals
+   - Combo Meals
+   - Combo Meals
+   - Combo Meals
+   - Boxes
+   - Boxes
+   - Boxes
+   - Boxes
+   - Boxes
+   - Boxes
+   - Boxes
+   - Boxes
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Kids
+   - Kids
+   - Kids
+   - Sides
+   - Sides
+   - Sides
+   - Sides
+   - Sides
+   - Sides
+   - Sides
+   - Sides
+   - Sides
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Dips & Sauces
+   - Add
+   - Add
+   - Add
+   - Beverages
+   - Beverages
+   - Beverages
+   - Beverages
+   - Beverages
+   - Beverages
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Salad
+   - Burgers
+   - Burgers
+   - Burgers
+   - Burgers
+   - Burgers
+   - Burgers
+   - Burgers
+   - Burgers
+   - Burgers
+   - Platters
+   - Platters
+   - Platters
+   - Platters
+   - Platters
+   - Platters
+   - Platters
+   - Platters
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Sandwiches
+   - Burgers
+   - Burgers
+   - أصناف مشوية - ساندويش
+   - أصناف مشوية - وجبة / سيخ
+   - أصناف مقلية - ساندويش
+   - فروج ووجبات كاملة
+   - مقبلات
+   - مشروبات
+   - Appetizers
+   - Fries
+   - Sandwiches
+   - Beef Burger
+   - Chicken Burger
+   - Pizza
+   - Pasta
+   - Salad
+   - Burgers
+   - Sandwiches
+   - Salads
+   - Appetizers
+   - Drinks
+   - Main & Soup
+   - Salads
+   - Cold Appetizers
+   - Hot Appetizers
+   - Platters & Main Dishes
+   - Sandwich Platters
+   - Kids Meal
+   - Desserts
+   - Hot Drinks
+   - Cold Drinks & Juices
+   - Shisha
+   - Sandwiches
+   - Burgers
+   - Pasta
+   - 88 Sides & Appetizers
+   - Meals & Boxes
+   - Drinks
+   - Appetizers
+   - Salads
+   - Beef Burgers
+   - Pizza
+   - Pasta
+   - Plates
+   - Drinks
+
+6. صحة وهنا:
+   - الوجبات
+   - المفرزات
+   - سلطات ومقبلات
+
+8. مطعم وشاورما الأخوين الجمل:
+   - شاورما
+   - مشاوي سندويش
+   - برغر عالفحم
+   - وجبة مشاوي
+   - كيلو مشاوي
+   - كبة الأخوين الجمل
+   - بطاطا وتبولة
+   - إضافات وصوص
+   - مشروبات
+
+9. شاورما غسان:
+   - شاورما ومشاوي (سندويشات ووجبات)
+   - Shawarma & Grills (Sandwiches & Meals)
+   - صحون
+   - Plates
+   - برغر
+   - Burgers
+   - بطاطا
+   - Potatoes
+   - مشروبات
+   - Beverages
+
+
+من Document (7).docx:
+----------------------------------------------------------------------
+1. مطعم دجاج شعبان:
+   - Food
+   - SHWRMAzz (Shawarma)
+   - Fries & Sides
+   - Drinks
+
+
+======================================================================
+المجموع الكلي للأصناف (categories): 625
+======================================================================

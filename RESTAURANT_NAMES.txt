@@ -1,0 +1,39 @@
+أسماء المطاعم
+======================================================================
+
+من res.md:
+----------------------------------------------------------------------
+1. King Croissant
+2. Furn Libnan (فرن لبنان)
+3. BOUDI SANDWICH
+4. KAAKÉ by meat chop
+5. Bayt Al Nar \- House of Fire
+6. Foul w Trawiqa
+7. Spuntino
+8. Linguine Menu
+9. SEEK
+10. SUBMARINE
+11. Krispy Tender
+12. Krispy Tender
+13. Smoking Hub
+14. Heartache
+15. Sandwich Abou Afif
+16. Shawarma Abul El Oud
+
+
+من rest2.md:
+----------------------------------------------------------------------
+1. Check In
+2. Aura
+3. Adi's
+
+
+من Document (4).docx:
+----------------------------------------------------------------------
+1. مغربي كيك أند مور (Moghrabi Cakes & More)
+2. جريش إبن البلد (Jarish Ibn Al Balad)
+3. مارينيد (Marinade)
+
+
+======================================================================
+المجموع الكلي: 22 مطعم/متجر

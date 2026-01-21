@@ -1,0 +1,1017 @@
+SOURCE: res.md
+
+RESTAURANT: King Croissant
+  CATEGORY: كعكة طرابلسية / Tripoli Kaak
+    - زعتر وعكاوي | LBP 200000 | USD 2.22
+    - عكاوي | LBP 230000 | USD 2.56
+    - عكاوي وقشقوان | LBP 250000 | USD 2.78
+    - حلوم مع خضار | LBP 300000 | USD 3.33
+    - لبنة حرة | LBP 300000 | USD 3.33
+    - لبنة مع خضار | LBP 300000 | USD 3.33
+    - زعتر مع جبنة | LBP 350000 | USD 3.89
+    - مرتديلا وقشقوان | LBP 300000 | USD 3.33
+    - حبش صدر مدخن | LBP 300000 | USD 3.33
+    - 3 أجبان | LBP 250000 | USD 2.78
+    - 4 أجبان | LBP 230000 | USD 2.56
+    - 5 أجبان | LBP 250000 | USD 2.78
+    - بيكون | LBP 200000 | USD 2.22
+    - بيكون مع عكاوي | LBP 230000 | USD 2.56
+    - جبنة وشيتوس | LBP 250000 | USD 2.78
+    - سجق | LBP 260000 | USD 2.89
+    - بيبروني | LBP 250000 | USD 2.78
+    - هوت دوج | LBP 180000 | USD 2.00
+    - شاورما | LBP 200000 | USD 2.22
+    - فاهيتا | LBP 200000 | USD 2.22
+    - طاووق مع موزاريلا | LBP 250000 | USD 2.78
+    - بستاشيو | LBP 300000 | USD 3.33
+    - لوتس | LBP 260000 | USD 2.89
+    - كوكتيل شوكولا | LBP 280000 | USD 3.11
+    - نوتيلا | LBP 300000 | USD 3.33
+  CATEGORY: كرواسون بيتزا / Croissant Pizza
+    - بيتزا خضار | LBP 300000 | USD 3.33
+    - بيتزا مرتديلا كوكتيل حبش | LBP 300000 | USD 3.33
+    - بيتزا حبش مدخن | LBP 330000 | USD 3.67
+    - بيتزا سجق | LBP 330000 | USD 3.67
+    - بيتزا بيبروني | LBP 330000 | USD 3.67
+    - بيتزا هوت دوج | LBP 350000 | USD 3.89
+    - 3 أجبان مفتوح | LBP 300000 | USD 3.33
+    - 4 أجبان مفتوح | LBP 330000 | USD 3.67
+    - 5 أجبان مفتوح | LBP 350000 | USD 3.89
+    - طاووق موزاريلا مفتوح | LBP 350000 | USD 3.89
+    - فاهيتا موزاريلا مفتوح | LBP 350000 | USD 3.89
+    - قاورما مفتوح | LBP 400000 | USD 4.44
+    - كشك مفتوح | LBP 270000 | USD 3.00
+    - زعتر مفتوح | LBP 150000 | USD 1.67
+    - جبنة مفتوح | LBP 250000 | USD 2.78
+    - عكاوي وقشقوان مفتوح | LBP 280000 | USD 3.11
+    - حلوم مفتوح | LBP 280000 | USD 3.11
+    - حبش مع موزاريلا مفتوح | LBP 330000 | USD 3.67
+  CATEGORY: كرواسون محشي / Stuffed Croissant
+    - كرواسون سادة | LBP 70000 | USD 0.78
+    - زعتر | LBP 70000 | USD 0.78
+    - عكاوي | LBP 90000 | USD 1.00
+    - شوكولا | LBP 90000 | USD 1.00
+    - لوز | LBP 150000 | USD 1.67
+    - قشقوان | LBP 240000 | USD 2.67
+    - عكاوي وقشقوان | LBP 240000 | USD 2.67
+    - لبنة سادة | LBP 150000 | USD 1.67
+    - لبنة مع خضار | LBP 170000 | USD 1.89
+    - حلوم | LBP 230000 | USD 2.56
+    - حلوم وعكاوي | LBP 250000 | USD 2.78
+    - جبنة وشيتوس | LBP 250000 | USD 2.78
+    - 3 أجبان | LBP 250000 | USD 2.78
+    - 4 أجبان | LBP 280000 | USD 3.11
+    - 5 أجبان | LBP 300000 | USD 3.33
+    - جبنة كيري | LBP 220000 | USD 2.44
+    - جبنة بوك | LBP 220000 | USD 2.44
+    - بيكون | LBP 220000 | USD 2.44
+    - حبش مدخن أو عادي | LBP 300000 | USD 3.33
+    - كوكتيل حبش | LBP 250000 | USD 2.78
+    - بيبروني | LBP 300000 | USD 3.33
+  CATEGORY: كرواسون حلو / Sweet Croissant
+    - نوتيلا | LBP 230000 | USD 2.56
+    - كندر | LBP 240000 | USD 2.67
+    - غلاكسي | LBP 220000 | USD 2.44
+    - لوتس | LBP 250000 | USD 2.78
+    - أوريو | LBP 220000 | USD 2.44
+    - بستاشيو | LBP 250000 | USD 2.78
+    - كرانش | LBP 200000 | USD 2.22
+    - باونتي | LBP 200000 | USD 2.22
+    - كيت كات | LBP 200000 | USD 2.22
+    - نوتيلا دايت | LBP 250000 | USD 2.78
+    - زبدة البندق مرجان | LBP 250000 | USD 2.78
+    - مربى الفريز | LBP 170000 | USD 1.89
+    - كندر بوينو | LBP 240000 | USD 2.67
+    - زبدة الفستق | LBP 230000 | USD 2.56
+    - كرواسون الكينج (قشطة وعسل وفواكه) | LBP 450000 | USD 5.00
+    - كرواسون بالبوظة والشوكولا | LBP 350000 | USD 3.89
+    - كرواسون كريم شانتيه مع الفواكه والشوكولا | LBP 350000 | USD 3.89
+  CATEGORY: كنافة / Knefeh
+    - كعكة الكنافة | LBP 200000 | USD 2.22
+    - صحن الكنافة | LBP 300000 | USD 3.33
+    - كنافة بالكرواسون | LBP 250000 | USD 2.78
+    - كنافة بالكرواسون مع البستاشيو | LBP 350000 | USD 3.89
+    - كنافة بالكرواسون مع اللوتس | LBP 300000 | USD 3.33
+    - كيلو كنافة بالجبن | LBP 1000000 | USD 11.11
+  CATEGORY: صاج / Saj
+    - زعتر | LBP 120000 | USD 1.33
+    - زعتر مع خضار | LBP 150000 | USD 1.67
+    - لبنة سادة | LBP 150000 | USD 1.67
+    - لبنة مع خضار | LBP 230000 | USD 2.56
+    - عكاوي | LBP 230000 | USD 2.56
+    - عكاوي وقشقوان | LBP 260000 | USD 2.89
+    - جبنة عكاوي مع خضار | LBP 250000 | USD 2.78
+    - قشقوان | LBP 260000 | USD 2.89
+    - جبنة وزعتر | LBP 200000 | USD 2.22
+    - كشك مع جبنة | LBP 250000 | USD 2.78
+    - مرتديلا وموزاريلا | LBP 300000 | USD 3.33
+    - حبش مع جبنة | LBP 350000 | USD 3.89
+    - حلوم مع خضار | LBP 280000 | USD 3.11
+    - 3 أجبان | LBP 280000 | USD 3.11
+    - 4 أجبان | LBP 320000 | USD 3.56
+    - 5 أجبان | LBP 350000 | USD 3.89
+    - كيري | LBP 250000 | USD 2.78
+    - بيكون | LBP 250000 | USD 2.78
+    - جبنة وشيتوس | LBP 270000 | USD 3.00
+    - بيكون وقشقوان | LBP 280000 | USD 3.11
+    - جبنة بوك | LBP 250000 | USD 2.78
+    - طاووق وموزاريلا | LBP 350000 | USD 3.89
+    - فاهيتا | LBP 400000 | USD 4.44
+    - فرانسيسكو | LBP 400000 | USD 4.44
+    - شاورما دجاج | LBP 400000 | USD 4.44
+    - سجق مع جبنة | LBP 350000 | USD 3.89
+    - بيبروني وموزاريلا | LBP 300000 | USD 3.33
+    - مقانق | LBP 350000 | USD 3.89
+    - بسترما | LBP 400000 | USD 4.44
+    - روستو | LBP 400000 | USD 4.44
+    - قاورما وموزاريلا | LBP 400000 | USD 4.44
+    - مربى فريز | LBP 180000 | USD 2.00
+    - زبدة الفستق | LBP 250000 | USD 2.78
+    - نوتيلا | LBP 250000 | USD 2.78
+    - شوكولا مرجان | LBP 250000 | USD 2.78
+    - كوكتيل شوكولا | LBP 300000 | USD 3.33
+  CATEGORY: أطباق وسندويشات متنوعة / Plates & Various Sandwiches
+    - كشك مع موزاريلا | LBP 230000 | USD 2.56
+    - هوت دوج | LBP 350000 | USD 3.89
+    - بسترما | LBP 350000 | USD 3.89
+    - سجق | LBP 350000 | USD 3.89
+    - مقانق | LBP 350000 | USD 3.89
+    - قاورما | LBP 400000 | USD 4.44
+    - طاووق | LBP 350000 | USD 3.89
+    - فاهيتا | LBP 350000 | USD 3.89
+    - شاورما دجاج | LBP 350000 | USD 3.89
+    - شاورما لحمة | LBP 400000 | USD 4.44
+    - هوت دوج صحن | LBP 350000 | USD 3.89
+    - شاورما دجاج صحن | LBP 350000 | USD 3.89
+    - شاورما لحمة صحن | LBP 400000 | USD 4.44
+  CATEGORY: كرواسون سي فود / Croissant Sea Food
+    - كرواسون كراب | LBP 350000 | USD 3.89
+  CATEGORY: ساندويش عربي / Arabi Sandwich
+    - طاووق | LBP 250000 | USD 2.78
+    - همبرغر | LBP 250000 | USD 2.78
+    - سودة دجاج | LBP 250000 | USD 2.78
+    - سجق | LBP 250000 | USD 2.78
+    - مقانق | LBP 250000 | USD 2.78
+  CATEGORY: ساندويش إفرنجي / Ifranji Sandwich
+    - فاهيتا | LBP 350000 | USD 3.89
+    - بسترما | LBP 350000 | USD 3.89
+    - روستو | LBP 350000 | USD 3.89
+    - فرانسيسكو | LBP 350000 | USD 3.89
+    - دجاج مسحب | LBP 350000 | USD 3.89
+  CATEGORY: بطاطا / Potatoes
+    - ساندويش بطاطا وسط | LBP 150000 | USD 1.67
+    - ساندويش بطاطا كبير | LBP 200000 | USD 2.22
+    - علبة البطاطا | LBP 100000 | USD 1.11
+    - صحن صغير | LBP 200000 | USD 2.22
+    - صحن وسط | LBP 300000 | USD 3.33
+
+RESTAURANT: Furn Libnan (فرن لبنان)
+    - Jebneh Akkawi \- Regular (جبنة عكاوي \- عادي) | 2.00
+    - Jebneh Akkawi \- Extra (جبنة عكاوي \- اكسترا) | 2.80
+    - Akkawi & Kashkaval \- Regular (عكاوي وقشقوان \- عادي) | 2.80
+    - Akkawi & Kashkaval \- Extra (عكاوي وقشقوان \- اكسترا) | 3.35
+    - Bulgari & Kashkaval \- Regular (بلغاري وقشقوان \- عادي) | 2.80
+    - Bulgari & Kashkaval \- Extra (بلغاري وقشقوان \- اكسترا) | 3.35
+    - Four Cheese \- Regular (فور تشيز \- عادي) | 2.80
+    - Four Cheese \- Extra (فور تشيز \- اكسترا) | 3.35
+    - Cheese Loaf (رغيف جبنة) | 3.90
+    - Half Cheese Half Zaatar \- Regular (نص جبنة نص زعتر \- عادي) | 1.45
+    - Half Cheese Half Zaatar \- Extra (نص جبنة نص زعتر \- اكسترا) | 2.20
+    - Tomato & Onion \- Regular (بندورة وبصل \- عادي) | 1.65
+    - Tomato & Onion \- Extra (بندورة وبصل \- اكسترا) | 2.20
+    - Tomato, Onion & Cheese \- Regular (بندورة وبصل وجبنة \- عادي) | 3.35
+    - Tomato, Onion & Cheese \- Extra (بندورة وبصل وجبنة \- اكسترا) | 3.90
+    - Tomato, Onion & Bulgari \- Regular (بندورة وبصل وبلغاري \- عادي) | 3.35
+    - Tomato, Onion & Bulgari \- Extra (بندورة وبصل وبلغاري \- اكسترا) | 3.90
+    - Tomato, Onion & Zaatar \- Regular (بندورة وبصل وزعتر \- عادي) | 1.65
+    - Tomato, Onion & Zaatar \- Extra (بندورة وبصل وزعتر \- اكسترا) | 1.65
+    - Labneh Mix \- Regular (خلطة اللبنة \- عادي) | 1.65
+    - Labneh Mix \- Extra (خلطة اللبنة \- اكسترا) | 2.20
+    - Keshek Mix \- Regular (خلطة الكشك \- عادي) | 1.65
+    - Keshek Mix \- Extra (خلطة الكشك \- اكسترا) | 2.20
+    - Zaatar w/ Molasses \- Regular (زعتر مع دبس الرمان \- عادي) | 0.90
+    - Zaatar w/ Molasses \- Extra (زعتر مع دبس الرمان \- اكسترا) | 1.00
+    - Zaatar Baladi \- Regular (زعتر بلدي \- عادي) | 0.80
+    - Zaatar Baladi \- Extra (زعتر بلدي \- اكسترا) | 0.90
+    - Extra Mushroom/Corn (زيادة فطر/ذرة) | 0.55
+    - Meat Pie (Lahm Baajin) \- Regular (لحمة بعجين \- عادي) | 2.80
+    - Meat Pie (Lahm Baajin) \- Extra (لحمة بعجين \- اكسترا) | 3.35
+    - Kafta / Kafta w Cheese \- Regular (كفتة / كفتة مع جبنة \- عادي) | 3.35
+    - Kafta / Kafta w Cheese \- Extra (كفتة / كفتة مع جبنة \- اكسترا) | 3.90
+    - Mortadella w Cheese \- Regular (مرتديلا وجبنة \- عادي) | 3.35
+    - Mortadella w Cheese \- Extra (مرتديلا وجبنة \- اكسترا) | 3.90
+    - Sojok w Cheese \- Regular (سجق وجبنة \- عادي) | 3.35
+    - Sojok w Cheese \- Extra (سجق وجبنة \- اكسترا) | 3.90
+    - Awarma w Cheese \- Regular (قاورما وجبنة \- عادي) | 3.90
+    - Awarma w Cheese \- Extra (قاورما وجبنة \- اكسترا) | 4.45
+    - Tawook w Cheese \- Regular (طاووق وجبنة \- عادي) | 3.90
+    - Tawook w Cheese \- Extra (طاووق وجبنة \- اكسترا) | 4.45
+    - Fajita w Cheese \- Regular (فاهيتا وجبنة \- عادي) | 3.90
+    - Fajita w Cheese \- Extra (فاهيتا وجبنة \- اكسترا) | 4.45
+    - Pizza Mortadella \- Regular (بيتزا مرتديلا \- عادي) | 5.00
+    - Pizza Mortadella \- Extra (بيتزا مرتديلا \- اكسترا) | 5.55
+    - Pizza Sojok \- Regular (بيتزا سجق \- عادي) | 5.00
+    - Pizza Sojok \- Extra (بيتزا سجق \- اكسترا) | 5.55
+    - Pizza Awarma \- Regular (بيتزا قاورما \- عادي) | 5.55
+    - Pizza Awarma \- Extra (بيتزا قاورما \- اكسترا) | 6.65
+    - Pizza Pepperoni \- Regular (بيتزا ببروني \- عادي) | 5.00
+    - Pizza Pepperoni \- Extra (بيتزا ببروني \- اكسترا) | 5.55
+    - Pizza Tuna \- Regular (بيتزا تونا \- عادي) | 5.00
+    - Pizza Tuna \- Extra (بيتزا تونا \- اكسترا) | 6.10
+    - Pizza Veggie \- Regular (بيتزا خضار \- عادي) | 4.45
+    - Pizza Veggie \- Extra (بيتزا خضار \- اكسترا) | 5.00
+    - Zaatar w Cheese (زعتر وجبنة) | 3.90
+    - Spinach (سبانخ) | 3.90
+    - Cheese (جبنة) | 4.45
+    - Keshek (كشك) | 3.90
+    - Pizza (بيتزا) | 5.00
+    - Meat (لحمة) | 5.00
+    - Mixed Pastries (معجنات مشكل) | 4.45
+    - Soft Drinks (مشروبات غازية) | 0.90
+    - Laban (لبن) | 0.90
+    - Juice (عصير) | 0.90
+    - Water (مياه) | 0.35
+    - Bon Jus (بون جوس) | 0.35
+
+RESTAURANT: BOUDI SANDWICH
+
+RESTAURANT: KAAKÉ by meat chop
+    - Zaatar | 1.00
+    - Keshek | 1.65
+    - Bandoura w bassal | 1.00
+    - Keshek w jebneh | 2.45
+    - Keshek w awarma w jebneh | 4.00
+    - Jebneh 3ekawi | 2.00
+    - 3ekawi w mozzarella | 2.45
+    - Jebeneh 3 cheese | 2.75
+    - 4 cheese | 3.35
+    - Jebneh Bolghari | 2.00
+    - Cheese & Ships | 3.00
+    - Haloum pesto | 3.35
+    - Labni | 1.65
+    - Labni w zaatar | 2.00
+    - Labni Harra | 2.00
+    - Jebni w zaatar | 2.00
+    - Picon | 2.20
+    - Basterma w jebneh | 4.90
+    - Basterma w eggs | 4.90
+    - Sojok w jebneh | 4.90
+    - Sojok w eggs | 4.90
+    - Kafta w jebneh | 4.90
+    - 2awarma w jebneh | 4.90
+    - 2awarma w eggs | 4.90
+    - Kaaki Burger | 4.90
+    - Rosto | 4.90
+    - Turkey cheese | 3.35
+    - Fajitas | 4.35
+    - Pepperoni | 4.90
+    - Chicken sub | 4.35
+    - Tawook | 4.35
+    - Nutella banana or strawberry | 3.00
+    - Nutella halewi w banana | 3.55
+    - Soft drinks | 1.65
+    - Water | 0.55
+    - Sparkling Water | 1.65
+    - Ice tea | 1.65
+
+RESTAURANT: Bayt Al Nar \- House of Fire
+    - Jebneh (Cheese) | 1.65
+    - Zaatar | 0.55
+    - Keshek | 1.45
+    - Bassal w Bandoura | 1.35
+    - Mortadella | 2.00
+    - Sojok | 2.20
+    - Tawook | 3.35
+    - Fajita | 3.35
+    - Habash (Turkey) | 2.75
+    - Pepperoni | 2.75
+    - Noss b Noss (Half & Half) | 1.45
+    - Awarma | 3.35
+    - Labneh w Khodra | 1.65
+    - Labneh Khalta | 1.65
+    - Bassal w Bandoura w Jebneh | 2.20
+    - Lahmeh (Meat) | 2.75
+    - Halloumi | 1.75
+    - Halloumi w Kashkaval | 2.75
+    - Bacon | 2.00
+    - Akkawi w Kashkaval | 2.75
+    - Raghif Jebneh (Cheese Loaf) | 1.90
+    - Keshek w Jebneh | 2.20
+    - Muhammara | 1.35
+    - Muhammara w Jebneh | 2.20
+    - Bulghari w Zaytoun w Bandoura | 2.20
+    - Bacon w Kashkaval | 3.10
+    - Pizza Khodra (Veggie) | 3.35
+    - Pizza Mortadella | 4.45
+    - Pizza Sojok | 4.45
+    - Pizza Awarma | 5.00
+    - Pizza Pepperoni | 5.00
+    - Pizza Habash | 4.45
+    - Pizza Margherita | 3.90
+    - Mo3ajanat Dozen (12 pcs) | 2.75
+    - Shamiyat | 6.65
+    - Croissant | 0.65
+    - Khobz (Bread) | 0.80
+    - Kaak | 3.90
+    - Kaak Al Abbas | 1.10
+
+RESTAURANT: Foul w Trawiqa
+    - Large Foul Plate (صحن فول كبير) | 3.35
+    - Clay Pot Foul (صحن فول فخار) | 2.20
+    - Large Msawha (صحن مشوشة كبير) | 3.35
+    - Clay Pot Msawha (صحن مشوشة فخار) | 2.20
+    - Large Hommos (صحن حمص كبير) | 3.35
+    - Clay Pot Hommos (صحن حمص فخار) | 2.20
+    - Large Balila (صحن بليلة كبير) | 3.35
+    - Clay Pot Balila (صحن بليلة فخار) | 2.20
+    - Large Fatteh Bowl (جاط فتة كبير) | 7.20
+    - Small Fatteh Bowl (جاط فتة صغير) | 5.00
+    - Half Dozen Falafel (نص دزينة فلافل) | 2.80
+    - Dozen Falafel (دزينة فلافل) | 5.55
+    - Labneh Plate with sides (صحن لبنة مع سرفيس) | 2.80
+    - Cheese Plate with sides (صحن جبنة مع سرفيس) | 2.80
+    - Eggs Plate with sides (صحن بيض مع سرفيس) | 2.80
+    - Sojok Plate with sides (صحن سجق مع سرفيس) | 5.00
+    - Awarma Plate with sides (صحن قورما مع سرفيس) | 5.00
+    - Large Hommos with Meat (حمص مع لحمة كبير) | 7.20
+    - Large Hommos with Awarma (حمص مع قورما كبير) | 7.80
+
+RESTAURANT: Spuntino
+
+RESTAURANT: Linguine Menu
+  CATEGORY: المفرزات / The Doner
+  CATEGORY: الدونر / Lebanese Shawarma
+  CATEGORY: الشاورما اللبناني / Markouk
+  CATEGORY: المرقوق / Tortilla
+  CATEGORY: التورتيا / Plates (Al Sahoun)
+  CATEGORY: الصحون / Burgers
+  CATEGORY: البرغر / Potatoes
+  CATEGORY: البطاطا / Appetizers
+  CATEGORY: المقبلات / Salads
+  CATEGORY: السلطات / Kids
+  CATEGORY: للأطفال / Desserts
+  CATEGORY: الحلويات / Beverages & Shisha
+  CATEGORY: المشروبات و الأركيلة / Sandwiches
+  CATEGORY: الساندويشات / Seafood
+  CATEGORY: مأكولات بحرية / Tenders
+  CATEGORY: تندرز / Chicken Combos
+  CATEGORY: كومبو الدجاج / Mixed Combo Meals
+  CATEGORY: وجبات كومبو المختلطة / Family Meals
+  CATEGORY: وجبات عائلية / Signature Sides
+  CATEGORY: طلبات جانبية مميزة / Popeyes Kids
+
+RESTAURANT: SEEK
+    - Roast Beef | 6.67
+    - Beef Tongue | 6.67
+    - Nkhaat | 6.67
+    - Sujuk | 5.00
+    - Makanek | 5.00
+    - Chicken Liver | 3.89
+    - Sanesel | 6.67
+    - Philadelphia | 5.56
+    - Beef Shawarma | 5.00
+    - Francisco | 5.00
+    - Tawook | 5.00
+    - Fajita | 5.00
+    - Chicken Shawarma | 3.89
+    - Crispy | 3.33
+    - Escalope | 3.33
+    - Chinese Chicken | 5.56
+    - Chicken Sub | 5.00
+    - Carioti | 5.56
+    - Shrimp | 5.56
+    - Shrimp With Crab | 6.67
+    - Tuna | 3.89
+    - Special Seek | 8.89
+    - Lebanese Beef | 4.44
+    - Beef Cheese | 5.00
+    - Chicken | 4.44
+    - Mushroom | 6.67
+    - Chicken | 5.56
+    - Shrimp | 6.67
+    - Fries | 2.22
+    - Fries Plate (Medium) | 3.89
+    - Mozzarella Stick (4 pieces) | 3.89
+    - Tuna | 5.56
+    - Crab | 5.56
+    - Caesar | 5.56
+    - Lebanese Beef Burger | 7.78
+    - Chicken Burger | 6.67
+    - Beef Shawarma | 8.89
+    - Chicken Shawarma | 7.78
+    - Crispy | 7.78
+    - Escalope | 7.78
+    - Small Water | 0.56
+    - Pepsi/Diet | 1.11
+    - Mirinda | 1.11
+    - 7up/Diet | 1.11
+    - Sparkling Water | 1.11
+    - Juice | 0.89
+
+RESTAURANT: SUBMARINE
+    - Spicy Steak | 6.89
+    - Chinese | 5.56
+    - Mexican | 6.00
+    - Tawook | 5.44
+    - Francisco | 6.11
+    - Crab | 5.89
+    - Shrimp | 7.44
+    - Crab & Shrimp | 7.78
+    - Supreme | 6.33
+    - Makanek | 5.78
+    - Spicy Fajita | 7.22
+    - Philadelphia | 7.33
+    - Escalope | 5.56
+    - Twister | 6.11
+    - Rosto | 6.11
+    - Rosto & Cheese | 6.67
+    - Honey Mustard | 6.67
+    - Chicken Sub | 6.11
+    - Sojok | 5.78
+    - Dynamite Chicken | 7.22
+    - Truffle Steak | 8.67
+    - Dynamite Shrimp | 8.67
+    - Lebanese | 6.89
+    - Submarine | 8.44
+    - Classic Smash | 7.11
+    - Mozzarella | 8.44
+
+RESTAURANT: Krispy Tender
+    - Krispy Meal 3 Pcs (with drink) | 10.00
+    - Krispy Meal 5 Pcs | 6.11
+    - Krispy Meal 8 Pcs | 20.00
+    - Twins Combo | 8.33
+    - Friends Meal | 21.11
+    - Family Meal | 37.22
+    - Cheese Royale Deluxe Combo | 10.56
+    - Cheese Royale Deluxe (Double Up) Combo | 12.22
+    - Krispy Tender Burger Combo | 9.44
+    - Combo Meal | 6.67
+    - Krispy Wrap Delight Combo | 9.44
+    - BBQ Wrap Combo | 9.44
+    - Double Combo Meal | 13.33
+    - Kids Meal Burger | 6.11
+    - Kids Meal Nuggets | 6.11
+    - Cheese Royale Deluxe (Sandwich) | 6.67
+    - Royale Sandwich (Double Up) | 9.44
+    - Delight Wrap Sandwich | 5.56
+    - BBQ Wrap Sandwich | 5.56
+    - KT Burger | 6.11
+    - Tender Loaded Fries | 6.67
+    - Krispy 1 Pc | 2.22
+    - Coleslaw | 2.22
+    - Cheese Fries | 4.89
+    - Fries | 3.67
+    - Mozzarella Sticks 3 Pcs | 3.67
+    - Pepsi | 1.22
+    - Diet Pepsi | 1.22
+    - 7up | 1.22
+    - Diet 7up | 1.22
+    - Mirinda | 1.22
+    - Small Water | 0.56
+    - Candia Juice | 0.61
+
+RESTAURANT: Krispy Tender
+    - Krispy Meal 3 Pcs (with drink) | 10.00
+    - Krispy Meal 5 Pcs | 6.11
+    - Krispy Meal 8 Pcs | 20.00
+    - Twins Combo | 8.33
+    - Friends Meal | 21.11
+    - Family Meal | 37.22
+    - Cheese Royale Deluxe Combo | 10.56
+    - Cheese Royale Deluxe (Double Up) Combo | 12.22
+    - Krispy Tender Burger Combo | 9.44
+    - Combo Meal | 6.67
+    - Krispy Wrap Delight Combo | 9.44
+    - BBQ Wrap Combo | 9.44
+    - Double Combo Meal | 13.33
+    - Kids Meal Burger | 6.11
+    - Kids Meal Nuggets | 6.11
+    - Cheese Royale Deluxe (Sandwich) | 6.67
+    - Royale Sandwich (Double Up) | 9.44
+    - Delight Wrap Sandwich | 5.56
+    - BBQ Wrap Sandwich | 5.56
+    - KT Burger | 6.11
+    - Tender Loaded Fries | 6.67
+    - Krispy 1 Pc | 2.22
+    - Coleslaw | 2.22
+    - Cheese Fries | 4.89
+    - Fries | 3.67
+    - Mozzarella Sticks 3 Pcs | 3.67
+    - Pepsi | 1.22
+    - Diet Pepsi | 1.22
+    - 7up | 1.22
+    - Diet 7up | 1.22
+    - Mirinda | 1.22
+    - Small Water | 0.56
+    - Candia Juice | 0.61
+
+RESTAURANT: Smoking Hub
+  CATEGORY: معجنات (دزينة) / Pastries (Dozen)
+  CATEGORY: فطاير / Fatayer (Pies)
+  CATEGORY: مرطبات / Refreshments
+  CATEGORY: إضافات / Extras
+  CATEGORY: عجين / Dough
+    - Fajita | 4.22
+    - Chicken Sub | 3.89
+    - Chinese (Sini) | 3.33
+    - Steak Sub | 4.22
+    - Crispy | 3.33
+    - Chicken Pesto | 4.22
+    - Crunchy Burger | 3.89
+    - Al Ghali Burger | 4.44
+    - Classico Burger | 4.44
+    - Lebanese Burger | 3.33
+    - Burger B | 5.00
+    - Mushroom Burger | 5.00
+    - Mac Burger | 3.89
+    - Honey Butter | 5.00
+    - Fried Potato (Large) | 3.33
+    - Fried Potato (Small) | 2.22
+    - Wedges | 2.78
+    - Mozzarella Sticks | 3.89
+    - Grilled Chicken Platter | 7.78
+    - Scaloppine Platter | 7.78
+    - Golden Chicken Potato | 3.89
+    - Cheese Potato | 3.33
+    - Chicken & BBQ Potato | 3.89
+    - Chicken & Spicy Sauce Potato | 3.89
+    - Boneless Chicken Meal (Musahab) | 7.78
+    - Boneless Chicken Whole (Farrouj Musahab) | 13.33
+    - Mixed Grill 1 Kilo | 13.89
+    - Mixed Grill Half Kilo | 7.78
+    - Half Chicken with Fries | 7.78
+    - Makanek | 1.11
+    - Sujuk | 1.11
+    - Khashkhash | 1.11
+    - Kafta | 1.11
+    - Shqaf (Meat Chunks) | 1.11
+    - Tawouk White | 1.11
+    - Tawouk Red | 1.11
+    - Sawda (Liver) | 1.11
+    - Bayd (Testicles) | 1.11
+    - Snasel (Spinal Cord) | 1.67
+    - Nkha'at (Brains) | 1.67
+    - Add Combo (Fries \+ Pepsi) | 2.22
+    - Extra Potato | 0.56
+
+RESTAURANT: Heartache
+
+RESTAURANT: Sandwich Abou Afif
+
+RESTAURANT: Shawarma Abul El Oud
+
+SOURCE: rest2.md
+
+RESTAURANT: Ramadan Juice
+    - MANGO | 2 ~ 6.5 $
+    - MANGO + STRAWBERRY | 2 ~ 6.5 $
+    - LEMONADE + BASIL | 2 ~ 6.5 $
+    - ROSE LEMONADE | 2 ~ 6.5 $
+    - BANANA + STRAWBERRY | 2 ~ 6.5 $
+    - ORANGE | 1.5 ~ 5.5 $
+    - WATERMELON | 3.3 ~ 11 $
+    - BLUEBERRY | 2 ~ 7 $
+    - GUAVA | 2 ~ 6.5 $
+    - BANANA + MILK | 2 ~ 6.5 $
+    - BLUE LEMONADE | 2 ~ 6.5 $
+    - POSITANO STRAWBERRY LEMONADE | POSITANO STRAWBERRY LEMONADE | 2.4 ~ 8 $
+    - STRAWBERRY | 2 ~ 6 $
+    - LEMONADE | 1.6 ~ 5.5 $
+    - LEMONADE + MINT | 2 ~ 6.5 $
+    - APPLE | 1.6 ~ 6 $
+    - GRAPEFRUIT | 2 ~ 6.5 $
+    - CARROT | 1.6 ~ 5.5 $
+    - CARROT + ORANGE | 1.5 ~ 5.5 $
+    - PASSION | 3.3 ~ 11 $
+    - DRAGON | 3.3 ~ 11 $
+    - GRAPE | 2.4 ~ 8 $
+    - PEACH | 2.4 ~ 8 $
+    - BEET | 2.4 ~ 8 $
+    - GINGER | 5.5 ~ 20 $
+    - JALLAB | 1.11 ~ 3.33 $
+    - TAMR | 1.11 ~ 3.33 $
+    - POMEGRANATE + ORANGE | 2.2 ~ 7.2 $
+    - MIXED BERRIES | 3.3 ~ 11 $
+    - POMEGRANATE | 2.5 ~ 8.5 $
+    - PINEAPPLE | 3.3 ~ 11 $
+    - SOUS | 0.55 ~ 2.22 $
+    - MELON | 2.4 ~ 8 $
+    - KIWI | 2.4 ~ 8 $
+    - COCKTAIL | 1.6 ~ 6 $
+    - THE MAGICAL | 2.7 ~ 10 $
+    - OASIS | 2.4 ~ 8 $
+    - REDTOX | REDTOX | 2.4 ~ 8 $
+    - GREENTOX | GREENTOX | 2.4 ~ 8 $
+    - PROTEIN FRESH JUICE | PROTEIN FRESH JUICE | 3.5 ~ 5 $
+    - COCKTAIL LAYERS | 3.3 ~ 7.7 $
+    - AVOCA | 5.5 ~ 13.8 $
+    - COCKTAIL + ASHTA | 2.5 ~ 3.3 $
+    - TAHITI | 4.5 ~ 5.5 $
+    - AVOCA + COCKTAIL | 3.8 ~ 9.5 $
+    - CHOCO AVOCA | 6 ~ 7.22 $
+    - KATYOSHA | 10 $
+    - SPECIAL EXOTIC | 9 $
+    - AVOCA + FRUITS | 6 ~ 7 $
+    - AVOCA EXTRA | 7 ~ 8 $
+    - LOTU AVOCA | 6 ~ 7.22 $
+    - SPECIAL NINJA | 15 $
+    - FRUIT COCKTAIL | 5.5 ~ 6.5 $
+    - PROTEIN SHAKE | PROTEIN SHAKE | 5.5 $
+    - PROTEIN SHAKE PLUS | PROTEIN SHAKE PLUS | 6.5 $
+    - DUBAI CUP | DUBAI CUP | 5 ~ 7 $
+    - NINJA BOMB | 15 $
+    - LOTUS CREPE | 5.5 $
+    - NUTELLA WAFFLE | 6 $
+    - KINDER WAFFLE | 6 $
+    - NUTELLA CREPE | 5.5 $
+    - KINDER CREPE | 5.5 $
+    - NINJA CREPE | NINJA CREPE | 6.5 $
+    - BROWNIES CREPE | 6.5 $
+    - FETTUCCINE CREPE | 6.5 $
+    - WRAP CREPE | WRAP CREPE | 6.5 $
+    - LOTUS WAFFLE | 6 $
+    - 4 SEASON WAFFLE | 4 SEASON WAFFLE | 6 $
+    - BUBBLE WAFFLE | 4.5 ~ 6 $
+    - PANCAKE FRUIT & CHOCO | 6.5 $
+    - PANCAKE TRIPPLE CHOCO | 6.5 $
+    - PANCAKE NUTELLA | 6 $
+    - PANCAKE BURGER | 7 $
+    - PANCAKE HONEY | 5 $
+    - STRAWBERRY MILKSHAKE | STRAWBERRY MILKSHAKE | 2.8 ~ 4 $
+    - AVOCA MILKSHAKE | AVOCA MILKSHAKE | 3.5 ~ 5 $
+    - CARAMEL MILKSHAKE | CARAMEL MILKSHAKE | 2.8 ~ 4 $
+    - CHOCOLAE MILKSHAKE | CHOCOLAE MILKSHAKE | 2.8 ~ 4 $
+    - OREO MILKSHAKE | OREO MILKSHAKE | 2.8 ~ 4 $
+    - ITALIAN ICECREAM | 1.1 ~ 12 $
+    - FRESCO | 1 ~ 1.5 $
+    - CHOCOLATE MOU | 5 $
+    - ICECREAM CUPS | ICECREAM CUPS | 2.55 $
+    - FROZEN BOULES | FROZEN BOULES | 2.22 $
+    - BANANA SPLIT | BANANA SPLIT | 4.44 $
+    - RAMADAN CUP | 3.8 $
+    - STRAWBERRY CUP | 4.44 ~ 5.55 $
+    - EXTRAS | 0.22 ~ 1.11 $
+    - JELLO | 1.11 $
+    - MEGHLE | 2 $
+    - SPECIAL CAKE PIECES | 3 $
+    - CAKE GLACÉ | CAKE GLACÉ | 12.22 ~ 22 $
+    - ASHTALEYE | 1.11 $
+    - CUSTARD | 1.11 $
+    - ECLAIR | 2.7 $
+    - RICE PUDDING | 1.11 ~ 3.88 $
+    - RAMADAN PLATE | 10 ~ 15 $
+    - ASHTA PLATE | 5 ~ 10 $
+  CATEGORY: Akkad Specials & Cocktails
+  CATEGORY: Special Mixes
+  CATEGORY: Fresh Juices
+  CATEGORY: Cakes & Pastries
+  CATEGORY: Crepes & Waffles
+  CATEGORY: Traditional Sweets
+  CATEGORY: Ice Cream
+  CATEGORY: Fruit Plates & Kashta
+  CATEGORY: Add-ons & Extras
+
+RESTAURANT: Al Abdalla
+  CATEGORY: Cold Cuts
+  CATEGORY: Appetizers
+  CATEGORY: Salads
+  CATEGORY: Arabic Sandwiches
+  CATEGORY: Sandwiches
+  CATEGORY: Subs
+  CATEGORY: Burgers
+  CATEGORY: Drinks
+  CATEGORY: Add on
+  CATEGORY: الشاورما (Shawarma)
+  CATEGORY:  برغر (Burgers)
+  CATEGORY: طاووق (Tawook)
+  CATEGORY: بطاطا (Fries)
+  CATEGORY: مشروبات (Drinks)
+  CATEGORY: المعجنات (Pastries – Dozen)
+  CATEGORY: مقبلات (Appetizers)
+  CATEGORY: سلطات (Salads)
+  CATEGORY: Hot Coffee & Espresso
+  CATEGORY: Hot Non-Coffee Drinks
+  CATEGORY: Iced Coffee & Cold Drinks
+  CATEGORY: Frappuccino (Blended)
+  CATEGORY: Tea (Hot)
+  CATEGORY: Water & Refreshments
+  CATEGORY: Sandwiches & Salads
+  CATEGORY: Bakery & Sweets
+  CATEGORY: Frozen Yogurt
+
+RESTAURANT: Twister Fries
+  CATEGORY:  بوظة (Ice Cream)
+  CATEGORY: كريب (Crepe)
+  CATEGORY: وافل (Waffle)
+  CATEGORY: بانكيك (Pancake)
+  CATEGORY: سموزي (Smoothies)
+  CATEGORY: Sandwiches
+  CATEGORY: Burgers
+  CATEGORY: Appetizers
+  CATEGORY: Drinks
+  CATEGORY: Appetizers
+  CATEGORY: Bagels
+  CATEGORY: Flat Bread \
+  CATEGORY: Salad
+  CATEGORY: Dips
+  CATEGORY: Desserts
+  CATEGORY: Hot Drinks
+  CATEGORY: Iced Drinks
+  CATEGORY: Milkshakes
+  CATEGORY: Iced Tea
+  CATEGORY: Appetizer
+  CATEGORY: Burger
+  CATEGORY: Sandwiches
+  CATEGORY: Fried (Ma2ali)
+  CATEGORY: Meal
+  CATEGORY: Offers
+  CATEGORY: Drink
+  CATEGORY: Pizza
+  CATEGORY: Sweet Pizza
+  CATEGORY: Starters & Sides
+  CATEGORY: Drinks
+  CATEGORY: Add-ons
+  CATEGORY: Salads Go Green
+  CATEGORY: Our Starters & Appetizers
+  CATEGORY: Fries Selection
+  CATEGORY: Classic Sandwiches
+  CATEGORY: Kids Corner
+  CATEGORY: Beef Burgers
+  CATEGORY: Grilled Chicken Burgers
+  CATEGORY: Fried Chicken Burgers
+  CATEGORY: Dessert
+  CATEGORY: Cool Beverages
+  CATEGORY: Milkshake (Ice Cream)
+  CATEGORY: Shisha
+  CATEGORY: Appetizers
+  CATEGORY: Salads
+  CATEGORY: Burgers
+  CATEGORY: Sandwishes
+  CATEGORY: Meat Plates
+  CATEGORY: Sauce
+  CATEGORY: Appetizers
+    - ZEE COLA | كوب V.I.P | 5.00
+  CATEGORY: Salads
+  CATEGORY: Cold Pasta Salads
+  CATEGORY: Baked Tortilla Wrap Sandwiches
+  CATEGORY: Specialty Pizza
+  CATEGORY: Gourmet Pizza
+  CATEGORY: Chicken Pizza
+  CATEGORY: Shrimp Pizza
+  CATEGORY: Fettuccine Pasta
+  CATEGORY: Appetizers
+  CATEGORY: Salads
+  CATEGORY: Cold Pasta Salads
+  CATEGORY: Baked Tortilla Wrap Sandwiches
+  CATEGORY: Specialty Pizza
+  CATEGORY: Gourmet Pizza
+  CATEGORY: Chicken Pizza
+  CATEGORY: Shrimp Pizza
+  CATEGORY: Fettuccine Pasta
+
+RESTAURANT: Qarmash (Super Bits)
+
+RESTAURANT: Qarmash (Super Bits)
+
+RESTAURANT: Baba Ghanouj
+  CATEGORY: Chicken Burger
+  CATEGORY: Beef Burger
+  CATEGORY: Sandwiches
+  CATEGORY: Sea Food
+  CATEGORY: Pasta (Penne)
+  CATEGORY: Pizza
+  CATEGORY: Combo
+  CATEGORY: Meals
+  CATEGORY: Kids Meal
+  CATEGORY: Sides
+  CATEGORY: Salad
+  CATEGORY: Adds
+
+SOURCE: Document (4).docx
+
+RESTAURANT: Moghrabi Cakes & More
+  CATEGORY: اسعار قوالب الكيك / Whole Cake Prices
+    - كيك 6 أشخاص | 10 USD
+    - كيك 8 أشخاص | 12 USD
+    - كيك 10 أشخاص | 15 USD
+    - كيك 15 أشخاص | 25 USD
+    - كيك كورتينا (6 أشخاص) | 13 USD
+    - كيك فرنوار (6 أشخاص) | 13 USD
+  CATEGORY: أسعار قطع الكيك / Cake Slice Prices
+    - القطعة العادية | 150 L.L
+    - القطعة سبيسيال | 200 L.L
+  CATEGORY: الجريش والمعجنات / Jarish & Manakish
+  CATEGORY: البيتزا / Pizza
+  CATEGORY: دزينة / ربطات / Dozen / Bundles
+  CATEGORY: أصناف أخرى / Others
+  CATEGORY: أصناف أخرى / Marinated
+    - حلاوة ودبس | 12.00 USD
+  CATEGORY: أصناف أخرى / Raw Chicken
+  CATEGORY: أصناف أخرى / Sauces
+  CATEGORY: أصناف أخرى / Frozen
+  CATEGORY: أصناف أخرى / Pantry
+  CATEGORY: شاورما ومشاوي (سندويشات ووجبات) / Shawarma & Grills (Sandwiches & Meals)
+  CATEGORY: صحون / Plates
+  CATEGORY: برغر / Burgers
+  CATEGORY: بطاطا / Potatoes
+  CATEGORY: مشروبات / Beverages
+
+SOURCE: Document (7).docx
+
+RESTAURANT:  (مطعم دجاج شعبان)
+  CATEGORY: Food
+    - Hamburger | همبرغر | 400
+    - Cheese Burger | تشيز برغر | 450
+    - Chicken Burger | تشكن برغر | 350
+    - Chicken Cheese Burger | تشكن تشيز برغر | 400
+    - Fajita | فاهيتا | 450
+    - Chicken Sub | تشكن ساب | 450
+    - Tawook | طاووق | 350
+    - Tawook Meal | وجبة طاووق | 750
+    - Burger Meal | وجبة برغر | 800
+  CATEGORY: SHWRMAzz (Shawarma)
+    - Small Chicken Shawarma | شاورما دجاج صغير | 250
+    - Large Chicken Shawarma | شاورما دجاج كبير | 350
+    - Small Meat Shawarma | شاورما لحمه صغير | 250
+    - Large Meat Shawarma | شاورما لحمه كبير | 400
+    - Chicken Markouk Shawarma | شاورما دجاج مرقوق | 450
+    - Meat Markouk Shawarma | شاورما لحمه مرقوق | 450
+    - Half Kilo Chicken Shawarma | نص كيلو شاورما دجاج | 1350
+    - Half Kilo Meat Shawarma | نص كيلو شاورما لحمه | 1350
+    - Waqiyet (Ounce) Chicken Shawarma | وقية شاورما دجاج | 540
+    - Waqiyet (Ounce) Meat Shawarma | وقية شاورما لحمه | 540
+    - Chicken Shawarma Meal | وجبة شاورما دجاج | 900
+    - Meat Shawarma Meal | وجبة شاورما لحمه | 1000
+    - Kilo Chicken / Meat | كيلو دجاج / لحمه | 30
+    - Kilo Chicken without fries | كيلو دجاج بدون بطاطا | 25
+  CATEGORY: Fries & Sides
+    - Large Plate (Fries) | صحن كبير | 450
+    - Small Plate (Fries) | صحن صغير | 300
+    - Fries Box | علبة بطاطا | 250
+    - Small Garlic Box | علبة ثوم صغيرة | 50
+    - Large Garlic Box | علبة ثوم كبيرة | 150
+    - Salad Box | علبة سلطة | 150
+  CATEGORY: Drinks
+    - Soft Drink | Soft Drink | 100
+    - Akawi | عكاوي | 100000
+    - Zaatar | زعتر | 50000
+    - Kashkawan | قشقوان | 150000
+    - Halloumi | حلوم | 150000
+    - Mozzarella | موزاريلا | 150000
+    - Two Cheeses | جبنتين | 150000
+    - 3 Cheeses (Akawi+Mozzarella+Kashkawan) | 3 اجبان (عكاوي+موزاريلا+قشقوان) | 200000
+    - 4 Cheeses (Akawi+Halloumi+Kashkawan+Mozzarella) | 4 اجبان (عكاوي+حلوم+قشقوان+موزاريلا) | 230000
+    - Bacon | بيكون | 150000
+    - Kiri | كيري | 150000
+    - Puck | بوك | 150000
+    - Cheese + Cheetos | جبنة + سيتوس | 150000
+    - Akawi + Mortadella | عكاوي+مرتديلا | 180000
+    - Akawi + Smoked Turkey | عكاوي+حبش مدخن | 200000
+    - 5 Cheeses | 5 اجبان (عكاوي+حلوم+نابلسيه+موزاريلا+شيدر) | 250000
+    - Cheese (Takis + Vegetables) | جبنه (وتاكز+خضار) | 230000
+    - Mozzarella + Mortadella | موزاريلا+مرتديلا | 200000
+    - Mozzarella + Smoked Turkey | موزاريلا+حبش مدخن | 230000
+    - Kashkawan + Mortadella | قشقوان+مرتديلا | 230000
+    - Kashkawan + Smoked Turkey | قشقوان+حبش مدخن | 230000
+    - Vegetable Pizza | بيتزا خضار | 250000
+    - Sujuk Pizza | بيتزا سجق | 320000
+    - Pepperoni Pizza | بيتزا ببيروني | 320000
+    - Mortadella Pizza | بيتزا مرتديلا | 300000
+    - Mozzarella + Sujuk | موزاريلا+سجق | 300000
+    - Fajita | فاهيتا | 350000
+    - Hot Dog | هوت دوغ | 350000
+    - Pastrami | بسترمة | 350000
+    - Tawook + Mozzarella | طاووق+موزاريلا | 300000
+    - Kashkawan (Pepperoni + Veg) | قشقوان (ببيروني+خضار) | 250000
+    - Hot Dog Plate | صحن هوت دوغ | 450000
+    - Plain Croissant | كرواسون ساده | 70000
+    - Regular Chocolate | شوكولا عادي | 100000
+    - Nutella | نيوتيلا | 180000
+    - Pistachio | بيستاشيو | 250000
+    - Lotus | لوتس | 150000
+    - Oreo | اوريو | 150000
+    - Kinder White | كيندر وايت | 150000
+    - Kinder Bueno | كيندر بوينو | 150000
+    - Chocolate Mix (2) | شوكولا ميكس (2) | 200000
+    - Chocolate Mix (3) | شوكولا ميكس (3) | 280000
+    - Galaxy | غالاكسي | 150000
+    - Luffy Plus | لوفي بلاص | 400000
+    - Morgan | المورجان | 200000
+    - Big Plain Donut | دوناتس كبير ساده | 100000
+    - Big Stuffed Donut | دوناتس كبير محشي | 150000
+    - Small Donut | دوناتس صغير | 50000
+    - Donut (Stuffed Pistachio) | دوناتس (محشي بيستاشيو) | 200000
+    - Eclair | كلير | 100000
+    - Cheesecake | شيزكايك | 250000
+    - Donuts Plate | صحن دوناتس | 200000
+    - Roll Croissant (Nutella) | رول كرواسون (نيوتيلا) | 200000
+    - Roll Croissant (Lotus) | رول كرواسون (لوتس) | 200000
+    - Roll Croissant (Kinder) | رول كرواسون (كيندر) | 200000
+    - Roll Croissant (Pistachio) | رول كرواسون (بيستاشيو) | 100000
+    - Donut Skewer | سيخ دوناتس | 100000
+    - Donut Cup | كباية دوناتس | 200000
+    - Donut Cup (Pistachio) | كباية دوناتس (بيستاشيو) | 250000
+    - Mini Special Croissant | ميني سبيسيال كرواسون | 150000
+    - Abu Mazen Luxury Manaqish & Pastries | مناقيش ومعجنات أبو مازن الفاخرة | 900000
+    - Zaatar | زعتر | 60000
+    - Zaatar Mashrouha | زعتر مشروحة | 90000
+    - Akawi | عكاوي | 170000
+    - Akawi & Kashkawan | عكاوي وقشقوان | 280000
+    - Chicken Pieces | تشيكي قطع | 300000
+    - Half Cheese Half Zaatar | نص جبنة نص زعتر | 150000
+    - Bulgari Cheese | بلغاري | 270000
+    - Bulgari & Kashkawan | بلغاري وقشقوان | 330000
+    - Halloumi | حلوم | 270000
+    - Halloumi & Kashkawan | حلوم وقشقوان | 330000
+    - Bacon | بيكون | 250000
+    - Bacon & Kashkawan | بيكون وقشقوان | 330000
+    - Onion & Tomato | بصل وبندورة | 170000
+    - Onion, Tomato & Kashkawan | بصل وبندورة وقشقوان | 300000
+    - Meat (Lahm) | لحمة | 250000
+    - Meat & Kashkawan | لحمة وقشقوان | 350000
+    - Plain Kashkawan | قشقوان ساده | 250000
+    - Kishk | كشك | 170000
+    - Labneh | لبنة | 170000
+    - Mortadella & Kashkawan | مرتديلا وقشقوان | 330000
+    - Sujuk & Kashkawan | سجق وقشقوان | 340000
+    - Pepperoni & Kashkawan | ببيروني وقشقوان | 370000
+    - Turkey & Kashkawan | حبش وقشقوان | 370000
+    - Tawook & Kashkawan | طاووق وقشقوان | 350000
+    - Fajita & Kashkawan | فاهيتا وقشقوان | 370000
+    - Awarma & Kashkawan | قورما وقشقوان | 400000
+    - Hot Dog & Kashkawan | هوت دوغ وقشقوان | 350000
+    - Diwan Abu Mazen | ديوان ابو مازن | 480000
+    - Al Diwan Al Amiri | الديوان الاميري | 350000
+    - Al Diwan Al Malaki | الديوان الملكي | 400000
+    - Chicken Pieces & Kashkawan | تشيكي قطع وقشقوان | 400000
+    - Special | سبيسيال | 550000
+    - Akawi | عكاوي | 270000
+    - Plain Kashkawan | قشقوان ساده | 290000
+    - Akawi & Kashkawan | عكاوي وقشقوان | 350000
+    - Bulgari & Kashkawan | بلغاري وقشقوان | 350000
+    - Halloumi & Kashkawan | حلوم وقشقوان | 380000
+    - Bacon & Kashkawan | بيكون وقشقوان | 370000
+    - Chicken Pieces & Kashkawan | تشيكي قطع وقشقوان | 430000
+    - Mortadella & Kashkawan | مرتديلا وقشقوان | 380000
+    - Turkey & Kashkawan | حبش وقشقوان | 430000
+    - Pepperoni & Kashkawan | ببيروني وقشقوان | 430000
+    - Hot Dog & Kashkawan | هوت دوغ وقشقوان | 430000
+    - Awarma & Kashkawan | قورما وقشقوان | 450000
+    - Vegetable | خضرة | 450000
+    - Mortadella | مرتديلا | 450000
+    - Margherita | مرغاريتا | 450000
+    - Sujuk | سجق | 550000
+    - Turkey | حبش | 550000
+    - Pepperoni | ببيروني | 550000
+    - Hot Dog | هوت دوغ | 550000
+    - Awarma | قورما | 600000
+    - Vegetable | خضرة | 600000
+    - Mortadella | مرتديلا | 600000
+    - Margherita | مرغاريتا | 600000
+    - Sujuk | سجق | 650000
+    - Turkey | حبش | 700000
+    - Pepperoni | ببيروني | 700000
+    - Hot Dog | هوت دوغ | 700000
+    - Awarma | قورما | 750000
+    -  | زيادة سعر المشروحة لمناقيش (عكاوي، كشك، بصل وبندورة، لبنة، كوكتيل) | 90000
+    -  | زيادة سعر المشروحة لباقي أصناف المناقيش | 150000
+    -  | أي زيادة (فطر أو ذرة أو فليفلة أو زيتون أو خضار) | 40000
+    -  | دزينة المعجنات مشكلة | 250000
+    - Sandwich Normal | سندويش عادي | 200000
+    - Sandwich Extra | سندويش اكسترا | 250000
+    - Sandwich Large | سندويش كبير | 300000
+    - Half Dozen | نص دزينة سادة | 150000
+    - Half Dozen In Box (with service) | نص دزينة مع سرفيس جات | 400000
+    - Dozen | دزينة سادة | 300000
+    - Dozen In Box (with service) | دزينة مع سرفيس جات | 800000
+    - Dozen & Half (Vegetable Service) | دزينة و نص مع سرفيس | 1050000
+    - Two Dozen (Vegetable Service) | دزينتين مع سرفيس | 1200000
+    - Vegetable Bag | كيس خضار | 100000
+    - Cucumber Pickles Bag | كيس خيار | 100000
+    - Cucumis Melo (Snake Cucumber) Bag | كيس مقني | 100000
+    - Turnip Pickles Bag | كيس لفت | 100000
+    - Chilli Pepper Bag | كيس حر | 100000
+    - Jar Cucumber | مرطبان خيار | 400000
+    - Jar Cucumis Melo | مرطبان مقني | 400000
+    - Jar Eggplant Pickles | مرطبان باذنجان | 500000
+    - Red Pepper Small Jar | مرطبان حر أحمر صغير | 300000
+    - Red Pepper Large Jar | مرطبان حر أحمر كبير | 500000
+    - Red Pepper Box | علبة حر أحمر | 150000
+    - Small Box | طراطور صغيرة | 100000
+    - Large Box | طراطور كبيرة | 200000
+    - Half kilo Dough | نص كيلو عجين | 350000
+    - Kilo Dough | كيلو عجين | 700000
+    - Soft Drinks | مشروبات غازية | 100000
+    - Small Water | مياه صغيرة | 50000
+    - Ayran Yogurt | لبن عيران | 100000
+    - Cheese Kaakeh | كعكة جبنة | 200000
+    - Kashkawan & Akawi Kaakeh | كعكة قشقوان وعكاوي | 325000
+    - Mortadella & Kashkawan Kaakeh | كعكة مرتديلا وقشقوان | 325000
+    - Mortadella Special Kaakeh | كعكة مرتديلا سبيسيال | 350000
+    - Sujuk Kaakeh | كعكة سجق | 325000
+    - Sujuk Special Kaakeh | كعكة سجق وسبيسيال | 350000
+    - Bran Loaf | رغيف نخالة | 200000
+    - Dozen Pastries | دزينة المعجنات | 300000
+    - Large Vegetable Plate | صحن خضرة كبير | 100000
+

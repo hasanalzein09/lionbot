@@ -1,0 +1,189 @@
+قائمة جميع المطاعم/المتاجر مع عدد الأصناف والعناصر
+======================================================================
+
+من res.md:
+----------------------------------------------------------------------
+1. King Croissant
+   عدد الأصناف (categories): 33
+   عدد العناصر (items): 163
+
+2. Furn Libnan (فرن لبنان)
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 66
+
+3. BOUDI SANDWICH
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 52
+
+4. KAAKÉ by meat chop
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 37
+
+5. Bayt Al Nar \- House of Fire
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 39
+
+6. Foul w Trawiqa
+   عدد الأصناف (categories): 43
+   عدد العناصر (items): 44
+
+7. Spuntino
+   عدد الأصناف (categories): 45
+   عدد العناصر (items): 38
+
+8. Linguine Menu
+   عدد الأصناف (categories): 31
+   عدد العناصر (items): 27
+
+9. Hayat Doner
+   عدد الأصناف (categories): 36
+   عدد العناصر (items): 12
+
+10. Popeyes
+   عدد الأصناف (categories): 24
+   عدد العناصر (items): 8
+
+11. SEEK
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 46
+
+12. SUBMARINE
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 26
+
+13. Krispy Tender
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 33
+
+14. Krispy Tender
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 33
+
+15. Smoking Hub
+   عدد الأصناف (categories): 55
+   عدد العناصر (items): 283
+
+16. Heartache
+   عدد الأصناف (categories): 6
+   عدد العناصر (items): 6
+
+17. Sandwich Abou Afif
+   عدد الأصناف (categories): 5
+   عدد العناصر (items): 139
+
+18. Shawarma Abul El Oud
+   عدد الأصناف (categories): 24
+   عدد العناصر (items): 10
+
+
+من rest2.md:
+----------------------------------------------------------------------
+1. Al Abdalla
+   عدد الأصناف (categories): 23
+   عدد العناصر (items): 114
+
+2. Check In
+   عدد الأصناف (categories): 0
+   عدد العناصر (items): 8
+
+3. Aura
+   عدد الأصناف (categories): 8
+   عدد العناصر (items): 23
+
+4. Unknown
+   عدد الأصناف (categories): 2
+   عدد العناصر (items): 2
+
+5. Unknown
+   عدد الأصناف (categories): 6
+   عدد العناصر (items): 6
+
+6. French Fries
+   عدد الأصناف (categories): 78
+   عدد العناصر (items): 100
+
+7. Qarmash (Super Bits)
+   عدد الأصناف (categories): 39
+   عدد العناصر (items): 13
+
+8. Qarmash (Super Bits)
+   عدد الأصناف (categories): 39
+   عدد العناصر (items): 13
+
+9. Baba Ghanouj
+   عدد الأصناف (categories): 63
+   عدد العناصر (items): 68
+
+10. Adi's
+   عدد الأصناف (categories): 12
+   عدد العناصر (items): 12
+
+
+من Document (4).docx:
+----------------------------------------------------------------------
+1. Moghrabi Cakes & More
+   عدد الأصناف (categories): 6
+   عدد العناصر (items): 10
+
+2. Jarish Ibn Al Balad
+   عدد الأصناف (categories): 12
+   عدد العناصر (items): 43
+
+3. Marinade
+   عدد الأصناف (categories): 30
+   عدد العناصر (items): 402
+
+4. Majed Zuheir
+   عدد الأصناف (categories): 17
+   عدد العناصر (items): 17
+
+5. Hamada Bakery
+   عدد الأصناف (categories): 184
+   عدد العناصر (items): 627
+
+6. صحة وهنا
+   عدد الأصناف (categories): 3
+   عدد العناصر (items): 3
+
+7. Submarine
+   عدد الأصناف (categories): 12
+   عدد العناصر (items): 13
+
+8. مطعم وشاورما الأخوين الجمل
+   عدد الأصناف (categories): 9
+   عدد العناصر (items): 9
+
+9. شاورما غسان
+   عدد الأصناف (categories): 15
+   عدد العناصر (items): 5
+
+
+من Document (7).docx:
+----------------------------------------------------------------------
+1. مطعم دجاج شعبان
+   عدد الأصناف (categories): 8
+   عدد العناصر (items): 4
+
+2. لوفي كرواسون
+   عدد الأصناف (categories): 8
+   عدد العناصر (items): 4
+
+3. مناقيش ومعجنات أبو مازن الفاخرة
+   عدد الأصناف (categories): 8
+   عدد العناصر (items): 4
+
+4. مطاعم فلافل عكاوي
+   عدد الأصناف (categories): 14
+   عدد العناصر (items): 7
+
+5. مناقيش أبو العز الممتازة
+   عدد الأصناف (categories): 12
+   عدد العناصر (items): 6
+
+
+======================================================================
+الملخص:
+- مجموع المطاعم/المتاجر: 42
+- مجموع الأصناف (categories): 910
+- مجموع العناصر (items): 2575
+======================================================================

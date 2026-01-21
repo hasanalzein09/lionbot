@@ -85,22 +85,70 @@ Please open the app to start delivery.
 
 
 @shared_task(name="app.tasks.notifications.notify_customer_order_status")
-def notify_customer_order_status(order_id: int, customer_phone: str, status: str, lang: str = "ar"):
+def notify_customer_order_status(order_id: int, customer_phone: str, status: str, lang: str = "ar", driver_name: str = None, estimated_time: int = None):
     """
-    Send order status update to customer.
+    Send order status update to customer with enhanced details.
     """
     async def _notify():
-        status_messages = {
-            "accepted": get_text("order_received", lang),
-            "preparing": get_text("order_processing", lang),
-            "ready": get_text("order_ready", lang),
-            "out_for_delivery": get_text("order_on_way", lang),
-            "delivered": get_text("order_delivered", lang),
+        # Enhanced status messages with emojis and progress
+        status_info = {
+            "accepted": {
+                "ar": "✅ تم استلام طلبك!\nالمطعم بدأ بتحضير طلبك 👨‍🍳",
+                "en": "✅ Order received!\nThe restaurant is preparing your order 👨‍🍳",
+                "progress": "1/4"
+            },
+            "preparing": {
+                "ar": "👨‍🍳 جاري تحضير طلبك...\nصبر شوي، عم يجهزوه بأسرع وقت!",
+                "en": "👨‍🍳 Preparing your order...\nAlmost ready!",
+                "progress": "2/4"
+            },
+            "ready": {
+                "ar": "✨ طلبك جاهز!\nعم ننتظر السائق ياخده 🚗",
+                "en": "✨ Your order is ready!\nWaiting for driver pickup 🚗",
+                "progress": "3/4"
+            },
+            "out_for_delivery": {
+                "ar": "🚗 طلبك بالطريق!\nالسائق عم يوصلك",
+                "en": "🚗 Out for delivery!\nDriver is on the way",
+                "progress": "4/4"
+            },
+            "delivered": {
+                "ar": "🎉 تم التوصيل!\nصحتين وعافية! شكراً لاختيارك LionBot 🦁",
+                "en": "🎉 Delivered!\nEnjoy your meal! Thanks for using LionBot 🦁",
+                "progress": "✅"
+            },
         }
-        
-        message = status_messages.get(status, f"Order #{order_id} status: {status}")
-        full_message = f"📦 *طلب #{order_id}*\n\n{message}" if lang == "ar" else f"📦 *Order #{order_id}*\n\n{message}"
-        
+
+        info = status_info.get(status, {"ar": f"حالة الطلب: {status}", "en": f"Status: {status}", "progress": ""})
+        message = info.get(lang, info.get("ar"))
+        progress = info.get("progress", "")
+
+        # Build full message
+        if lang == "ar":
+            full_message = f"📦 *طلب #{order_id}*\n"
+            if progress:
+                full_message += f"📊 التقدم: {progress}\n\n"
+            full_message += message
+        else:
+            full_message = f"📦 *Order #{order_id}*\n"
+            if progress:
+                full_message += f"📊 Progress: {progress}\n\n"
+            full_message += message
+
+        # Add driver info if available
+        if driver_name and status == "out_for_delivery":
+            if lang == "ar":
+                full_message += f"\n\n👤 السائق: {driver_name}"
+            else:
+                full_message += f"\n\n👤 Driver: {driver_name}"
+
+        # Add estimated time if available
+        if estimated_time and status in ["out_for_delivery", "preparing"]:
+            if lang == "ar":
+                full_message += f"\n⏱️ الوقت المتوقع: ~{estimated_time} دقيقة"
+            else:
+                full_message += f"\n⏱️ Estimated: ~{estimated_time} min"
+
         await whatsapp_service.send_text(customer_phone, full_message)
         logger.info(f"Notified customer {customer_phone} about order {order_id} status: {status}")
     

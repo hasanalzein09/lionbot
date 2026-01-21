@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 
-DATABASE_URL = "postgresql+asyncpg://postgres:LionBot2024@34.165.115.23/lionbot"
+DATABASE_URL = "postgresql+asyncpg://lionbot:LionBot2024@163.245.208.160:5432/lionbot"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -412,7 +412,7 @@ RESTAURANTS = [
 async def main():
     """Main function to add all restaurants."""
     logger.info("🚀 Starting import of 4 new restaurants...")
-    logger.info(f"📍 Connecting to Cloud SQL: 34.165.115.23/lionbot")
+    logger.info(f"📍 Connecting to Cloud SQL: 163.245.208.160/lionbot")
     
     async with AsyncSessionLocal() as db:
         try:

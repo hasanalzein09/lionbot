@@ -1,0 +1,1063 @@
+{
+  "restaurant_info": {
+    "name_ar": "مطعم دجاج شعبان",
+    "name_en": "Shaaban Chicken Restaurant"
+  },
+  "menu": [
+    {
+      "category_name": "Food",
+      "items": [
+        {
+          "id": 1,
+          "name_ar": "همبرغر",
+          "name_en": "Hamburger",
+          "price": 400
+        },
+        {
+          "id": 2,
+          "name_ar": "تشيز برغر",
+          "name_en": "Cheese Burger",
+          "price": 450
+        },
+        {
+          "id": 3,
+          "name_ar": "تشكن برغر",
+          "name_en": "Chicken Burger",
+          "price": 350
+        },
+        {
+          "id": 4,
+          "name_ar": "تشكن تشيز برغر",
+          "name_en": "Chicken Cheese Burger",
+          "price": 400
+        },
+        {
+          "id": 5,
+          "name_ar": "فاهيتا",
+          "name_en": "Fajita",
+          "price": 450
+        },
+        {
+          "id": 6,
+          "name_ar": "تشكن ساب",
+          "name_en": "Chicken Sub",
+          "price": 450
+        },
+        {
+          "id": 7,
+          "name_ar": "طاووق",
+          "name_en": "Tawook",
+          "price": 350
+        },
+        {
+          "id": 8,
+          "name_ar": "وجبة طاووق",
+          "name_en": "Tawook Meal",
+          "price": 750
+        },
+        {
+          "id": 9,
+          "name_ar": "وجبة برغر",
+          "name_en": "Burger Meal",
+          "price": 800
+        }
+      ]
+    },
+    {
+      "category_name": "SHWRMAzz (Shawarma)",
+      "items": [
+        {
+          "id": 10,
+          "name_ar": "شاورما دجاج صغير",
+          "name_en": "Small Chicken Shawarma",
+          "price": 250
+        },
+        {
+          "id": 11,
+          "name_ar": "شاورما دجاج كبير",
+          "name_en": "Large Chicken Shawarma",
+          "price": 350
+        },
+        {
+          "id": 12,
+          "name_ar": "شاورما لحمه صغير",
+          "name_en": "Small Meat Shawarma",
+          "price": 250
+        },
+        {
+          "id": 13,
+          "name_ar": "شاورما لحمه كبير",
+          "name_en": "Large Meat Shawarma",
+          "price": 400
+        },
+        {
+          "id": 14,
+          "name_ar": "شاورما دجاج مرقوق",
+          "name_en": "Chicken Markouk Shawarma",
+          "price": 450
+        },
+        {
+          "id": 15,
+          "name_ar": "شاورما لحمه مرقوق",
+          "name_en": "Meat Markouk Shawarma",
+          "price": 450
+        },
+        {
+          "id": 16,
+          "name_ar": "نص كيلو شاورما دجاج",
+          "name_en": "Half Kilo Chicken Shawarma",
+          "price": 1350
+        },
+        {
+          "id": 17,
+          "name_ar": "نص كيلو شاورما لحمه",
+          "name_en": "Half Kilo Meat Shawarma",
+          "price": 1350
+        },
+        {
+          "id": 18,
+          "name_ar": "وقية شاورما دجاج",
+          "name_en": "Waqiyet (Ounce) Chicken Shawarma",
+          "price": 540
+        },
+        {
+          "id": 19,
+          "name_ar": "وقية شاورما لحمه",
+          "name_en": "Waqiyet (Ounce) Meat Shawarma",
+          "price": 540
+        },
+        {
+          "id": 20,
+          "name_ar": "وجبة شاورما دجاج",
+          "name_en": "Chicken Shawarma Meal",
+          "price": 900
+        },
+        {
+          "id": 21,
+          "name_ar": "وجبة شاورما لحمه",
+          "name_en": "Meat Shawarma Meal",
+          "price": 1000
+        },
+        {
+          "id": 22,
+          "name_ar": "كيلو دجاج / لحمه",
+          "name_en": "Kilo Chicken / Meat",
+          "price": 30,
+          "currency": "USD"
+        },
+        {
+          "id": 23,
+          "name_ar": "كيلو دجاج بدون بطاطا",
+          "name_en": "Kilo Chicken without fries",
+          "price": 25,
+          "currency": "USD"
+        }
+      ]
+    },
+    {
+      "category_name": "Fries & Sides",
+      "items": [
+        {
+          "id": 24,
+          "name_ar": "صحن كبير",
+          "name_en": "Large Plate (Fries)",
+          "price": 450
+        },
+        {
+          "id": 25,
+          "name_ar": "صحن صغير",
+          "name_en": "Small Plate (Fries)",
+          "price": 300
+        },
+        {
+          "id": 26,
+          "name_ar": "علبة بطاطا",
+          "name_en": "Fries Box",
+          "price": 250
+        },
+        {
+          "id": 27,
+          "name_ar": "علبة ثوم صغيرة",
+          "name_en": "Small Garlic Box",
+          "price": 50
+        },
+        {
+          "id": 28,
+          "name_ar": "علبة ثوم كبيرة",
+          "name_en": "Large Garlic Box",
+          "price": 150
+        },
+        {
+          "id": 29,
+          "name_ar": "علبة سلطة",
+          "name_en": "Salad Box",
+          "price": 150
+        }
+      ]
+    },
+    {
+      "category_name": "Drinks",
+      "items": [
+        {
+          "id": 30,
+          "name_ar": "Soft Drink",
+          "name_en": "Soft Drink",
+          "price": 100
+        }
+      ]
+    }
+  ]
+}
+
+
+
+{
+  "restaurant_info": {
+    "name_ar": "لوفي كرواسون",
+    "name_en": "Luffy Croissant",
+    "phone": "78781674",
+    "address": "طريق عبرا بعد كوع خروبي"
+  },
+  "menu": [
+    {
+      "category_name_ar": "كرواسون مالح",
+      "category_name_en": "Salty Croissant",
+      "items": [
+        { "name_ar": "عكاوي", "name_en": "Akawi", "price": 100000 },
+        { "name_ar": "زعتر", "name_en": "Zaatar", "price": 50000 },
+        { "name_ar": "قشقوان", "name_en": "Kashkawan", "price": 150000 },
+        { "name_ar": "حلوم", "name_en": "Halloumi", "price": 150000 },
+        { "name_ar": "موزاريلا", "name_en": "Mozzarella", "price": 150000 },
+        { "name_ar": "جبنتين", "name_en": "Two Cheeses", "price": 150000 },
+        { "name_ar": "3 اجبان (عكاوي+موزاريلا+قشقوان)", "name_en": "3 Cheeses (Akawi+Mozzarella+Kashkawan)", "price": 200000 },
+        { "name_ar": "4 اجبان (عكاوي+حلوم+قشقوان+موزاريلا)", "name_en": "4 Cheeses (Akawi+Halloumi+Kashkawan+Mozzarella)", "price": 230000 },
+        { "name_ar": "بيكون", "name_en": "Bacon", "price": 150000 },
+        { "name_ar": "كيري", "name_en": "Kiri", "price": 150000 },
+        { "name_ar": "بوك", "name_en": "Puck", "price": 150000 },
+        { "name_ar": "جبنة + سيتوس", "name_en": "Cheese + Cheetos", "price": 150000 },
+        { "name_ar": "عكاوي+مرتديلا", "name_en": "Akawi + Mortadella", "price": 180000 },
+        { "name_ar": "عكاوي+حبش مدخن", "name_en": "Akawi + Smoked Turkey", "price": 200000 },
+        { "name_ar": "5 اجبان (عكاوي+حلوم+نابلسيه+موزاريلا+شيدر)", "name_en": "5 Cheeses", "price": 250000 },
+        { "name_ar": "جبنه (وتاكز+خضار)", "name_en": "Cheese (Takis + Vegetables)", "price": 230000 }
+      ]
+    },
+    {
+      "category_name_ar": "بيتزا وأصناف مالحة",
+      "category_name_en": "Pizza & Savory Items",
+      "items": [
+        { "name_ar": "موزاريلا+مرتديلا", "name_en": "Mozzarella + Mortadella", "price": 200000 },
+        { "name_ar": "موزاريلا+حبش مدخن", "name_en": "Mozzarella + Smoked Turkey", "price": 230000 },
+        { "name_ar": "قشقوان+مرتديلا", "name_en": "Kashkawan + Mortadella", "price": 230000 },
+        { "name_ar": "قشقوان+حبش مدخن", "name_en": "Kashkawan + Smoked Turkey", "price": 230000 },
+        { "name_ar": "بيتزا خضار", "name_en": "Vegetable Pizza", "price": 250000 },
+        { "name_ar": "بيتزا سجق", "name_en": "Sujuk Pizza", "price": 320000 },
+        { "name_ar": "بيتزا ببيروني", "name_en": "Pepperoni Pizza", "price": 320000 },
+        { "name_ar": "بيتزا مرتديلا", "name_en": "Mortadella Pizza", "price": 300000 },
+        { "name_ar": "موزاريلا+سجق", "name_en": "Mozzarella + Sujuk", "price": 300000 },
+        { "name_ar": "فاهيتا", "name_en": "Fajita", "price": 350000 },
+        { "name_ar": "هوت دوغ", "name_en": "Hot Dog", "price": 350000 },
+        { "name_ar": "بسترمة", "name_en": "Pastrami", "price": 350000 },
+        { "name_ar": "طاووق+موزاريلا", "name_en": "Tawook + Mozzarella", "price": 300000 },
+        { "name_ar": "قشقوان (ببيروني+خضار)", "name_en": "Kashkawan (Pepperoni + Veg)", "price": 250000 },
+        { "name_ar": "صحن هوت دوغ", "name_en": "Hot Dog Plate", "price": 450000 }
+      ]
+    },
+    {
+      "category_name_ar": "كرواسون حلو",
+      "category_name_en": "Sweet Croissant",
+      "items": [
+        { "name_ar": "كرواسون ساده", "name_en": "Plain Croissant", "price": 70000 },
+        { "name_ar": "شوكولا عادي", "name_en": "Regular Chocolate", "price": 100000 },
+        { "name_ar": "نيوتيلا", "name_en": "Nutella", "price": 180000 },
+        { "name_ar": "بيستاشيو", "name_en": "Pistachio", "price": 250000 },
+        { "name_ar": "لوتس", "name_en": "Lotus", "price": 150000 },
+        { "name_ar": "اوريو", "name_en": "Oreo", "price": 150000 },
+        { "name_ar": "كيندر وايت", "name_en": "Kinder White", "price": 150000 },
+        { "name_ar": "كيندر بوينو", "name_en": "Kinder Bueno", "price": 150000 },
+        { "name_ar": "شوكولا ميكس (2)", "name_en": "Chocolate Mix (2)", "price": 200000 },
+        { "name_ar": "شوكولا ميكس (3)", "name_en": "Chocolate Mix (3)", "price": 280000 },
+        { "name_ar": "غالاكسي", "name_en": "Galaxy", "price": 150000 },
+        { "name_ar": "لوفي بلاص", "name_en": "Luffy Plus", "price": 400000 },
+        { "name_ar": "المورجان", "name_en": "Morgan", "price": 200000 }
+      ]
+    },
+    {
+      "category_name_ar": "حلويات",
+      "category_name_en": "Sweets",
+      "items": [
+        { "name_ar": "دوناتس كبير ساده", "name_en": "Big Plain Donut", "price": 100000 },
+        { "name_ar": "دوناتس كبير محشي", "name_en": "Big Stuffed Donut", "price": 150000 },
+        { "name_ar": "دوناتس صغير", "name_en": "Small Donut", "price": 50000 },
+        { "name_ar": "دوناتس (محشي بيستاشيو)", "name_en": "Donut (Stuffed Pistachio)", "price": 200000 },
+        { "name_ar": "كلير", "name_en": "Eclair", "price": 100000 },
+        { "name_ar": "شيزكايك", "name_en": "Cheesecake", "price": 250000 },
+        { "name_ar": "صحن دوناتس", "name_en": "Donuts Plate", "price": 200000 },
+        { "name_ar": "رول كرواسون (نيوتيلا)", "name_en": "Roll Croissant (Nutella)", "price": 200000 },
+        { "name_ar": "رول كرواسون (لوتس)", "name_en": "Roll Croissant (Lotus)", "price": 200000 },
+        { "name_ar": "رول كرواسون (كيندر)", "name_en": "Roll Croissant (Kinder)", "price": 200000 },
+        { "name_ar": "رول كرواسون (بيستاشيو)", "name_en": "Roll Croissant (Pistachio)", "price": 100000 },
+        { "name_ar": "سيخ دوناتس", "name_en": "Donut Skewer", "price": 100000 },
+        { "name_ar": "كباية دوناتس", "name_en": "Donut Cup", "price": 200000 },
+        { "name_ar": "كباية دوناتس (بيستاشيو)", "name_en": "Donut Cup (Pistachio)", "price": 250000 },
+        { "name_ar": "ميني سبيسيال كرواسون", "name_en": "Mini Special Croissant", "price": 150000 }
+      ]
+    }
+  ]
+}
+
+
+
+{
+  "restaurant_info": {
+    "name_ar": "مناقيش ومعجنات أبو مازن الفاخرة",
+    "name_en": "Abu Mazen Luxury Manaqish & Pastries",
+    "currency": "LBP",
+    "special_offer": {
+      "description_ar": "عرض البيتزا (2 بيتزا مرتديلا أو خضار الحجم الكبير / 30 سم)",
+      "description_en": "Pizza Offer (2 Large Pizza Mortadella or Veggie / 30cm)",
+      "price": 900000
+    }
+  },
+  "menu": [
+    {
+      "category_name_ar": "المناقيش",
+      "category_name_en": "Manaqish",
+      "items": [
+        { "name_ar": "زعتر", "name_en": "Zaatar", "price": 60000 },
+        { "name_ar": "زعتر مشروحة", "name_en": "Zaatar Mashrouha", "price": 90000 },
+        { "name_ar": "عكاوي", "name_en": "Akawi", "price": 170000 },
+        { "name_ar": "عكاوي وقشقوان", "name_en": "Akawi & Kashkawan", "price": 280000 },
+        { "name_ar": "تشيكي قطع", "name_en": "Chicken Pieces", "price": 300000 },
+        { "name_ar": "نص جبنة نص زعتر", "name_en": "Half Cheese Half Zaatar", "price": 150000 },
+        { "name_ar": "بلغاري", "name_en": "Bulgari Cheese", "price": 270000 },
+        { "name_ar": "بلغاري وقشقوان", "name_en": "Bulgari & Kashkawan", "price": 330000 },
+        { "name_ar": "حلوم", "name_en": "Halloumi", "price": 270000 },
+        { "name_ar": "حلوم وقشقوان", "name_en": "Halloumi & Kashkawan", "price": 330000 },
+        { "name_ar": "بيكون", "name_en": "Bacon", "price": 250000 },
+        { "name_ar": "بيكون وقشقوان", "name_en": "Bacon & Kashkawan", "price": 330000 },
+        { "name_ar": "بصل وبندورة", "name_en": "Onion & Tomato", "price": 170000 },
+        { "name_ar": "بصل وبندورة وقشقوان", "name_en": "Onion, Tomato & Kashkawan", "price": 300000 },
+        { "name_ar": "لحمة", "name_en": "Meat (Lahm)", "price": 250000 },
+        { "name_ar": "لحمة وقشقوان", "name_en": "Meat & Kashkawan", "price": 350000 },
+        { "name_ar": "قشقوان ساده", "name_en": "Plain Kashkawan", "price": 250000 },
+        { "name_ar": "كشك", "name_en": "Kishk", "price": 170000 },
+        { "name_ar": "لبنة", "name_en": "Labneh", "price": 170000 },
+        { "name_ar": "مرتديلا وقشقوان", "name_en": "Mortadella & Kashkawan", "price": 330000 },
+        { "name_ar": "سجق وقشقوان", "name_en": "Sujuk & Kashkawan", "price": 340000 },
+        { "name_ar": "ببيروني وقشقوان", "name_en": "Pepperoni & Kashkawan", "price": 370000 },
+        { "name_ar": "حبش وقشقوان", "name_en": "Turkey & Kashkawan", "price": 370000 },
+        { "name_ar": "طاووق وقشقوان", "name_en": "Tawook & Kashkawan", "price": 350000 },
+        { "name_ar": "فاهيتا وقشقوان", "name_en": "Fajita & Kashkawan", "price": 370000 },
+        { "name_ar": "قورما وقشقوان", "name_en": "Awarma & Kashkawan", "price": 400000 },
+        { "name_ar": "هوت دوغ وقشقوان", "name_en": "Hot Dog & Kashkawan", "price": 350000 },
+        { "name_ar": "ديوان ابو مازن", "name_en": "Diwan Abu Mazen", "price": 480000 },
+        { "name_ar": "الديوان الاميري", "name_en": "Al Diwan Al Amiri", "price": 350000 },
+        { "name_ar": "الديوان الملكي", "name_en": "Al Diwan Al Malaki", "price": 400000 },
+        { "name_ar": "تشيكي قطع وقشقوان", "name_en": "Chicken Pieces & Kashkawan", "price": 400000 },
+        { "name_ar": "سبيسيال", "name_en": "Special", "price": 550000 }
+      ]
+    },
+    {
+      "category_name_ar": "رغيف (كعكة)",
+      "category_name_en": "Loaf (Kaakeh)",
+      "items": [
+        { "name_ar": "عكاوي", "name_en": "Akawi", "price": 270000 },
+        { "name_ar": "قشقوان ساده", "name_en": "Plain Kashkawan", "price": 290000 },
+        { "name_ar": "عكاوي وقشقوان", "name_en": "Akawi & Kashkawan", "price": 350000 },
+        { "name_ar": "بلغاري وقشقوان", "name_en": "Bulgari & Kashkawan", "price": 350000 },
+        { "name_ar": "حلوم وقشقوان", "name_en": "Halloumi & Kashkawan", "price": 380000 },
+        { "name_ar": "بيكون وقشقوان", "name_en": "Bacon & Kashkawan", "price": 370000 },
+        { "name_ar": "تشيكي قطع وقشقوان", "name_en": "Chicken Pieces & Kashkawan", "price": 430000 },
+        { "name_ar": "مرتديلا وقشقوان", "name_en": "Mortadella & Kashkawan", "price": 380000 },
+        { "name_ar": "حبش وقشقوان", "name_en": "Turkey & Kashkawan", "price": 430000 },
+        { "name_ar": "ببيروني وقشقوان", "name_en": "Pepperoni & Kashkawan", "price": 430000 },
+        { "name_ar": "هوت دوغ وقشقوان", "name_en": "Hot Dog & Kashkawan", "price": 430000 },
+        { "name_ar": "قورما وقشقوان", "name_en": "Awarma & Kashkawan", "price": 450000 }
+      ]
+    },
+    {
+      "category_name_ar": "بيتزا الحجم الصغير (25 سم)",
+      "category_name_en": "Pizza Small Size (25cm)",
+      "items": [
+        { "name_ar": "خضرة", "name_en": "Vegetable", "price": 450000 },
+        { "name_ar": "مرتديلا", "name_en": "Mortadella", "price": 450000 },
+        { "name_ar": "مرغاريتا", "name_en": "Margherita", "price": 450000 },
+        { "name_ar": "سجق", "name_en": "Sujuk", "price": 550000 },
+        { "name_ar": "حبش", "name_en": "Turkey", "price": 550000 },
+        { "name_ar": "ببيروني", "name_en": "Pepperoni", "price": 550000 },
+        { "name_ar": "هوت دوغ", "name_en": "Hot Dog", "price": 550000 },
+        { "name_ar": "قورما", "name_en": "Awarma", "price": 600000 }
+      ]
+    },
+    {
+      "category_name_ar": "بيتزا الحجم الكبير (30 سم)",
+      "category_name_en": "Pizza Large Size (30cm)",
+      "items": [
+        { "name_ar": "خضرة", "name_en": "Vegetable", "price": 600000 },
+        { "name_ar": "مرتديلا", "name_en": "Mortadella", "price": 600000 },
+        { "name_ar": "مرغاريتا", "name_en": "Margherita", "price": 600000 },
+        { "name_ar": "سجق", "name_en": "Sujuk", "price": 650000 },
+        { "name_ar": "حبش", "name_en": "Turkey", "price": 700000 },
+        { "name_ar": "ببيروني", "name_en": "Pepperoni", "price": 700000 },
+        { "name_ar": "هوت دوغ", "name_en": "Hot Dog", "price": 700000 },
+        { "name_ar": "قورما", "name_en": "Awarma", "price": 750000 }
+      ]
+    }
+  ],
+  "add_ons": [
+    {
+      "name_ar": "زيادة سعر المشروحة لمناقيش (عكاوي، كشك، بصل وبندورة، لبنة، كوكتيل)",
+      "price": 90000
+    },
+    {
+      "name_ar": "زيادة سعر المشروحة لباقي أصناف المناقيش",
+      "price": 150000
+    },
+    {
+      "name_ar": "أي زيادة (فطر أو ذرة أو فليفلة أو زيتون أو خضار)",
+      "price": 40000
+    },
+    {
+      "name_ar": "دزينة المعجنات مشكلة",
+      "price": 250000
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+{
+  "restaurant_info": {
+    "name_ar": "مطاعم فلافل عكاوي",
+    "name_en": "Falafel Akawi Restaurants",
+    "phone": "03127793",
+    "delivery_available": true
+  },
+  "menu": [
+    {
+      "category_name_ar": "سندويشات",
+      "category_name_en": "Sandwiches",
+      "items": [
+        {
+          "name_ar": "سندويش عادي",
+          "name_en": "Sandwich Normal",
+          "price": 200000
+        },
+        {
+          "name_ar": "سندويش اكسترا",
+          "name_en": "Sandwich Extra",
+          "price": 250000
+        },
+        {
+          "name_ar": "سندويش كبير",
+          "name_en": "Sandwich Large",
+          "price": 300000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "فلافل فلت",
+      "category_name_en": "Falafel Beads (Pieces)",
+      "items": [
+        {
+          "name_ar": "نص دزينة سادة",
+          "name_en": "Half Dozen",
+          "price": 150000
+        },
+        {
+          "name_ar": "نص دزينة مع سرفيس جات",
+          "name_en": "Half Dozen In Box (with service)",
+          "price": 400000
+        },
+        {
+          "name_ar": "دزينة سادة",
+          "name_en": "Dozen",
+          "price": 300000
+        },
+        {
+          "name_ar": "دزينة مع سرفيس جات",
+          "name_en": "Dozen In Box (with service)",
+          "price": 800000
+        },
+        {
+          "name_ar": "دزينة و نص مع سرفيس",
+          "name_en": "Dozen & Half (Vegetable Service)",
+          "price": 1050000
+        },
+        {
+          "name_ar": "دزينتين مع سرفيس",
+          "name_en": "Two Dozen (Vegetable Service)",
+          "price": 1200000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "خضروات",
+      "category_name_en": "Vegetables",
+      "items": [
+        {
+          "name_ar": "كيس خضار",
+          "name_en": "Vegetable Bag",
+          "price": 100000
+        },
+        {
+          "name_ar": "كيس خيار",
+          "name_en": "Cucumber Pickles Bag",
+          "price": 100000
+        },
+        {
+          "name_ar": "كيس مقني",
+          "name_en": "Cucumis Melo (Snake Cucumber) Bag",
+          "price": 100000
+        },
+        {
+          "name_ar": "كيس لفت",
+          "name_en": "Turnip Pickles Bag",
+          "price": 100000
+        },
+        {
+          "name_ar": "كيس حر",
+          "name_en": "Chilli Pepper Bag",
+          "price": 100000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "مرطبانات",
+      "category_name_en": "Jar Pickles",
+      "items": [
+        {
+          "name_ar": "مرطبان خيار",
+          "name_en": "Jar Cucumber",
+          "price": 400000
+        },
+        {
+          "name_ar": "مرطبان مقني",
+          "name_en": "Jar Cucumis Melo",
+          "price": 400000
+        },
+        {
+          "name_ar": "مرطبان باذنجان",
+          "name_en": "Jar Eggplant Pickles",
+          "price": 500000
+        },
+        {
+          "name_ar": "مرطبان حر أحمر صغير",
+          "name_en": "Red Pepper Small Jar",
+          "price": 300000
+        },
+        {
+          "name_ar": "مرطبان حر أحمر كبير",
+          "name_en": "Red Pepper Large Jar",
+          "price": 500000
+        },
+        {
+          "name_ar": "علبة حر أحمر",
+          "name_en": "Red Pepper Box",
+          "price": 150000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "طراطور",
+      "category_name_en": "Tartar Sauce (Tarator)",
+      "items": [
+        {
+          "name_ar": "طراطور صغيرة",
+          "name_en": "Small Box",
+          "price": 100000
+        },
+        {
+          "name_ar": "طراطور كبيرة",
+          "name_en": "Large Box",
+          "price": 200000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "عجينة الفلافل",
+      "category_name_en": "Falafel Dough",
+      "items": [
+        {
+          "name_ar": "نص كيلو عجين",
+          "name_en": "Half kilo Dough",
+          "price": 350000
+        },
+        {
+          "name_ar": "كيلو عجين",
+          "name_en": "Kilo Dough",
+          "price": 700000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "مرطبات",
+      "category_name_en": "Drinks",
+      "items": [
+        {
+          "name_ar": "مشروبات غازية",
+          "name_en": "Soft Drinks",
+          "price": 100000
+        },
+        {
+          "name_ar": "مياه صغيرة",
+          "name_en": "Small Water",
+          "price": 50000
+        },
+        {
+          "name_ar": "لبن عيران",
+          "name_en": "Ayran Yogurt",
+          "price": 100000
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+{
+  "restaurant_info": {
+    "name_ar": "مناقيش أبو العز الممتازة",
+    "name_en": "Manakeesh Abu Al-Ezz Al-Mumtazah",
+    "currency": "LBP"
+  },
+  "menu": [
+    {
+      "category_name_ar": "المناقيش (عادي / مشروحة)",
+      "category_name_en": "Manakeesh (Regular / Mashrouha)",
+      "items": [
+        {
+          "name_ar": "زعتر",
+          "name_en": "Zaatar",
+          "price_regular": 80000,
+          "price_mashrouha": 125000
+        },
+        {
+          "name_ar": "جبنة",
+          "name_en": "Cheese",
+          "price_regular": 200000,
+          "price_mashrouha": 300000
+        },
+        {
+          "name_ar": "نص زعتر نص جبنة",
+          "name_en": "Half Zaatar Half Cheese",
+          "price_regular": 150000,
+          "price_mashrouha": 250000
+        },
+        {
+          "name_ar": "بصل وبندورة",
+          "name_en": "Onion & Tomato",
+          "price_regular": 150000,
+          "price_mashrouha": 250000
+        },
+        {
+          "name_ar": "زعتر بصل وبندورة",
+          "name_en": "Zaatar Onion & Tomato",
+          "price_regular": 150000,
+          "price_mashrouha": 250000
+        },
+        {
+          "name_ar": "جبنة بصل وبندورة",
+          "name_en": "Cheese Onion & Tomato",
+          "price_regular": 250000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "جبنة وزيتون",
+          "name_en": "Cheese & Olives",
+          "price_regular": 250000,
+          "price_mashrouha": 325000
+        },
+        {
+          "name_ar": "جبنة وذرة",
+          "name_en": "Cheese & Corn",
+          "price_regular": 250000,
+          "price_mashrouha": 325000
+        },
+        {
+          "name_ar": "جبنة سبيسيال",
+          "name_en": "Cheese Special",
+          "price_regular": 250000,
+          "price_mashrouha": 350000
+        },
+        {
+          "name_ar": "قشقوان وعكاوي",
+          "name_en": "Kashkawan & Akawi",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "حلوم وقشقوان",
+          "name_en": "Halloumi & Kashkawan",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "حلوم سادة",
+          "name_en": "Plain Halloumi",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "بيكون سادة",
+          "name_en": "Plain Bacon",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "بيكون وقشقوان",
+          "name_en": "Bacon & Kashkawan",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "جبنة بلغاري سادة",
+          "name_en": "Plain Bulgari Cheese",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "جبنة بلغاري وقشقوان",
+          "name_en": "Bulgari & Kashkawan",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "سجق وقشقوان",
+          "name_en": "Sujuk & Kashkawan",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "سجق سبيسيال",
+          "name_en": "Sujuk Special",
+          "price_regular": 350000,
+          "price_mashrouha": 450000
+        },
+        {
+          "name_ar": "سجق فطر وذرة",
+          "name_en": "Sujuk Mushroom & Corn",
+          "price_regular": 350000,
+          "price_mashrouha": 450000
+        },
+        {
+          "name_ar": "مرتديلا وقشقوان",
+          "name_en": "Mortadella & Kashkawan",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "مرتديلا سبيسيال",
+          "name_en": "Mortadella Special",
+          "price_regular": 350000,
+          "price_mashrouha": 450000
+        },
+        {
+          "name_ar": "مرتديلا فطر وذرة",
+          "name_en": "Mortadella Mushroom & Corn",
+          "price_regular": 350000,
+          "price_mashrouha": 450000
+        },
+        {
+          "name_ar": "لحم بعجين / دبس رمان",
+          "name_en": "Lahm Baajin / Pomegranate Molasses",
+          "price_regular": 250000,
+          "price_mashrouha": 350000
+        },
+        {
+          "name_ar": "كفتة",
+          "name_en": "Kafta",
+          "price_regular": 300000,
+          "price_mashrouha": 450000
+        },
+        {
+          "name_ar": "كشك",
+          "name_en": "Kishk",
+          "price_regular": 200000,
+          "price_mashrouha": 300000
+        },
+        {
+          "name_ar": "لبنة",
+          "name_en": "Labneh",
+          "price_regular": 200000,
+          "price_mashrouha": 300000
+        },
+        {
+          "name_ar": "قاورما وجبنة",
+          "name_en": "Awarma & Cheese",
+          "price_regular": 350000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "قاورما سبيسيال",
+          "name_en": "Awarma Special",
+          "price_regular": 400000,
+          "price_mashrouha": 550000
+        },
+        {
+          "name_ar": "جبنة تونا",
+          "name_en": "Tuna Cheese",
+          "price_regular": 350000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "جبنة تونا فطر وذرة",
+          "name_en": "Tuna Cheese Mushroom & Corn",
+          "price_regular": 400000,
+          "price_mashrouha": 550000
+        },
+        {
+          "name_ar": "محمرة وجبنة",
+          "name_en": "Muhammara & Cheese",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "مرتديلا حبش",
+          "name_en": "Turkey Mortadella",
+          "price_regular": 350000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "مرتديلا حبش فطر وذرة",
+          "name_en": "Turkey Mortadella Mushroom & Corn",
+          "price_regular": 400000,
+          "price_mashrouha": 550000
+        },
+        {
+          "name_ar": "هوت دوغ",
+          "name_en": "Hot Dog",
+          "price_regular": 350000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "هوت دوغ سبيسيال",
+          "name_en": "Hot Dog Special",
+          "price_regular": 400000,
+          "price_mashrouha": 550000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "أصناف اللحمة (عادي / مشروحة)",
+      "category_name_en": "Meat Items (Regular / Mashrouha)",
+      "items": [
+        {
+          "name_ar": "بسطرما وقشقوان",
+          "name_en": "Basturma & Kashkawan",
+          "price_regular": 350000,
+          "price_mashrouha": 450000
+        },
+        {
+          "name_ar": "بسطرما سبيسيال",
+          "name_en": "Basturma Special",
+          "price_regular": 400000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "ببيروني وجبنة",
+          "name_en": "Pepperoni & Cheese",
+          "price_regular": 350000,
+          "price_mashrouha": 450000
+        },
+        {
+          "name_ar": "ببيروني فطر وذرة",
+          "name_en": "Pepperoni Mushroom & Corn",
+          "price_regular": 400000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "ببيروني وجبنة سبيسيال",
+          "name_en": "Pepperoni & Cheese Special",
+          "price_regular": 400000,
+          "price_mashrouha": 500000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "أصناف الدجاج (عادي / مشروحة)",
+      "category_name_en": "Chicken Items (Regular / Mashrouha)",
+      "items": [
+        {
+          "name_ar": "طاووق",
+          "name_en": "Tawook",
+          "price_regular": 300000,
+          "price_mashrouha": 400000
+        },
+        {
+          "name_ar": "دجاج فاهيتا",
+          "name_en": "Chicken Fajita",
+          "price_regular": 400000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "دجاج ...",
+          "name_en": "Chicken (Illegible)",
+          "price_regular": 400000,
+          "price_mashrouha": 500000
+        },
+        {
+          "name_ar": "تشيكن ...",
+          "name_en": "Chicken (Illegible)",
+          "price_regular": 400000,
+          "price_mashrouha": 500000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "كعكة",
+      "category_name_en": "Kaakeh",
+      "items": [
+        { "name_ar": "كعكة جبنة", "name_en": "Cheese Kaakeh", "price": 200000 },
+        { "name_ar": "كعكة قشقوان وعكاوي", "name_en": "Kashkawan & Akawi Kaakeh", "price": 325000 },
+        { "name_ar": "كعكة مرتديلا وقشقوان", "name_en": "Mortadella & Kashkawan Kaakeh", "price": 325000 },
+        { "name_ar": "كعكة مرتديلا سبيسيال", "name_en": "Mortadella Special Kaakeh", "price": 350000 },
+        { "name_ar": "كعكة سجق", "name_en": "Sujuk Kaakeh", "price": 325000 },
+        { "name_ar": "كعكة سجق وسبيسيال", "name_en": "Sujuk Special Kaakeh", "price": 350000 },
+        { "name_ar": "رغيف نخالة", "name_en": "Bran Loaf", "price": 200000 }
+      ]
+    },
+    {
+      "category_name_ar": "بيتزا (صغير / وسط / كبير)",
+      "category_name_en": "Pizza (Small / Medium / Large)",
+      "items": [
+        {
+          "name_ar": "بيتزا مرتديلا",
+          "name_en": "Mortadella Pizza",
+          "price_small": 500000,
+          "price_medium": 650000,
+          "price_large": 850000
+        },
+        {
+          "name_ar": "بيتزا سجق",
+          "name_en": "Sujuk Pizza",
+          "price_small": 500000,
+          "price_medium": 650000,
+          "price_large": 850000
+        },
+        {
+          "name_ar": "بيتزا خضرة",
+          "name_en": "Vegetable Pizza",
+          "price_small": 450000,
+          "price_medium": 600000,
+          "price_large": 800000
+        },
+        {
+          "name_ar": "بيتزا طاووق",
+          "name_en": "Tawook Pizza",
+          "price_small": 600000,
+          "price_medium": 750000,
+          "price_large": 950000
+        },
+        {
+          "name_ar": "بيتزا بسطرما",
+          "name_en": "Basturma Pizza",
+          "price_small": 600000,
+          "price_medium": 750000,
+          "price_large": 950000
+        },
+        {
+          "name_ar": "بيتزا تونا",
+          "name_en": "Tuna Pizza",
+          "price_small": 600000,
+          "price_medium": 750000,
+          "price_large": 950000
+        },
+        {
+          "name_ar": "بيتزا قورما",
+          "name_en": "Awarma Pizza",
+          "price_small": 600000,
+          "price_medium": 750000,
+          "price_large": 950000
+        },
+        {
+          "name_ar": "بيتزا ...",
+          "name_en": "Pizza (Illegible)",
+          "price_small": 800000,
+          "price_medium": 1000000,
+          "price_large": 1200000
+        },
+        {
+          "name_ar": "بيتزا دجاج",
+          "name_en": "Chicken Pizza",
+          "price_small": 800000,
+          "price_medium": 1000000,
+          "price_large": 1200000
+        },
+        {
+          "name_ar": "بيتزا هوت دوغ",
+          "name_en": "Hot Dog Pizza",
+          "price_small": 600000,
+          "price_medium": 750000,
+          "price_large": 950000
+        },
+        {
+          "name_ar": "بيتزا حبش",
+          "name_en": "Turkey Pizza",
+          "price_small": 600000,
+          "price_medium": 750000,
+          "price_large": 950000
+        },
+        {
+          "name_ar": "بيتزا ببيروني",
+          "name_en": "Pepperoni Pizza",
+          "price_small": 600000,
+          "price_medium": 750000,
+          "price_large": 950000
+        }
+      ]
+    },
+    {
+      "category_name_ar": "أخرى",
+      "category_name_en": "Others",
+      "items": [
+        {
+          "name_ar": "دزينة المعجنات",
+          "name_en": "Dozen Pastries",
+          "price": 300000
+        },
+        {
+          "name_ar": "صحن خضرة صغير",
+          "name_en": "Small Vegetable Plate",
+          "price": "N/A"
+        },
+        {
+          "name_ar": "صحن خضرة كبير",
+          "name_en": "Large Vegetable Plate",
+          "price": 100000
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

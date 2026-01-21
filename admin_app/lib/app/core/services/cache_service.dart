@@ -9,7 +9,7 @@ class CacheService {
   final Map<String, _CacheEntry> _cache = {};
 
   /// Get default cache duration from config
-  static Duration get defaultTTL => Duration(minutes: AppConfig.cacheDurationMinutes);
+  static Duration get defaultTTL => const Duration(minutes: AppConfig.cacheDurationMinutes);
 
   /// Get cached data if valid
   T? get<T>(String key) {

@@ -11,7 +11,7 @@ from sqlalchemy import text
 
 # Direct connection to Cloud SQL using external IP
 # Instance: lionbot-db, Region: me-west1
-DATABASE_URL = "postgresql+asyncpg://postgres:LionBot2024@34.165.115.23/lionbot"
+DATABASE_URL = "postgresql+asyncpg://lionbot:LionBot2024@163.245.208.160:5432/lionbot"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -271,7 +271,7 @@ async def add_submarine_restaurant():
 async def main():
     """Add bilingual columns and insert restaurant data."""
     logger.info("🚀 Starting Sub Marine restaurant import...")
-    logger.info(f"📍 Connecting to Cloud SQL: 34.165.115.23/lionbot")
+    logger.info(f"📍 Connecting to Cloud SQL: 163.245.208.160/lionbot")
     
     # Ensure bilingual columns exist
     await ensure_columns()

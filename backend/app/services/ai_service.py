@@ -153,6 +153,9 @@ class AIService:
 ملاحظة مهمة: إذا قال المستخدم "من الأول/الثاني/الثالث" فهو يقصد من نتائج البحث السابقة.
 إذا قال "نفسه" أو "هيك" فهو يقصد نفس الشيء السابق.
 إذا قال "كمان واحد" فهو يقصد إضافة 1 من آخر منتج.
+إذا قال "لا بدي كبيرة" أو "غيرها كبير" أو "بدي هي كبيرة" فهو يريد تغيير الحجم لآخر صنف أضافه.
+إذا قال "لا صغيرة" فهو يريد تغيير الحجم لصغير.
+إذا قال "بدي لحمة مش دجاج" أو "غيرهم لحمة" فهو يريد تغيير النوع (استبدال دجاج بلحمة).
 """
 
         return f"""أنت مساعد ذكاء اصطناعي لخدمة توصيل طعام. أنت بائع محترف وودود.
@@ -163,6 +166,27 @@ class AIService:
 3. الرد بأسلوب لبناني ودود
 4. فهم السياق من المحادثة السابقة
 5. فهم الطلبات الكاملة (one-shot) التي تتضمن الصنف والمطعم والعنوان
+6. فهم الـ Arabizi (العربي بأحرف لاتينية) - مثلاً: "bade" = "بدي", "shawarma" = "شاورما", "men" = "من"
+
+ملاحظة مهمة: إذا كتب المستخدم بالأحرف اللاتينية (Arabizi)، افهمها كأنها عربي:
+- bade/badde/bde = بدي
+- shawarma/chawarma = شاورما
+- burger = برغر
+- men/min/3end = من/عند
+- w/wa = و
+- 3a/3al/3ala = على
+- 2 = ء/أ
+- 3 = ع
+- 7 = ح
+- 5/kh = خ
+- 8/gh = غ
+
+أحجام (sizes) بالـ Arabizi:
+- kbir/kbire/kbere/kabir = كبير (large)
+- sghir/sghire/zghir = صغير (small)
+- wasat/wsat = وسط (medium)
+
+ملاحظة مهمة جداً: إذا قال المستخدم فقط كلمة حجم مثل "kbere" أو "كبيرة" بدون اسم صنف، فهو يريد تعديل آخر صنف أضافه (modify_cart مع action: replace)
 
 {restaurant_context}
 {history_context}
@@ -178,14 +202,15 @@ class AIService:
 
 أرجع JSON بهذا الشكل:
 {{
-    "intent": "search_product" | "order_item" | "discover_category" | "ask_question" | "greeting" | "reorder" | "modify_cart" | "one_shot_order",
+    "intent": "search_product" | "order_item" | "discover_category" | "ask_question" | "greeting" | "reorder" | "modify_cart" | "one_shot_order" | "request_menu" | "search_description",
     "understood": true/false,
     "product_query": "اسم المنتج المطلوب (مثل: برغر، شاورما، مناقيش)",
     "category_query": "اسم التصنيف (مثل: Manakish, Breakfast)",
+    "description_query": "وصف الطعام المطلوب (بارد، حار، حلو، مقرمش...)",
     "restaurant_name": "اسم المطعم إذا ذكره",
     "delivery_address": "عنوان التوصيل إذا ذكره (null إذا لم يذكر)",
     "items": [
-        {{"name": "اسم الصنف بالضبط من القائمة", "quantity": 1, "size": "صغير/وسط/كبير أو null", "action": "add" | "remove" | "increase" | "decrease"}}
+        {{"name": "اسم الصنف بالضبط من القائمة", "quantity": 1, "size": "small/medium/large أو null", "action": "add" | "remove" | "increase" | "decrease" | "replace"}}
     ],
     "reference_position": null أو رقم (1, 2, 3) إذا أشار لنتيجة سابقة,
     "upsell_suggestions": ["بطاطا", "بيبسي", "صوص"],
@@ -204,6 +229,54 @@ class AIService:
 "طلبلي برغر من ماكدونالدز على المريجة" → {{"intent": "one_shot_order", "items": [{{"name": "برغر", "quantity": 1}}], "restaurant_name": "ماكدونالدز", "delivery_address": "المريجة", "needs_confirmation": true, "message": "حاضر! برغر من ماكدونالدز على المريجة 🍔"}}
 "زيد 2 بيبسي" → {{"intent": "modify_cart", "items": [{{"name": "بيبسي", "quantity": 2, "action": "increase"}}], "message": "تم زدنا 2 بيبسي"}}
 "نقص شاورما وحدة" → {{"intent": "modify_cart", "items": [{{"name": "شاورما", "quantity": 1, "action": "decrease"}}], "message": "تم نقصنا شاورما"}}
+"لا بدي كبيرة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "كبير", "action": "replace"}}], "message": "تم غيرناها لكبيرة!"}}
+"غيرها كبير" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "كبير", "action": "replace"}}], "message": "حاضر! غيرناها لكبير"}}
+"بدي هي كبيرة مش صغيرة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "كبير", "action": "replace"}}], "message": "تكرم! كبيرة بدل الصغيرة"}}
+"بدي لحمة مش دجاج" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "replace_type": "لحمة", "action": "replace"}}], "message": "تم! غيرناهم للحمة"}}
+"غيرهم لحمة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "replace_type": "لحمة", "action": "replace"}}], "message": "حاضر! لحمة بدل الدجاج"}}
+"بدي هني لحمة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "replace_type": "لحمة", "action": "replace"}}], "message": "تكرم! صارو لحمة"}}
+
+أمثلة Arabizi:
+"bade burger" → {{"intent": "search_product", "product_query": "برغر", "message": "تكرم! عنا كذا مطعم فيهم برغر 🍔"}}
+"bade 2 shawarma men ghasan" → {{"intent": "order_item", "items": [{{"name": "شاورما", "quantity": 2}}], "restaurant_name": "غسان", "message": "على راسي! 2 شاورما من غسان 😋"}}
+"3tine pizza" → {{"intent": "search_product", "product_query": "بيتزا", "message": "حاضر! خليني دور على بيتزا 🍕"}}
+"shou fi akl" → {{"intent": "discover_category", "message": "عنا كتير خيارات! شو بدك تاكل؟ 😋"}}
+
+أمثلة طلب المانيو (request_menu):
+"ابعتلي مانيو مطعم غسان" → {{"intent": "request_menu", "restaurant_name": "غسان", "message": "حاضر! رح بعتلك مانيو غسان 📋"}}
+"بدي شوف قائمة طعام بوبايز" → {{"intent": "request_menu", "restaurant_name": "بوبايز", "message": "تكرم! هيدي قائمة بوبايز 🍗"}}
+"شو في عند ساب مارين" → {{"intent": "request_menu", "restaurant_name": "ساب مارين", "message": "عم بعتلك المانيو 📋"}}
+"عطيني منيو Stories" → {{"intent": "request_menu", "restaurant_name": "Stories", "message": "تفضل منيو Stories ☕"}}
+"menu ghasan" → {{"intent": "request_menu", "restaurant_name": "غسان", "message": "Here's Ghasan's menu 📋"}}
+"send me twister menu" → {{"intent": "request_menu", "restaurant_name": "Twister", "message": "Here's Twister's menu 🍗"}}
+
+أمثلة البحث بالوصف (search_description):
+"بدي شي بارد ومنعش" → {{"intent": "search_description", "description_query": "بارد منعش", "message": "عم دور على شي بارد ومنعش! 🧊"}}
+"شي حار وحرّيف" → {{"intent": "search_description", "description_query": "حار حريف", "message": "بتحب الحار؟ عنا خيارات 🌶️"}}
+"بدي شي حلو" → {{"intent": "search_description", "description_query": "حلو حلويات", "message": "عنا أطيب حلويات! 🍰"}}
+"شي سريع التحضير" → {{"intent": "search_description", "description_query": "سريع", "message": "خليني شوفلك شي سريع ⚡"}}
+"أكل صحي" → {{"intent": "search_description", "description_query": "صحي سلطات", "message": "صحتك أولاً! 🥗"}}
+
+أمثلة طلبات متعددة بجملة واحدة:
+"بدي 2 شاورما كبير و 1 بطاطا و 2 بيبسي من غسان" → {{"intent": "order_item", "items": [{{"name": "شاورما", "quantity": 2, "size": "large"}}, {{"name": "بطاطا", "quantity": 1}}, {{"name": "بيبسي", "quantity": 2}}], "restaurant_name": "غسان", "message": "تكرم! 2 شاورما كبير + بطاطا + 2 بيبسي من غسان 😋"}}
+"عطيني برتقال كبيرة وكوكتيل" → {{"intent": "order_item", "items": [{{"name": "برتقال", "quantity": 1, "size": "large"}}, {{"name": "كوكتيل", "quantity": 1}}], "message": "حاضر! برتقال كبيرة وكوكتيل 🍊"}}
+
+أمثلة تعديل السلة بالكلام:
+"غير البرتقال لكبيرة" → {{"intent": "modify_cart", "items": [{{"name": "برتقال", "size": "large", "action": "replace"}}], "message": "تم غيرنا البرتقال لكبيرة! 👍"}}
+"بدل الدجاج بلحمة" → {{"intent": "modify_cart", "items": [{{"name": "دجاج", "replace_type": "لحمة", "action": "replace"}}], "message": "تم! صارت لحمة بدل الدجاج"}}
+"ضيف كمان 2 بيبسي" → {{"intent": "modify_cart", "items": [{{"name": "بيبسي", "quantity": 2, "action": "increase"}}], "message": "تم ضفنا 2 بيبسي! 🥤"}}
+"شيل البطاطا من السلة" → {{"intent": "modify_cart", "items": [{{"name": "بطاطا", "action": "remove"}}], "message": "تم شيلنا البطاطا 👍"}}
+"نقص شاورما وحدة" → {{"intent": "modify_cart", "items": [{{"name": "شاورما", "quantity": 1, "action": "decrease"}}], "message": "تم نقصنا شاورما"}}
+
+أمثلة تعديل الحجم بكلمة واحدة (يغير آخر صنف مضاف):
+"كبيرة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "large", "action": "replace"}}], "message": "تم غيرناها لكبيرة! 👍"}}
+"kbere" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "large", "action": "replace"}}], "message": "تم غيرناها لكبيرة! 👍"}}
+"kbir" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "large", "action": "replace"}}], "message": "حاضر! صارت كبيرة"}}
+"صغيرة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "small", "action": "replace"}}], "message": "تم غيرناها لصغيرة!"}}
+"sghire" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "small", "action": "replace"}}], "message": "تم غيرناها لصغيرة!"}}
+"وسط" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "medium", "action": "replace"}}], "message": "تم غيرناها لوسط!"}}
+"large" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "large", "action": "replace"}}], "message": "Changed to large! 👍"}}
+"small" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "small", "action": "replace"}}], "message": "Changed to small!"}}
 
 طلب المستخدم: {text}
 """
@@ -490,13 +563,49 @@ class AIService:
                 "message": "ما فهمت عليك، قلي كمان مرة! 🙏"
             }
 
+    # Size keywords mapping - comprehensive for Arabic, English, and Arabizi
+    SIZE_KEYWORDS = {
+        # Arabic
+        "كبير": "large", "كبيرة": "large", "كبيره": "large",
+        "صغير": "small", "صغيرة": "small", "صغيره": "small",
+        "وسط": "medium", "متوسط": "medium", "متوسطة": "medium",
+        # English
+        "large": "large", "big": "large", "l": "large",
+        "small": "small", "s": "small",
+        "medium": "medium", "med": "medium", "m": "medium",
+        # Arabizi - all variations
+        "kbir": "large", "kbire": "large", "kbere": "large", "kbiir": "large", "kbeere": "large",
+        "kabir": "large", "kabire": "large", "kabiir": "large",
+        "sghir": "small", "sghire": "small", "saghir": "small", "saghire": "small",
+        "zghir": "small", "zghire": "small",
+        "wasat": "medium", "wsat": "medium", "wassat": "medium",
+    }
+
+    def _extract_size_from_name(self, name: str) -> tuple:
+        """Extract size keyword from item name and return (base_name, size)"""
+        name_lower = name.lower().strip()
+        words = name_lower.split()
+
+        detected_size = None
+        base_words = []
+
+        for word in words:
+            if word in self.SIZE_KEYWORDS:
+                detected_size = self.SIZE_KEYWORDS[word]
+            else:
+                base_words.append(word)
+
+        base_name = " ".join(base_words).strip()
+        return base_name, detected_size
+
     async def _match_menu_items(self, ai_result: dict, restaurant_id: int) -> dict:
-        """Match AI items with actual menu"""
+        """Match AI items with actual menu - enhanced with size/variant support"""
         matched_items = []
         unmatched_items = []
-        
+
         try:
             async with AsyncSessionLocal() as db:
+                # Get menu items
                 result = await db.execute(
                     select(MenuItem)
                     .join(Category)
@@ -505,49 +614,104 @@ class AIService:
                     .where(MenuItem.is_available == True)
                 )
                 menu_items = result.scalars().all()
-                
+
+                # Build lookup with both Arabic and English names
                 menu_lookup = {}
                 for item in menu_items:
                     name = self._normalize_arabic(item.name_ar or item.name)
                     menu_lookup[name] = item
                     if item.name_ar:
                         menu_lookup[self._normalize_arabic(item.name)] = item
-                
+
                 for requested in ai_result.get("items", []):
-                    req_name = self._normalize_arabic(requested.get("name", ""))
+                    req_name = requested.get("name", "")
+                    req_size = requested.get("size")  # Size from AI
                     quantity = requested.get("quantity", 1)
                     matched = None
-                    
-                    # Exact match
-                    if req_name in menu_lookup:
-                        matched = menu_lookup[req_name]
+                    matched_variant = None
+
+                    # Extract size from name if not provided separately
+                    base_name, extracted_size = self._extract_size_from_name(req_name)
+                    if not req_size and extracted_size:
+                        req_size = extracted_size
+
+                    normalized_name = self._normalize_arabic(base_name or req_name)
+
+                    # Try exact match first
+                    if normalized_name in menu_lookup:
+                        matched = menu_lookup[normalized_name]
                     else:
                         # Partial match
                         for menu_name, item in menu_lookup.items():
-                            if req_name in menu_name or menu_name in req_name:
+                            if normalized_name in menu_name or menu_name in normalized_name:
                                 matched = item
                                 break
-                    
+
                     if matched:
-                        # Convert Decimal price to float for JSON serialization
                         price = float(matched.price) if matched.price else 0.0
-                        logger.info(f"Matched item: {matched.name_ar} with price: {price}")
-                        matched_items.append({
+                        variant_id = None
+                        variant_name = None
+
+                        # Check if item has variants and size was requested
+                        if hasattr(matched, 'has_variants') and matched.has_variants and req_size:
+                            # Get variants for this item
+                            from app.models.menu import MenuItemVariant
+                            variants_result = await db.execute(
+                                select(MenuItemVariant)
+                                .where(MenuItemVariant.menu_item_id == matched.id)
+                            )
+                            variants = variants_result.scalars().all()
+
+                            # Map size to variant
+                            size_map = {
+                                "small": ["small", "s", "صغير", "صغيرة"],
+                                "medium": ["medium", "m", "وسط", "متوسط"],
+                                "large": ["large", "l", "كبير", "كبيرة"],
+                            }
+
+                            for variant in variants:
+                                v_name = (variant.name or "").lower()
+                                v_name_ar = (variant.name_ar or "").lower()
+
+                                # Check if variant matches requested size
+                                if req_size in size_map:
+                                    for size_keyword in size_map[req_size]:
+                                        if size_keyword in v_name or size_keyword in v_name_ar:
+                                            matched_variant = variant
+                                            break
+                                if matched_variant:
+                                    break
+
+                            if matched_variant:
+                                price = float(matched_variant.price) if matched_variant.price else price
+                                variant_id = matched_variant.id
+                                variant_name = matched_variant.name_ar or matched_variant.name
+                                logger.info(f"Matched item: {matched.name_ar or matched.name} with variant: {variant_name} price: {price}")
+
+                        item_data = {
                             "menu_item_id": matched.id,
                             "name": matched.name_ar or matched.name,
                             "price": price,
                             "quantity": quantity,
-                            "restaurant_id": restaurant_id  # Required for order creation
-                        })
+                            "restaurant_id": restaurant_id
+                        }
+
+                        if variant_id:
+                            item_data["variant_id"] = variant_id
+                            item_data["variant_name"] = variant_name
+                            item_data["name"] = f"{matched.name_ar or matched.name} ({variant_name})"
+
+                        matched_items.append(item_data)
+                        logger.info(f"Matched item: {item_data['name']} with price: {price}")
                     else:
                         unmatched_items.append(requested.get("name", ""))
         except Exception as e:
             logger.error(f"Error matching items: {e}")
-        
+
         ai_result["items"] = matched_items
         ai_result["unmatched"] = unmatched_items
         ai_result["success"] = len(matched_items) > 0
-        
+
         return ai_result
 
     async def get_upsell_suggestions(self, restaurant_id: int, current_items: List[int]) -> List[dict]:

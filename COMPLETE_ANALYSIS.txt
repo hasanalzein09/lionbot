@@ -1,0 +1,53 @@
+تحليل شامل لجميع الملفات
+======================================================================
+
+من res.md:
+- restaurant_info: 18
+- store_info: 0
+- menu: 35
+- category: 110
+- category_ar: 45
+- category_name: 33
+- items: 200
+- name_en: 177
+- name_ar: 287
+
+من rest2.md:
+- restaurant_info: 10
+- store_info: 0
+- menu: 22
+- category: 107
+- category_ar: 51
+- category_name: 7
+- items: 261
+- name_en: 345
+- name_ar: 90
+
+من Document (4).docx:
+- restaurant_info: 6
+- store_info: 3
+- menu: 13
+- category: 223
+- category_ar: 11
+- category_name: 5
+- items: 131
+- name_en: 27
+- name_ar: 107
+
+من Document (7).docx:
+- restaurant_info: 5
+- store_info: 0
+- menu: 5
+- category: 0
+- category_ar: 0
+- category_name: 4
+- items: 25
+- name_en: 247
+- name_ar: 251
+
+======================================================================
+الملخص:
+- المجموع الكلي للـ menus: 75
+- المجموع الكلي للأصناف: 596
+- المجموع الكلي للعناصر: 617
+======================================================================

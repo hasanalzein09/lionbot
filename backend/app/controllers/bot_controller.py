@@ -276,6 +276,15 @@ class BotController:
         elif btn_id == "skip_fav":
             await self._send_main_menu(phone_number, lang)
 
+        # Restaurant selection from menu request
+        elif btn_id.startswith("rest_"):
+            restaurant_id = int(btn_id.split("_")[1])
+            await self._show_categories(phone_number, restaurant_id, lang)
+
+        # Show restaurants list
+        elif btn_id == "show_restaurants":
+            await self._show_restaurants(phone_number, lang)
+
     async def _handle_list_reply(self, phone_number: str, list_id: str, state: str, lang: str, user_data: dict):
         """Handle list item selection"""
         logger.debug(f"List ID: {list_id}, State: {state}")
@@ -354,6 +363,73 @@ class BotController:
         elif list_id.startswith("fav_"):
             restaurant_id = int(list_id.split("_")[1])
             await self._show_categories(phone_number, restaurant_id, lang)
+
+        # Quick order from favorites (quickorder_itemId_restId)
+        elif list_id.startswith("quickorder_"):
+            parts = list_id.split("_")
+            item_id = int(parts[1])
+            restaurant_id = int(parts[2])
+            await self._quick_add_favorite_item(phone_number, item_id, restaurant_id, lang)
+
+    async def _quick_add_favorite_item(self, phone_number: str, item_id: int, restaurant_id: int, lang: str):
+        """Quickly add a favorite item to cart"""
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(
+                select(MenuItem, Restaurant)
+                .join(Category, MenuItem.category_id == Category.id)
+                .join(Menu, Category.menu_id == Menu.id)
+                .join(Restaurant, Menu.restaurant_id == Restaurant.id)
+                .where(MenuItem.id == item_id)
+            )
+            row = result.first()
+
+            if not row:
+                await whatsapp_service.send_text(phone_number, "ما لقيت الصنف 🤔")
+                await self._send_main_menu(phone_number, lang)
+                return
+
+            item, rest = row
+            item_name = item.name_ar if lang == "ar" and item.name_ar else item.name
+            price = float(item.price) if item.price else 0.0
+
+            # Check if item has variants
+            if hasattr(item, 'has_variants') and item.has_variants:
+                # Show variants
+                await self._show_item_details(phone_number, item_id, lang, {"restaurant_id": restaurant_id, "lang": lang})
+                return
+
+            # Add directly to cart
+            cart_item = {
+                "menu_item_id": item.id,
+                "name": item_name,
+                "price": price,
+                "quantity": 1,
+                "restaurant_id": restaurant_id
+            }
+            await redis_service.add_to_cart(phone_number, cart_item)
+
+            # Get cart total
+            cart_total = await redis_service.get_cart_total(phone_number)
+            cart_count = await redis_service.get_cart_count(phone_number)
+
+            response = f"⚡ *طلب سريع!*\n\n"
+            response += f"✅ تم إضافة {item_name}\n"
+            response += f"💰 السعر: ${price:.2f}\n"
+            response += f"🛒 المجموع: ${float(cart_total):.2f} ({cart_count} أصناف)"
+
+            await whatsapp_service.send_text(phone_number, response)
+
+            # Show checkout options
+            buttons = [
+                {"id": "checkout", "title": "إتمام الطلب ✅" if lang == "ar" else "Checkout"},
+                {"id": "view_cart", "title": "عرض السلة 🛒" if lang == "ar" else "View Cart"},
+                {"id": "favorites", "title": "المزيد ⭐" if lang == "ar" else "More Favorites"}
+            ]
+            await whatsapp_service.send_interactive_buttons(
+                phone_number,
+                "شو بدك تعمل؟" if lang == "ar" else "What next?",
+                buttons
+            )
 
     # ==================== Location Handler ====================
     async def _handle_location_message(self, phone_number: str, message_body: dict, state: str, lang: str, user_data: dict):
@@ -1479,68 +1555,186 @@ https://maps.google.com/?q={lat},{lng}
             # Complete order in one sentence (items + restaurant + address)
             await self._handle_one_shot_order(phone_number, ai_result, lang, user_data)
 
+        elif intent == "request_menu":
+            # User wants to see a restaurant's full menu
+            await self._handle_menu_request(phone_number, ai_result, lang)
+
+        elif intent == "search_description":
+            # User searching by description (cold, hot, sweet, etc.)
+            await self._handle_description_search(phone_number, ai_result, lang)
+
         else:
             # Error or unknown intent - provide smart recovery
             await self._handle_ai_error_recovery(phone_number, text, ai_result, lang)
 
     async def _handle_ai_error_recovery(self, phone_number: str, original_text: str, ai_result: dict, lang: str):
-        """Smart error recovery with suggestions"""
+        """Smart error recovery with intelligent suggestions"""
         ai_message = ai_result.get("message", "")
 
-        # Try to find similar products
+        # Try to find similar products using multiple strategies
         suggestions = []
+        restaurants_found = []
+
         try:
             async with AsyncSessionLocal() as db:
-                # Search for similar items
-                words = original_text.lower().split()
-                for word in words:
-                    if len(word) > 2:
-                        result = await db.execute(
-                            select(MenuItem, Restaurant)
-                            .join(Category, MenuItem.category_id == Category.id)
-                            .join(Menu, Category.menu_id == Menu.id)
-                            .join(Restaurant, Menu.restaurant_id == Restaurant.id)
-                            .where(MenuItem.is_available == True)
-                            .where(Restaurant.is_active == True)
-                            .limit(50)
-                        )
-                        items = result.all()
+                # Strategy 1: Search for similar items by name
+                words = [w for w in original_text.lower().split() if len(w) > 2]
 
-                        for item, rest in items:
-                            item_name = (item.name_ar or item.name or "").lower()
-                            if word in item_name:
-                                suggestions.append({
-                                    "id": item.id,
-                                    "name": item.name_ar or item.name,
-                                    "restaurant": rest.name_ar or rest.name,
-                                    "price": item.price
+                # Get all items for searching
+                result = await db.execute(
+                    select(MenuItem, Restaurant)
+                    .join(Category, MenuItem.category_id == Category.id)
+                    .join(Menu, Category.menu_id == Menu.id)
+                    .join(Restaurant, Menu.restaurant_id == Restaurant.id)
+                    .where(MenuItem.is_available == True)
+                    .where(Restaurant.is_active == True)
+                )
+                all_items = result.all()
+
+                # Score-based matching
+                scored_items = []
+                for item, rest in all_items:
+                    item_name = (item.name_ar or item.name or "").lower()
+                    item_desc = (item.description_ar or item.description or "").lower()
+                    rest_name = (rest.name_ar or rest.name or "").lower()
+
+                    score = 0
+                    for word in words:
+                        if word in item_name:
+                            score += 10  # High score for name match
+                        if word in item_desc:
+                            score += 5   # Medium for description
+                        if word in rest_name:
+                            score += 3   # Low for restaurant name
+
+                    if score > 0:
+                        scored_items.append({
+                            "id": item.id,
+                            "name": item.name_ar or item.name,
+                            "restaurant": rest.name_ar or rest.name,
+                            "restaurant_id": rest.id,
+                            "price": float(item.price) if item.price else 0,
+                            "score": score
+                        })
+
+                # Sort by score and take top results
+                scored_items.sort(key=lambda x: x["score"], reverse=True)
+                suggestions = scored_items[:8]
+
+                # Strategy 2: If no suggestions, check if it's a restaurant name
+                if not suggestions:
+                    rest_result = await db.execute(
+                        select(Restaurant)
+                        .where(Restaurant.is_active == True)
+                    )
+                    all_restaurants = rest_result.scalars().all()
+
+                    for rest in all_restaurants:
+                        rest_name_ar = (rest.name_ar or "").lower()
+                        rest_name_en = (rest.name or "").lower()
+                        for word in words:
+                            if word in rest_name_ar or word in rest_name_en:
+                                restaurants_found.append({
+                                    "id": rest.id,
+                                    "name": rest.name_ar or rest.name
                                 })
-                        if suggestions:
-                            break
+                                break
+
         except Exception as e:
             logger.error(f"Error finding suggestions: {e}")
 
-        if suggestions and len(suggestions) >= 1:
-            # Show suggestions
-            suggestions = suggestions[:5]  # Max 5
-            msg = get_text("item_not_found_suggestions", lang).format(
-                query=original_text,
-                suggestions="\n".join([
-                    f"{i+1}. {s['name']} @ {s['restaurant']} (${float(s['price']):.2f})"
-                    for i, s in enumerate(suggestions)
-                ])
-            )
+        # Build response based on what we found
+        if suggestions:
+            # Group by restaurant
+            by_restaurant = {}
+            for s in suggestions:
+                rest = s["restaurant"]
+                if rest not in by_restaurant:
+                    by_restaurant[rest] = []
+                if len(by_restaurant[rest]) < 3:  # Max 3 per restaurant
+                    by_restaurant[rest].append(s)
 
-            # Store suggestions in context for reference
+            # Build interactive list
+            sections = []
+            for rest_name, items in list(by_restaurant.items())[:3]:  # Max 3 restaurants
+                rows = []
+                for item in items:
+                    price_str = f"${item['price']:.2f}" if item['price'] else ""
+                    rows.append({
+                        "id": f"item_{item['id']}",
+                        "title": item["name"][:24],
+                        "description": f"💰 {price_str}" if price_str else ""
+                    })
+                sections.append({
+                    "title": rest_name[:24],
+                    "rows": rows
+                })
+
+            header = f"🤔 ما لقيت '{original_text}' بالضبط\n\n"
+            header += "💡 بس ممكن تقصد:" if lang == "ar" else "Did you mean:"
+
+            # Store suggestions in context
             await redis_service.update_conversation_context(phone_number, {
-                "suggestions": suggestions
+                "suggestions": suggestions[:5]
             })
 
-            await whatsapp_service.send_text(phone_number, msg)
+            await whatsapp_service.send_interactive_list(
+                phone_number,
+                header,
+                "اختار 👆" if lang == "ar" else "Select",
+                sections
+            )
+
+        elif restaurants_found:
+            # Found matching restaurants
+            header = f"🔍 لقيت مطاعم قريبة من '{original_text}':"
+
+            sections = [{
+                "title": "🏪 مطاعم" if lang == "ar" else "Restaurants",
+                "rows": [
+                    {
+                        "id": f"rest_{r['id']}",
+                        "title": r["name"][:24],
+                        "description": "عرض المانيو" if lang == "ar" else "View menu"
+                    }
+                    for r in restaurants_found[:5]
+                ]
+            }]
+
+            await whatsapp_service.send_interactive_list(
+                phone_number,
+                header,
+                "اختار 👆" if lang == "ar" else "Select",
+                sections
+            )
+
         else:
-            # No suggestions found
-            error_msg = ai_message or ("ما فهمت عليك، قلي شو بدك تطلب! 🙏" if lang == "ar" else "I didn't understand, what would you like to order?")
-            await whatsapp_service.send_text(phone_number, error_msg)
+            # Nothing found - provide helpful message
+            helpful_messages = {
+                "ar": [
+                    "🤔 ما فهمت عليك...",
+                    "",
+                    "💡 *جرب تقول:*",
+                    "• \"بدي شاورما\" - للبحث عن صنف",
+                    "• \"ابعتلي مانيو غسان\" - لعرض قائمة مطعم",
+                    "• \"شو في برغر\" - للبحث عن مطاعم",
+                    "• \"بدي شي بارد\" - للبحث بالوصف",
+                    "",
+                    "او اختار من القائمة 👇"
+                ],
+                "en": [
+                    "🤔 I didn't understand...",
+                    "",
+                    "💡 *Try saying:*",
+                    "• \"I want shawarma\" - to search",
+                    "• \"Send me Ghasan menu\" - to view menu",
+                    "• \"What burgers do you have\" - to browse",
+                    "",
+                    "Or choose from the menu 👇"
+                ]
+            }
+
+            await whatsapp_service.send_text(phone_number, "\n".join(helpful_messages.get(lang, helpful_messages["ar"])))
             await self._send_main_menu(phone_number, lang)
 
     async def _handle_product_search(self, phone_number: str, ai_result: dict, lang: str):
@@ -1842,7 +2036,7 @@ https://maps.google.com/?q={lat},{lng}
         await self._show_cart(phone_number, lang)
 
     async def _find_item_with_size(self, current_name: str, target_size: str, restaurant_id: int) -> Optional[dict]:
-        """Find a menu item with different size (e.g., small → large)"""
+        """Find a menu item with different size - supports both name-based and variant-based sizes"""
         try:
             async with AsyncSessionLocal() as db:
                 result = await db.execute(
@@ -1856,19 +2050,64 @@ https://maps.google.com/?q={lat},{lng}
 
                 # Size words to strip for base name comparison
                 size_words = ["صغير", "كبير", "وسط", "small", "medium", "large", "صغيرة", "كبيرة", "وسطى"]
+
+                # Size mapping
+                size_map = {
+                    "small": ["small", "s", "صغير", "صغيرة"],
+                    "medium": ["medium", "m", "وسط", "متوسط"],
+                    "large": ["large", "l", "كبير", "كبيرة"],
+                }
+
+                # Normalize target size
+                target_normalized = target_size.lower()
+                for key, variants in size_map.items():
+                    if target_normalized in variants:
+                        target_normalized = key
+                        break
+
+                # Clean up current name - remove size words and variant info
                 base_name = current_name.lower()
+                # Remove (Large), (Small), etc.
+                import re
+                base_name = re.sub(r'\([^)]*\)', '', base_name).strip()
                 for sw in size_words:
                     base_name = base_name.replace(sw, "").strip()
 
-                # Find matching item with target size
+                # First, try to find item with variants
                 for item in menu_items:
                     item_name = (item.name_ar or item.name or "").lower()
-                    item_base = item_name
+                    item_base = re.sub(r'\([^)]*\)', '', item_name).strip()
                     for sw in size_words:
                         item_base = item_base.replace(sw, "").strip()
 
-                    # Check if same base name and has target size
                     if base_name in item_base or item_base in base_name:
+                        # Check if this item has variants
+                        if hasattr(item, 'has_variants') and item.has_variants:
+                            from app.models.menu import MenuItemVariant
+                            variants_result = await db.execute(
+                                select(MenuItemVariant)
+                                .where(MenuItemVariant.menu_item_id == item.id)
+                            )
+                            variants = variants_result.scalars().all()
+
+                            for variant in variants:
+                                v_name = (variant.name or "").lower()
+                                v_name_ar = (variant.name_ar or "").lower()
+
+                                # Check if variant matches target size
+                                if target_normalized in size_map:
+                                    for size_keyword in size_map[target_normalized]:
+                                        if size_keyword in v_name or size_keyword in v_name_ar:
+                                            return {
+                                                "menu_item_id": item.id,
+                                                "variant_id": variant.id,
+                                                "name": f"{item.name_ar or item.name} ({variant.name_ar or variant.name})",
+                                                "price": float(variant.price) if variant.price else 0.0,
+                                                "quantity": 1,
+                                                "restaurant_id": restaurant_id
+                                            }
+
+                        # No variants, check if size is in item name
                         if target_size in item_name:
                             return {
                                 "menu_item_id": item.id,
@@ -2023,6 +2262,310 @@ https://maps.google.com/?q={lat},{lng}
                 "lang": lang,
                 "restaurant_id": restaurant_id
             })
+
+    # ==================== Menu Request Feature ====================
+    async def _handle_menu_request(self, phone_number: str, ai_result: dict, lang: str):
+        """Handle request to see a restaurant's full menu"""
+        restaurant_name = ai_result.get("restaurant_name", "")
+        ai_message = ai_result.get("message", "")
+
+        if not restaurant_name:
+            await whatsapp_service.send_text(
+                phone_number,
+                "أي مطعم بدك تشوف المانيو تبعه؟ 🤔" if lang == "ar" else "Which restaurant's menu would you like to see?"
+            )
+            await self._show_restaurants(phone_number, lang)
+            return
+
+        # Find restaurant by name
+        restaurant_id = await ai_service._find_restaurant_id(restaurant_name)
+
+        if not restaurant_id:
+            # Try fuzzy match
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(Restaurant)
+                    .where(Restaurant.is_active == True)
+                )
+                restaurants = result.scalars().all()
+
+                # Find best match
+                search_lower = restaurant_name.lower()
+                for rest in restaurants:
+                    name_en = (rest.name or "").lower()
+                    name_ar = (rest.name_ar or "").lower()
+                    if search_lower in name_en or search_lower in name_ar or name_en in search_lower or name_ar in search_lower:
+                        restaurant_id = rest.id
+                        break
+
+        if not restaurant_id:
+            await whatsapp_service.send_text(
+                phone_number,
+                f"ما لقيت مطعم باسم '{restaurant_name}' 🤔\nاختار من القائمة:" if lang == "ar"
+                else f"Couldn't find restaurant '{restaurant_name}'\nChoose from the list:"
+            )
+            await self._show_restaurants(phone_number, lang)
+            return
+
+        # Get full menu
+        async with AsyncSessionLocal() as db:
+            # Get restaurant
+            rest_result = await db.execute(
+                select(Restaurant).where(Restaurant.id == restaurant_id)
+            )
+            restaurant = rest_result.scalars().first()
+
+            if not restaurant:
+                await whatsapp_service.send_text(phone_number, "المطعم غير موجود 🤔")
+                await self._show_restaurants(phone_number, lang)
+                return
+
+            rest_name = restaurant.name_ar if lang == "ar" and restaurant.name_ar else restaurant.name
+
+            # Get all categories with items
+            categories_result = await db.execute(
+                select(Category)
+                .options(selectinload(Category.items))
+                .join(Menu)
+                .where(Menu.restaurant_id == restaurant_id)
+                .where(Menu.is_active == True)
+            )
+            categories = categories_result.scalars().all()
+
+            if not categories:
+                await whatsapp_service.send_text(
+                    phone_number,
+                    f"لا يوجد قائمة طعام لـ {rest_name} حالياً 😕" if lang == "ar"
+                    else f"No menu available for {rest_name} currently 😕"
+                )
+                return
+
+            # Build menu text
+            menu_text = f"📋 *مانيو {rest_name}*\n"
+            menu_text += "=" * 25 + "\n\n"
+
+            for category in categories:
+                cat_name = category.name_ar if lang == "ar" and category.name_ar else category.name
+                available_items = [item for item in category.items if item.is_available]
+
+                if not available_items:
+                    continue
+
+                menu_text += f"🔸 *{cat_name}*\n"
+
+                for item in available_items:
+                    item_name = item.name_ar if lang == "ar" and item.name_ar else item.name
+
+                    # Handle price display
+                    if hasattr(item, 'has_variants') and item.has_variants:
+                        # Get variants for price range
+                        from app.models.menu import MenuItemVariant
+                        variants_result = await db.execute(
+                            select(MenuItemVariant)
+                            .where(MenuItemVariant.menu_item_id == item.id)
+                            .order_by(MenuItemVariant.price)
+                        )
+                        variants = variants_result.scalars().all()
+                        if variants:
+                            min_price = float(min(v.price for v in variants))
+                            max_price = float(max(v.price for v in variants))
+                            if min_price == max_price:
+                                price_str = f"${min_price:.2f}"
+                            else:
+                                price_str = f"${min_price:.2f}-${max_price:.2f}"
+                        else:
+                            price_str = "سعر متغير"
+                    elif item.price:
+                        price_str = f"${float(item.price):.2f}"
+                    else:
+                        price_str = "-"
+
+                    menu_text += f"  • {item_name} - {price_str}\n"
+
+                menu_text += "\n"
+
+            # WhatsApp has a 4096 character limit, split if needed
+            if len(menu_text) > 4000:
+                # Split into chunks
+                chunks = []
+                current_chunk = f"📋 *مانيو {rest_name}* (1)\n" + "=" * 25 + "\n\n"
+                chunk_num = 1
+
+                for category in categories:
+                    cat_name = category.name_ar if lang == "ar" and category.name_ar else category.name
+                    available_items = [item for item in category.items if item.is_available]
+
+                    if not available_items:
+                        continue
+
+                    cat_text = f"🔸 *{cat_name}*\n"
+                    for item in available_items:
+                        item_name = item.name_ar if lang == "ar" and item.name_ar else item.name
+                        if item.price:
+                            price_str = f"${float(item.price):.2f}"
+                        else:
+                            price_str = "-"
+                        cat_text += f"  • {item_name} - {price_str}\n"
+                    cat_text += "\n"
+
+                    if len(current_chunk) + len(cat_text) > 3800:
+                        chunks.append(current_chunk)
+                        chunk_num += 1
+                        current_chunk = f"📋 *مانيو {rest_name}* ({chunk_num})\n" + "=" * 25 + "\n\n"
+
+                    current_chunk += cat_text
+
+                if current_chunk.strip():
+                    chunks.append(current_chunk)
+
+                # Send all chunks
+                for chunk in chunks:
+                    await whatsapp_service.send_text(phone_number, chunk)
+            else:
+                await whatsapp_service.send_text(phone_number, menu_text)
+
+            # Ask if they want to order
+            await whatsapp_service.send_interactive_buttons(
+                phone_number,
+                "بدك تطلب شي من هالمطعم؟ 🍽️" if lang == "ar" else "Would you like to order from this restaurant?",
+                [
+                    {"id": f"rest_{restaurant_id}", "title": "نعم، اختار 👍" if lang == "ar" else "Yes, browse"},
+                    {"id": "show_restaurants", "title": "لا، مطعم تاني 🔙" if lang == "ar" else "No, another"}
+                ]
+            )
+
+            await redis_service.set_user_state(phone_number, "MAIN_MENU", {"lang": lang})
+
+    # ==================== Description Search Feature ====================
+    async def _handle_description_search(self, phone_number: str, ai_result: dict, lang: str):
+        """Handle search by description (cold, hot, sweet, spicy, etc.)"""
+        description = ai_result.get("description_query", "")
+        ai_message = ai_result.get("message", "")
+
+        if not description:
+            await whatsapp_service.send_text(phone_number, ai_message or "شو نوع الأكل اللي بدك ياه؟ 🤔")
+            return
+
+        # Search keywords mapping
+        description_keywords = {
+            # Cold/Refreshing
+            "بارد": ["عصير", "سموذي", "آيس", "ice", "cold", "ليموناضة", "موهيتو", "كوكتيل"],
+            "منعش": ["عصير", "ليموناضة", "موهيتو", "فريش", "fresh"],
+            "cold": ["juice", "smoothie", "ice", "lemonade", "mojito"],
+            # Hot/Spicy
+            "حار": ["حارة", "سبايسي", "spicy", "hot", "بافلو", "buffalo"],
+            "حريف": ["حارة", "سبايسي", "spicy", "فاهيتا", "جالبينو"],
+            "spicy": ["spicy", "hot", "buffalo", "jalapeño"],
+            # Sweet
+            "حلو": ["كيك", "حلويات", "شوكولا", "آيس كريم", "وافل", "كريب", "نوتيلا"],
+            "sweet": ["cake", "dessert", "chocolate", "ice cream", "waffle"],
+            # Healthy
+            "صحي": ["سلطة", "salad", "grilled", "مشوي", "خضار"],
+            "healthy": ["salad", "grilled", "vegetables", "light"],
+            # Fast
+            "سريع": ["برغر", "ساندويش", "شاورما", "فرايز", "هوت دوغ"],
+            "fast": ["burger", "sandwich", "fries", "hot dog"],
+            # Breakfast
+            "فطور": ["منقوشة", "فول", "حمص", "لبنة", "بيض", "كرواسان"],
+            "breakfast": ["manakish", "foul", "hummus", "eggs", "croissant"],
+        }
+
+        # Find matching keywords
+        search_terms = []
+        desc_lower = description.lower()
+        for key, terms in description_keywords.items():
+            if key in desc_lower:
+                search_terms.extend(terms)
+
+        if not search_terms:
+            search_terms = description.split()
+
+        # Search in database
+        matching_items = []
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(MenuItem, Restaurant)
+                    .join(Category, MenuItem.category_id == Category.id)
+                    .join(Menu, Category.menu_id == Menu.id)
+                    .join(Restaurant, Menu.restaurant_id == Restaurant.id)
+                    .where(MenuItem.is_available == True)
+                    .where(Restaurant.is_active == True)
+                    .limit(200)
+                )
+                rows = result.all()
+
+                for item, rest in rows:
+                    item_name = (item.name_ar or item.name or "").lower()
+                    item_desc = (item.description_ar or item.description or "").lower()
+
+                    for term in search_terms:
+                        if term.lower() in item_name or term.lower() in item_desc:
+                            matching_items.append({
+                                "id": item.id,
+                                "name": item.name_ar or item.name,
+                                "restaurant": rest.name_ar or rest.name,
+                                "restaurant_id": rest.id,
+                                "price": float(item.price) if item.price else 0
+                            })
+                            break
+
+                # Remove duplicates and limit
+                seen = set()
+                unique_items = []
+                for item in matching_items:
+                    key = f"{item['name']}_{item['restaurant_id']}"
+                    if key not in seen:
+                        seen.add(key)
+                        unique_items.append(item)
+                matching_items = unique_items[:10]
+
+        except Exception as e:
+            logger.error(f"Error searching by description: {e}")
+
+        if matching_items:
+            # Build response with suggestions
+            response = ai_message + "\n\n" if ai_message else f"🔍 لقيت {len(matching_items)} خيارات:\n\n"
+
+            # Group by restaurant
+            by_restaurant = {}
+            for item in matching_items:
+                rest = item["restaurant"]
+                if rest not in by_restaurant:
+                    by_restaurant[rest] = []
+                by_restaurant[rest].append(item)
+
+            # Build interactive list
+            sections = []
+            for rest_name, items in list(by_restaurant.items())[:3]:
+                rows = []
+                for item in items[:4]:
+                    price_str = f"${item['price']:.2f}" if item['price'] else ""
+                    rows.append({
+                        "id": f"item_{item['id']}",
+                        "title": item["name"][:24],
+                        "description": f"💰 {price_str}" if price_str else ""
+                    })
+                sections.append({
+                    "title": rest_name[:24],
+                    "rows": rows
+                })
+
+            if sections:
+                await whatsapp_service.send_interactive_list(
+                    phone_number,
+                    response.strip(),
+                    "اختار 👆" if lang == "ar" else "Select",
+                    sections
+                )
+            else:
+                await whatsapp_service.send_text(phone_number, response)
+        else:
+            await whatsapp_service.send_text(
+                phone_number,
+                f"ما لقيت شي بهالوصف 🤔\nجرب تقلي شو بدك بالضبط!"
+            )
+            await self._show_restaurant_categories(phone_number, lang)
 
     # ==================== Reorder Feature ====================
     async def _show_previous_orders(self, phone_number: str, lang: str):
@@ -2300,8 +2843,9 @@ https://maps.google.com/?q={lat},{lng}
 
     # ==================== Favorites Feature ====================
     async def _show_favorites(self, phone_number: str, lang: str):
-        """Show user's favorite restaurants"""
+        """Show user's favorite restaurants and most ordered items"""
         from app.api.v1.endpoints.favorites import Favorite
+        from sqlalchemy import func
 
         async with AsyncSessionLocal() as db:
             result = await db.execute(select(User).where(User.phone_number == phone_number))
@@ -2312,37 +2856,79 @@ https://maps.google.com/?q={lat},{lng}
                 await self._send_main_menu(phone_number, lang)
                 return
 
-            # Get favorites
+            # Get favorite restaurants
             fav_result = await db.execute(
                 select(Favorite, Restaurant)
                 .join(Restaurant, Favorite.restaurant_id == Restaurant.id)
                 .where(Favorite.user_id == user.id)
                 .order_by(Favorite.created_at.desc())
+                .limit(5)
             )
             favorites = fav_result.all()
 
-            if not favorites:
+            # Get most ordered items (smart favorites)
+            from app.models.order import OrderItem
+            top_items_result = await db.execute(
+                select(
+                    MenuItem,
+                    Restaurant,
+                    func.sum(OrderItem.quantity).label('total_qty')
+                )
+                .select_from(OrderItem)
+                .join(Order, OrderItem.order_id == Order.id)
+                .join(MenuItem, OrderItem.menu_item_id == MenuItem.id)
+                .join(Category, MenuItem.category_id == Category.id)
+                .join(Menu, Category.menu_id == Menu.id)
+                .join(Restaurant, Menu.restaurant_id == Restaurant.id)
+                .where(Order.user_id == user.id)
+                .group_by(MenuItem.id, Restaurant.id)
+                .order_by(func.sum(OrderItem.quantity).desc())
+                .limit(5)
+            )
+            top_items = top_items_result.all()
+
+            sections = []
+
+            # Add top items section first (most valuable for quick reorder)
+            if top_items:
+                item_rows = []
+                for item, rest, qty in top_items:
+                    item_name = (item.name_ar if lang == "ar" and item.name_ar else item.name)[:20]
+                    rest_name = (rest.name_ar if lang == "ar" and rest.name_ar else rest.name)[:15]
+                    item_rows.append({
+                        "id": f"quickorder_{item.id}_{rest.id}",
+                        "title": f"⭐ {item_name}",
+                        "description": f"من {rest_name} | طلبت {qty}x"
+                    })
+                sections.append({
+                    "title": "🔥 أصنافك المفضلة" if lang == "ar" else "🔥 Your Favorites",
+                    "rows": item_rows
+                })
+
+            # Add favorite restaurants section
+            if favorites:
+                rest_rows = []
+                for fav, rest in favorites:
+                    rest_name = (rest.name_ar if lang == "ar" and rest.name_ar else rest.name)[:24]
+                    rest_rows.append({
+                        "id": f"rest_{rest.id}",
+                        "title": f"🏪 {rest_name}",
+                        "description": "عرض المانيو" if lang == "ar" else "View menu"
+                    })
+                sections.append({
+                    "title": "❤️ مطاعمك" if lang == "ar" else "❤️ Your Restaurants",
+                    "rows": rest_rows
+                })
+
+            if not sections:
                 await whatsapp_service.send_text(phone_number, get_text("no_favorites", lang))
                 await self._send_main_menu(phone_number, lang)
                 return
 
-            # Build list
-            sections = [{
-                "title": get_text("your_favorites", lang),
-                "rows": [
-                    {
-                        "id": f"fav_{rest.id}",
-                        "title": (rest.name_ar if lang == "ar" and rest.name_ar else rest.name)[:24],
-                        "description": "اطلب الآن" if lang == "ar" else "Order now"
-                    }
-                    for fav, rest in favorites
-                ]
-            }]
-
             await whatsapp_service.send_interactive_list(
                 phone_number,
-                "❤️ " + get_text("your_favorites", lang),
-                get_text("view_restaurants", lang),
+                "⭐ *المفضلة*\nاختار للطلب السريع!" if lang == "ar" else "⭐ *Favorites*\nQuick order!",
+                "اختار 👆" if lang == "ar" else "Select",
                 sections
             )
             await redis_service.set_user_state(phone_number, "BROWSING_FAVORITES", {"lang": lang})

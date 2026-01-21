@@ -1,0 +1,233 @@
+{
+  "common": {
+    "appName": "Lion Delivery",
+    "home": "Home",
+    "restaurants": "Restaurants",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "orders": "My Orders",
+    "search": "Search",
+    "about": "About",
+    "contact": "Contact",
+    "language": "Language",
+    "arabic": "العربية",
+    "english": "English",
+    "loading": "Loading...",
+    "error": "Error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "viewAll": "View All",
+    "seeMore": "See More",
+    "noResults": "No results found",
+    "currency": "$",
+    "categories": "Categories"
+  },
+  "home": {
+    "hero": {
+      "title": "Order from the best restaurants in Saida",
+      "subtitle": "Fast delivery to your doorstep",
+      "searchPlaceholder": "Search for a restaurant or dish...",
+      "stats": {
+        "restaurants": "restaurants",
+        "dishes": "dishes",
+        "delivery": "fast delivery"
+      }
+    },
+    "categories": {
+      "title": "Restaurant Categories",
+      "all": "All"
+    },
+    "featured": {
+      "title": "Featured Restaurants"
+    },
+    "howItWorks": {
+      "title": "How Lion Delivery Works",
+      "step1": {
+        "title": "Choose a restaurant",
+        "description": "Browse our restaurant list and pick your favorite"
+      },
+      "step2": {
+        "title": "Add to cart",
+        "description": "Select the dishes you want and add them to your cart"
+      },
+      "step3": {
+        "title": "Receive your order",
+        "description": "Complete your order and receive it at your doorstep"
+      }
+    },
+    "whatsapp": {
+      "title": "Order via WhatsApp too!",
+      "subtitle": "Contact us directly on WhatsApp",
+      "button": "Message us on WhatsApp"
+    }
+  },
+  "restaurants": {
+    "title": "Restaurants",
+    "subtitle": "Discover the best restaurants in Saida",
+    "searchPlaceholder": "Search for a restaurant...",
+    "filters": {
+      "all": "All",
+      "sortBy": "Sort by",
+      "newest": "Newest",
+      "rating": "Rating",
+      "mostOrdered": "Most Ordered"
+    },
+    "results": "{count} restaurants",
+    "loadMore": "Load More",
+    "open": "Open",
+    "closed": "Closed",
+    "openNow": "Open Now",
+    "deliveryTime": "{min}-{max} min",
+    "reviews": "{count} reviews"
+  },
+  "restaurant": {
+    "menu": "Menu",
+    "searchMenu": "Search menu...",
+    "categories": "Categories",
+    "items": "{count} items",
+    "popular": "Popular",
+    "call": "Call",
+    "location": "Location",
+    "share": "Share",
+    "workingHours": "Working Hours"
+  },
+  "menu": {
+    "addToCart": "Add to Cart",
+    "selectSize": "Select Size",
+    "selectOptions": "Add-ons (Optional)",
+    "specialInstructions": "Special Instructions",
+    "specialInstructionsPlaceholder": "e.g., No onions, no sauce...",
+    "quantity": "Quantity",
+    "total": "Total"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "emptyDescription": "Add some delicious dishes to your cart",
+    "browseRestaurants": "Browse Restaurants",
+    "from": "From",
+    "clearAll": "Clear All",
+    "notes": "Notes for restaurant",
+    "notesPlaceholder": "e.g., Please don't knock...",
+    "promoCode": "Promo Code",
+    "promoCodePlaceholder": "Enter promo code",
+    "apply": "Apply",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery",
+    "deliveryFee": "Delivery Fee",
+    "discount": "Discount",
+    "total": "Total",
+    "checkout": "Checkout",
+    "continueShopping": "Continue Shopping",
+    "addMore": "Add more from {restaurant}",
+    "itemAdded": "Added to cart",
+    "categories": "Categories"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "steps": {
+      "delivery": "Delivery Info",
+      "payment": "Payment",
+      "confirm": "Confirm"
+    },
+    "deliveryInfo": {
+      "title": "Delivery Information",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your name",
+      "phone": "Phone Number",
+      "phonePlaceholder": "71 XXX XXX",
+      "address": "Detailed Address",
+      "addressPlaceholder": "City, street, building, floor..."
+    },
+    "payment": {
+      "title": "Payment Method",
+      "cash": "Cash on Delivery",
+      "card": "Credit Card",
+      "cardComingSoon": "Coming Soon"
+    },
+    "summary": {
+      "title": "Order Summary"
+    },
+    "placeOrder": "Place Order",
+    "processing": "Processing order...",
+    "errors": {
+      "nameRequired": "Name is required",
+      "phoneRequired": "Phone number is required",
+      "phoneInvalid": "Invalid phone number",
+      "addressRequired": "Address is required",
+      "orderFailed": "Failed to place order, please try again"
+    }
+  },
+  "order": {
+    "success": {
+      "title": "Order Received!",
+      "orderNumber": "Order Number",
+      "estimatedTime": "Estimated Time",
+      "minutes": "minutes"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "delivering": "Delivering",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "details": {
+      "title": "Order Details",
+      "deliveryAddress": "Delivery Address"
+    },
+    "track": "Track Order",
+    "contactWhatsapp": "Contact via WhatsApp",
+    "backHome": "Back to Home",
+    "reorder": "Reorder"
+  },
+  "search": {
+    "title": "Search Results",
+    "placeholder": "Search for a restaurant or dish...",
+    "recent": "Recent Searches",
+    "popular": "Popular Searches",
+    "clear": "Clear",
+    "noResults": {
+      "title": "No results found",
+      "subtitle": "Try searching with different keywords"
+    },
+    "tabs": {
+      "all": "All",
+      "restaurants": "Restaurants",
+      "items": "Items"
+    }
+  },
+  "footer": {
+    "description": "The best food delivery service in Saida",
+    "quickLinks": "Quick Links",
+    "contactUs": "Contact Us",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "socialMedia": "Follow Us",
+    "copyright": "© {year} Lion Delivery. All rights reserved"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page Not Found",
+      "subtitle": "Sorry, the page you're looking for doesn't exist",
+      "button": "Go Home"
+    },
+    "general": {
+      "title": "Error Occurred",
+      "subtitle": "Sorry, an unexpected error occurred",
+      "button": "Try Again"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+قائمة جميع الـ Menus مع أصحابها
+======================================================================
+
+من res.md:
+عدد الـ menus: 16
+1. King Croissant
+2. Furn Libnan (فرن لبنان)
+3. BOUDI SANDWICH
+4. KAAKÉ by meat chop
+5. Bayt Al Nar \- House of Fire
+6. Foul w Trawiqa
+7. Spuntino
+8. Linguine Menu
+9. SEEK
+10. SUBMARINE
+11. Krispy Tender
+12. Krispy Tender
+13. Smoking Hub
+14. Heartache
+15. Sandwich Abou Afif
+16. Shawarma Abul El Oud
+
+من rest2.md:
+عدد الـ menus: 20
+1. القائمة 1
+2. القائمة 2
+3. القائمة 3
+4. القائمة 4
+5. القائمة 5
+6. القائمة 6
+7. القائمة 7
+8. القائمة 8
+9. القائمة 9
+10. القائمة 10
+11. القائمة 11
+12. القائمة 12
+13. القائمة 13
+14. القائمة 14
+15. القائمة 15
+16. القائمة 16
+17. القائمة 17
+18. القائمة 18
+19. القائمة 19
+20. القائمة 20
+
+من Document (4).docx:
+عدد الـ menus: 3
+1. مغربي كيك أند مور (Moghrabi Cakes & More)
+2. جريش إبن البلد (Jarish Ibn Al Balad)
+3. مارينيد (Marinade)
+
+من Document (7).docx:
+عدد الـ menus: 5
+1. مطعم دجاج شعبان (Shaaban Chicken Restaurant)
+2. لوفي كرواسون (Luffy Croissant)
+3. مناقيش ومعجنات أبو مازن الفاخرة (Abu Mazen Luxury Manaqish & Pastries)
+4. مطاعم فلافل عكاوي (Falafel Akawi Restaurants)
+5. مناقيش أبو العز الممتازة (Manakeesh Abu Al-Ezz Al-Mumtazah)
+
+======================================================================
+المجموع الكلي: 44 menu
+======================================================================
+- res.md: 16 menu
+- rest2.md: 20 menu
+- Document (4).docx: 3 menu
+- Document (7).docx: 5 menu

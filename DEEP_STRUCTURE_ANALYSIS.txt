@@ -1,0 +1,39 @@
+تحليل عميق جداً لبنية الملفات الأربعة الأساسية
+======================================================================
+
+من res.md:
+- restaurant_info: 18
+- store_info: 0
+- menu: 35
+- category: 110, category_ar: 45, category_en: 36, category_name: 33
+- items: 200, item_ar: 214, item_en: 62, item: 586
+- name: 1038, name_en: 177, name_ar: 289
+- price: 1285, price_lbp: 277, price_usd: 515
+
+من rest2.md:
+- restaurant_info: 10
+- store_info: 0
+- menu: 22
+- category: 107, category_ar: 51, category_en: 47, category_name: 7
+- items: 261, item_ar: 0, item_en: 0, item: 98
+- name: 1428, name_en: 345, name_ar: 401
+- price: 947, price_lbp: 129, price_usd: 777
+
+من Document (4).docx:
+- restaurant_info: 6
+- store_info: 3
+- menu: 13
+- category: 223, category_ar: 11, category_en: 16, category_name: 5
+- items: 131, item_ar: 47, item_en: 47, item: 895
+- name: 559, name_en: 27, name_ar: 107
+- price: 1013, price_lbp: 95, price_usd: 134
+
+من Document (7).docx:
+- restaurant_info: 5
+- store_info: 0
+- menu: 5
+- category: 0, category_ar: 0, category_en: 0, category_name: 4
+- items: 25, item_ar: 0, item_en: 0, item: 0
+- name: 0, name_en: 247, name_ar: 251
+- price: 191, price_lbp: 0, price_usd: 0
+

@@ -1,0 +1,2069 @@
+================================================================================
+تقرير شامل للمطاعم من جميع الملفات المصدرية
+COMPREHENSIVE RESTAURANT REPORT FROM ALL SOURCE FILES
+================================================================================
+
+
+################################################################################
+# الملف الأول: res.md
+# FILE 1: res.md
+################################################################################
+
+    - King Croissant
+    - Furn Libnan (فرن لبنان)
+    - Jebneh Akkawi \- Regular (جبنة عكاوي \- عادي): $2.00
+    - Jebneh Akkawi \- Extra (جبنة عكاوي \- اكسترا): $2.80
+    - Akkawi & Kashkaval \- Regular (عكاوي وقشقوان \- عادي): $2.80
+    - Akkawi & Kashkaval \- Extra (عكاوي وقشقوان \- اكسترا): $3.35
+    - Bulgari & Kashkaval \- Regular (بلغاري وقشقوان \- عادي): $2.80
+    - Bulgari & Kashkaval \- Extra (بلغاري وقشقوان \- اكسترا): $3.35
+    - Four Cheese \- Regular (فور تشيز \- عادي): $2.80
+    - Four Cheese \- Extra (فور تشيز \- اكسترا): $3.35
+    - Cheese Loaf (رغيف جبنة): $3.90
+    - Half Cheese Half Zaatar \- Regular (نص جبنة نص زعتر \- عادي): $1.45
+    - Half Cheese Half Zaatar \- Extra (نص جبنة نص زعتر \- اكسترا): $2.20
+    - Tomato & Onion \- Regular (بندورة وبصل \- عادي): $1.65
+    - Tomato & Onion \- Extra (بندورة وبصل \- اكسترا): $2.20
+    - Tomato, Onion & Cheese \- Regular (بندورة وبصل وجبنة \- عادي): $3.35
+    - Tomato, Onion & Cheese \- Extra (بندورة وبصل وجبنة \- اكسترا): $3.90
+    - Tomato, Onion & Bulgari \- Regular (بندورة وبصل وبلغاري \- عادي): $3.35
+    - Tomato, Onion & Bulgari \- Extra (بندورة وبصل وبلغاري \- اكسترا): $3.90
+    - Tomato, Onion & Zaatar \- Regular (بندورة وبصل وزعتر \- عادي): $1.65
+    - Tomato, Onion & Zaatar \- Extra (بندورة وبصل وزعتر \- اكسترا): $1.65
+    - Labneh Mix \- Regular (خلطة اللبنة \- عادي): $1.65
+    - Labneh Mix \- Extra (خلطة اللبنة \- اكسترا): $2.20
+    - Keshek Mix \- Regular (خلطة الكشك \- عادي): $1.65
+    - Keshek Mix \- Extra (خلطة الكشك \- اكسترا): $2.20
+    - Zaatar w/ Molasses \- Regular (زعتر مع دبس الرمان \- عادي): $0.90
+    - Zaatar w/ Molasses \- Extra (زعتر مع دبس الرمان \- اكسترا): $1.00
+    - Zaatar Baladi \- Regular (زعتر بلدي \- عادي): $0.80
+    - Zaatar Baladi \- Extra (زعتر بلدي \- اكسترا): $0.90
+    - Extra Mushroom/Corn (زيادة فطر/ذرة): $0.55
+    - Meat Pie (Lahm Baajin) \- Regular (لحمة بعجين \- عادي): $2.80
+    - Meat Pie (Lahm Baajin) \- Extra (لحمة بعجين \- اكسترا): $3.35
+    - Kafta / Kafta w Cheese \- Regular (كفتة / كفتة مع جبنة \- عادي): $3.35
+    - Kafta / Kafta w Cheese \- Extra (كفتة / كفتة مع جبنة \- اكسترا): $3.90
+    - Mortadella w Cheese \- Regular (مرتديلا وجبنة \- عادي): $3.35
+    - Mortadella w Cheese \- Extra (مرتديلا وجبنة \- اكسترا): $3.90
+    - Sojok w Cheese \- Regular (سجق وجبنة \- عادي): $3.35
+    - Sojok w Cheese \- Extra (سجق وجبنة \- اكسترا): $3.90
+    - Awarma w Cheese \- Regular (قاورما وجبنة \- عادي): $3.90
+    - Awarma w Cheese \- Extra (قاورما وجبنة \- اكسترا): $4.45
+    - Tawook w Cheese \- Regular (طاووق وجبنة \- عادي): $3.90
+    - Tawook w Cheese \- Extra (طاووق وجبنة \- اكسترا): $4.45
+    - Fajita w Cheese \- Regular (فاهيتا وجبنة \- عادي): $3.90
+    - Fajita w Cheese \- Extra (فاهيتا وجبنة \- اكسترا): $4.45
+    - Pizza Mortadella \- Regular (بيتزا مرتديلا \- عادي): $5.00
+    - Pizza Mortadella \- Extra (بيتزا مرتديلا \- اكسترا): $5.55
+    - Pizza Sojok \- Regular (بيتزا سجق \- عادي): $5.00
+    - Pizza Sojok \- Extra (بيتزا سجق \- اكسترا): $5.55
+    - Pizza Awarma \- Regular (بيتزا قاورما \- عادي): $5.55
+    - Pizza Awarma \- Extra (بيتزا قاورما \- اكسترا): $6.65
+    - Pizza Pepperoni \- Regular (بيتزا ببروني \- عادي): $5.00
+    - Pizza Pepperoni \- Extra (بيتزا ببروني \- اكسترا): $5.55
+    - Pizza Tuna \- Regular (بيتزا تونا \- عادي): $5.00
+    - Pizza Tuna \- Extra (بيتزا تونا \- اكسترا): $6.10
+    - Pizza Veggie \- Regular (بيتزا خضار \- عادي): $4.45
+    - Pizza Veggie \- Extra (بيتزا خضار \- اكسترا): $5.00
+    - Zaatar w Cheese (زعتر وجبنة): $3.90
+    - Spinach (سبانخ): $3.90
+    - Cheese (جبنة): $4.45
+    - Keshek (كشك): $3.90
+    - Pizza (بيتزا): $5.00
+    - Meat (لحمة): $5.00
+    - Mixed Pastries (معجنات مشكل): $4.45
+    - Soft Drinks (مشروبات غازية): $0.90
+    - Laban (لبن): $0.90
+    - Juice (عصير): $0.90
+    - Water (مياه): $0.35
+    - Bon Jus (بون جوس): $0.35
+    - BOUDI SANDWICH
+    - KAAKÉ by meat chop
+    - Zaatar: $1.00
+    - Keshek: $1.65
+    - Bandoura w bassal: $1.00
+    - Keshek w jebneh: $2.45
+    - Keshek w awarma w jebneh: $4.00
+    - Jebneh 3ekawi: $2.00
+    - 3ekawi w mozzarella: $2.45
+    - Jebeneh 3 cheese: $2.75
+    - 4 cheese: $3.35
+    - Jebneh Bolghari: $2.00
+    - Cheese & Ships: $3.00
+    - Haloum pesto: $3.35
+    - Labni: $1.65
+    - Labni w zaatar: $2.00
+    - Labni Harra: $2.00
+    - Jebni w zaatar: $2.00
+    - Picon: $2.20
+    - Basterma w jebneh: $4.90
+    - Basterma w eggs: $4.90
+    - Sojok w jebneh: $4.90
+    - Sojok w eggs: $4.90
+    - Kafta w jebneh: $4.90
+    - 2awarma w jebneh: $4.90
+    - 2awarma w eggs: $4.90
+    - Kaaki Burger: $4.90
+    - Rosto: $4.90
+    - Turkey cheese: $3.35
+    - Fajitas: $4.35
+    - Pepperoni: $4.90
+    - Chicken sub: $4.35
+    - Tawook: $4.35
+    - Nutella banana or strawberry: $3.00
+    - Nutella halewi w banana: $3.55
+    - Soft drinks: $1.65
+    - Water: $0.55
+    - Sparkling Water: $1.65
+    - Ice tea: $1.65
+    - Bayt Al Nar \- House of Fire
+    - Jebneh (Cheese): $1.65
+    - Zaatar: $0.55
+    - Keshek: $1.45
+    - Bassal w Bandoura: $1.35
+    - Mortadella: $2.00
+    - Sojok: $2.20
+    - Tawook: $3.35
+    - Fajita: $3.35
+    - Habash (Turkey): $2.75
+    - Pepperoni: $2.75
+    - Noss b Noss (Half & Half): $1.45
+    - Awarma: $3.35
+    - Labneh w Khodra: $1.65
+    - Labneh Khalta: $1.65
+    - Bassal w Bandoura w Jebneh: $2.20
+    - Lahmeh (Meat): $2.75
+    - Halloumi: $1.75
+    - Halloumi w Kashkaval: $2.75
+    - Bacon: $2.00
+    - Akkawi w Kashkaval: $2.75
+    - Raghif Jebneh (Cheese Loaf): $1.90
+    - Keshek w Jebneh: $2.20
+    - Muhammara: $1.35
+    - Muhammara w Jebneh: $2.20
+    - Bulghari w Zaytoun w Bandoura: $2.20
+    - Bacon w Kashkaval: $3.10
+    - Pizza Khodra (Veggie): $3.35
+    - Pizza Mortadella: $4.45
+    - Pizza Sojok: $4.45
+    - Pizza Awarma: $5.00
+    - Pizza Pepperoni: $5.00
+    - Pizza Habash: $4.45
+    - Pizza Margherita: $3.90
+    - Mo3ajanat Dozen (12 pcs): $2.75
+    - Shamiyat: $6.65
+    - Croissant: $0.65
+    - Khobz (Bread): $0.80
+    - Kaak: $3.90
+    - Kaak Al Abbas: $1.10
+    - Foul w Trawiqa
+    - Large Foul Plate (صحن فول كبير): $3.35
+    - Clay Pot Foul (صحن فول فخار): $2.20
+    - Large Msawha (صحن مشوشة كبير): $3.35
+    - Clay Pot Msawha (صحن مشوشة فخار): $2.20
+    - Large Hommos (صحن حمص كبير): $3.35
+    - Clay Pot Hommos (صحن حمص فخار): $2.20
+    - Large Balila (صحن بليلة كبير): $3.35
+    - Clay Pot Balila (صحن بليلة فخار): $2.20
+    - Large Fatteh Bowl (جاط فتة كبير): $7.20
+    - Small Fatteh Bowl (جاط فتة صغير): $5.00
+    - Half Dozen Falafel (نص دزينة فلافل): $2.80
+    - Dozen Falafel (دزينة فلافل): $5.55
+    - Labneh Plate with sides (صحن لبنة مع سرفيس): $2.80
+    - Cheese Plate with sides (صحن جبنة مع سرفيس): $2.80
+    - Eggs Plate with sides (صحن بيض مع سرفيس): $2.80
+    - Sojok Plate with sides (صحن سجق مع سرفيس): $5.00
+    - Awarma Plate with sides (صحن قورما مع سرفيس): $5.00
+    - Large Hommos with Meat (حمص مع لحمة كبير): $7.20
+    - Large Hommos with Awarma (حمص مع قورما كبير): $7.80
+
+  قسم: Sandwiches
+    - Chicken Sub
+    - Crispy Chicken
+    - Turkey N' Cheese
+    - Roast Beef
+    - Mido's Chicken
+    - Philadelphia
+    - Crab Sandwich
+    - Tuna Sandwich
+    - Anthony's Roasto
+    - Fajita
+    - Francisco
+    - Tuna Avoca
+
+  قسم: Burgers
+    - Midos Burger
+    - Priya's Sandwich
+    - Lebanese Burger
+    - Swiss Mushroom Burger
+    - X-treme Burger
+    - Zinger Burger
+    - Smash Burger
+    - Truffle Burger
+    - Roasto Burger
+    - Cheddar Burger
+    - AngusBeef Burger
+    - D. B. Burger
+
+  قسم: Meals
+    - Crispy Meal
+    - Chicken Nuggets Meal
+    - Upgrade to meal
+
+  قسم: Salads
+    - Chef Salad
+    - Greek Salad
+    - Caesar Salad
+    - Crab Salad
+    - Tuna Salad
+
+  قسم: Starters
+    - Mozzarella Sticks
+    - Mido's Appetizers
+    - Wedges Box
+    - Cheese Garlic Bread
+    - Curly Fries
+    - Crispy Dip
+    - Bao Bread (NEW)
+    - VIP-Fries
+    - French Fries Box
+    - Onion Rings
+    - Cheddarpino
+    - Cheddar Sticks
+
+  قسم: Breakfast
+    - Labneh
+    - Kashkawan Cheese
+    - Feta Cheese
+    - Halloumi Cheese
+    - Egg N' Cheese
+    - Cheese N' Jam
+    - Boiled Egg with Avocado
+
+  قسم: Drinks
+    - Soft Drinks
+    - Water
+    - Zaatar: $1.10
+    - Zaatar And Labneh: $2.78
+    - Zaatar Remen: $2.80
+    - Basal Banadora: $2.22
+    - Basal Banadora w Gebne: $4.00
+    - Zaatar Basal Banadora: $2.00
+    - Keshek: $2.78
+    - Akkawi Cheese: $2.50
+    - Nos gebne nos Zaatar: $1.90
+    - Mozzerella: $4.00
+    - Nakka Akawi Cheese: $4.70
+    - Akkawi And Mozzarella: $3.67
+    - Halloum And Mozzarella: $4.00
+    - Plain Halloumi: $4.00
+    - Picon: $4.00
+    - Picon and Mozzarella: $4.00
+    - Labneh: $2.50
+    - Mohammara And mozzarella: $4.00
+    - Four Cheese: $4.60
+    - Sojok and Mozzarella: $4.00
+    - Martadella And Mozzarella: $4.00
+    - Turkey And Cheese: $5.00
+    - Lahmeh b 3ajin: $2.60
+    - Kafta and Mozzarella: $5.00
+    - Kawarma And mozzarella: $5.00
+    - Basterma And Mozzarella: $5.00
+    - Peperoni and Cheese: $5.00
+    - Halloumi And Eggs: $5.00
+    - KAwarma and eggs: $5.50
+    - Sojok and Eggs: $5.50
+    - Basterma And Eggs: $5.50
+    - Tawook and Cheese: $4.50
+    - Chicken BBQ: $5.00
+    - Honey Mustard Chicken: $5.00
+    - Tandori Chicken: $5.00
+    - Kari Chicken: $5.00
+    - Fajita: $5.00
+    - Akkawi And Mozzarella: $4.00
+    - Halloum And Mozzarella: $4.00
+    - Plain Halloumi: $4.00
+    - Picon and Mozzarella: $4.00
+    - Mohammara And mozzarella: $4.00
+    - Four Cheese: $5.00
+    - Sojok and Mozzarella: $4.00
+    - Martadella And Mozzarella: $4.00
+    - Kafta and Mozzarella: $5.00
+    - Kawarma And mozzarella: $5.00
+    - Sweet & Chilli Pizza: $6.00
+    - Dynamite Chicken Pizza: $6.00
+    - Taco Pizza: $6.00
+    - Pesto Chicken Pizza: $6.00
+    - Truffle Chicken Pizza: $8.50
+    - BBQ Chicken Pizza: $6.00
+    - White BBQ Chicken Pizza: $6.00
+    - Chicken Alfredo Pizza: $8.50
+    - Pizza Margherita: $6.00
+    - Vegetarian Pizza: $6.00
+    - American Peperoni Pizza: $6.00
+    - Lebanese Peperoni Pizza: $6.00
+    - Sweet And Sour Pizza: $6.00
+    - Honey Mustard Pizza: $6.00
+    - Har w Nar Pizza: $6.00
+    - Dynamite Shrimp Pizza: $8.50
+    - Sweet And sour Shrimp Pizza: $8.50
+    - Martadela Pizza: $6.00
+    - Sujuk Pizza: $6.00
+    - Awarma Pizza: $6.00
+    - Smoked Turkey Pizza: $6.00
+    - Basterma Pizza: $6.00
+    - Grilled Halloumi: $3.50
+    - Zaatar Honey Grilled Halloumi: $4.50
+    - Grilled Halloumi Pesto: $4.50
+    - Labneh: $3.50
+    - Chilli Labneh With Walnuts: $4.00
+    - Sunny Side Eggs: $3.50
+    - Awarma And Eggs: $6.00
+    - Scrambled Eggs: $3.50
+    - Sojok and Eggs: $5.00
+    - Omlette: $4.00
+    - Omelet with Cheese: $5.00
+    - Chicken Tenders: $5.50
+    - Garlic Bread: $3.50
+    - Wedges: $3.50
+    - Mozzarella Sticks: $4.50
+    - Fries Box: $3.30
+    - Sbene5 m8atas b debes e remen: $4.00
+    - sbene8 m8atas b debes el remen ma3 labneh: $5.00
+    - Turkey Wrap: $6.00
+    - Sweet Chilli Wrap: $6.00
+    - Crispy Wrap: $6.00
+    - Honey MUstard Wrap: $6.00
+    - BBQ Chicken Wrap: $6.00
+    - Basterma Wrap: $6.00
+    - Kawarma Wrap: $6.00
+    - Kafta Wrap: $6.00
+    - Sojouk Wrap: $4.00
+    - Labneh wrap: $3.00
+    - Plain Halloumi Wrap: $4.00
+    - Gebne Wrap: $3.00
+    - zaatar Wrap: $1.11
+    - Zaatar With Labneh Wrap: $3.50
+    - zaatar Remen Wrap: $3.50
+    - Mushroom Pasta: $7.00
+    - Tandori Pasta: $7.00
+    - Kari Pasta: $7.00
+    - Pesto Pasta: $7.00
+    - Rose Pasta: $7.00
+    - Smoked Turkey Pannouzzo: $6.00
+    - Halloumi Pesto Pannuzzo: $6.00
+    - Chicken Mushroom Pannozzou: $7.00
+    - Halloumi Salad: $6.00
+    - Chicken Salad: $6.00
+    - Chocolate man2oshi: $4.00
+    - Chocolate and halawa: $5.00
+    - Knefe Manouchi: $4.00
+    - Nuttella Pistachio Panuzzo: $6.00
+    - Nuttella Brownies Panuzzo: $6.00
+    - Morjan Spread Panuzzo: $6.00
+    - Biscoff Spread Panuzzo: $6.00
+    - Pepsi: $1.10
+    - Kinza: $1.00
+    - Ice Tea: $1.10
+    - Water: $0.30
+    - Laban: $1.10
+    - CEASAR BURGER: $4.5
+    - SIMPLE CHICKEN BURGER: $5.0
+    - PEPOS CHICKEN BURGER: $5.0
+    - PEPOS BEEF CHEESE BURGER: $5.5
+    - SIMPLE HONEY MUSTARD BURGER: $5.0
+    - FAJITA BURGER: $4.8
+    - HONEY MUSTARD CHICKEN: $5.0
+    - HONEY MUSTARD BEEF: $5.5
+    - CARMALIZED CHICKEN BURGER: $5.5
+    - CARMALIZED BEEF BURGER: $6.0
+    - SIMPLE MUSHROOM BURGER: $5.5
+    - SALTAA CEASER BURGER: $5.0
+    - SALTAA BURGER: $6.0
+    - MAC N CHEESE CHICKEN BURGER: $6.0
+    - MAC N CHEESE BEEF BURGER: $6.5
+    - CHICKEN MUSHROOM BURGER: $5.5
+    - BEEF MUSHROOM BURGER: $6.0
+    - CHICKEN MOZZARELLA BURGER: $6.5
+    - BEEF MOZZARELLA BURGER: $7.0
+    - MIXED CHEESE CHICKEN BURGER: $7.0
+    - MIXED CHEESE BEEF BURGER: $7.5
+    - CRUNCHY BURGER: $6.5
+    - DOUBLE BEEF BURGER: $7.0
+    - DOUBLE CHICKEN BURGER: $6.5
+    - VEGETERIAN BURGER: $4.0
+    - MAARMASH BURGER: $6.5
+    - CHICKEN CEASER: $4.0
+    - CHICKEN CURRY: $4.0
+    - TAOUK: $4.0
+    - CHICKEN MEXICAN: $4.5
+    - CHICKEN SUB: $4.0
+    - FRANCISCO: $4.0
+    - CRISPY SANDWICH: $5.0
+    - CHICKEN MUSHROOM: $4.5
+    - CHICKEN MUSHROOM MIXED: $4.5
+    - PEPPERONI SUB: $4.5
+    - FAJITA: $5.0
+    - MUSHROOM FAJITA: $5.5
+    - DOUBLE SUB: $6.0
+    - DOUBLE TAOUK: $6.0
+    - DOUBLE FRANCISCO: $6.0
+    - DOUBLE CURRY: $6.0
+    - FRIES SANDWICH: $2.5
+    - MAARMASH SANDWICH: $5.0
+    - TWO CHICKEN BREASTS: $7.0
+    - HONEY MUSTARD: $7.5
+    - CRISPY PLATE: $8.0
+    - MUSHROOM: $9.0
+    - MIXED PLATE: $8.5
+    - MUSHROOM PASTA: $8.0
+    - MAC N CHEESE: $6.5
+    - CHICKEN CURRY: $8.0
+    - FRIES: $2.5
+    - LARGE FRIES: $5.0
+    - CHEESY FRIES: $4.0
+    - CHICKEN CEASER SALAD: $7.0
+    - MUSHROOM FRIES: $4.5
+    - PEPPERONI: $4.8
+    - MOZZARELLA STICKS: $3.5
+    - SOFT DRINK: $0.8
+    - WATER: $0.3
+    - CHEDDAR CUP: $0.7
+    - JALAPENO CUP: $0.3
+    - BEEF PATTY: $2.0
+    - CHICKEN BREAST: $1.5
+    - MOZZARELLA PATTY: $1.5
+    - Spuntino
+    - Ceasar Salad: $5.00
+    - CHICKEN BREAST: $2.70
+    - Double Sauce Ceasar: $1.20
+    - Pasta Tuna Salad: $7.50
+    - Chicken Pasta Salad: $7.50
+    - Double Vinegar: $1.00
+    - Pasta Salad: $5.00
+    - Chicken Ceaser Salad: $7.50
+    - Mozzarella Sticks: $4.50
+    - Onion Rings: $4.00
+    - Wedges Fries: $4.00
+    - Appetizers Comboo: $11.50
+    - Curly Fries: $4.80
+    - Mini FriesTino Ranch: $3.22
+    - Mini FriesTino BBQ: $3.22
+    - Mini FriesTino Dynamite: $3.22
+    - FriesTino Dynamite: $5.70
+    - FriesTino Ranch: $5.70
+    - FriesTino BBQ: $5.70
+    - Wings Shaker 4pc: $4.33
+    - Wings Shaker 8 pc: $7.50
+    - Chicken Sub: $5.50
+    - Fries: $3.50
+    - Fajitas Sandwich: $7.50
+    - Francisco Sandwich: $5.50
+    - Crispy Sandwich: $5.50
+    - SPICY CRISPY SANDWICH: $5.50
+    - Combp Plate: $2.90
+    - TWISTER: $4.90
+    - SPICY TWISTER: $4.90
+    - Mini Crispy: $2.55
+    - Mini chkn sub: $2.55
+    - Mini Fransico: $2.55
+    - Mini Twister: $2.55
+    - Hamburger: $6.50
+    - Spuntino Burger: $6.50
+    - Chicken Fillet: $5.50
+    - Mozz Chicken Brgr: $8.50
+    - Bbq Beef Burger: $6.50
+    - Moz. Beef Brgr: $8.50
+    - Mushroom Burger: $8.50
+    - Combo Plate: $2.90
+    - Mushroom Chkn Burger: $8.50
+    - Hony Mustard: $5.50
+    - Zinger: $5.50
+    - Mighty Zinger: $8.50
+    - Twintino Chck A La Carte: $3.20
+    - Twintino Chck Burgers: $6.10
+    - Twintino Beef Burgers: $6.10
+    - Beef A La Carte: $3.20
+    - DOUBLE BURGER: $6.00
+    - COMBO PLATE KINZA: $2.90
+    - MIGHTY FILLET: $8.50
+    - Spuntino Bucket: $30.90
+    - 4x4: $12.50
+    - Mix Tino: $11.90
+    - Dinner 2 Pcs: $8.50
+    - Dinner 3 Pcs: $9.40
+    - Dinner 4 Pcs: $10.35
+    - Dinner 9 Pcs: $26.30
+    - Dinner 15 Pcs: $39.90
+    - Dinner 21 Pcs: $49.90
+    - CRISPY 3 PCS: $8.90
+    - CRISPY 15 PCS: $32.50
+    - CRISPY 10 PCS: $21.80
+    - CRISPY 5 PCS: $10.60
+    - CRISPY 20 PCS: $39.90
+    - Extra Bread: $0.50
+    - Coleslaw: $2.00
+    - Ketchup: $0.23
+    - Cocktail 50 Cc: $0.55
+    - Chedder 50 Cc: $1.00
+    - Garlic 50 Cc: $0.55
+    - Zinger 50 Cc: $1.00
+    - Mushroom Chicken: $8.0
+    - Grilled Plate: $8.0
+    - Honey Mustard: $8.0
+    - Crispy Plate (5 Pcs): $8.0
+    - Escalope Plate (5 Pcs): $8.0
+    - Mushroom Chicken: $7.5
+    - Buffalo Pasta: $7.5
+    - Shrimp Pasta: $9.0
+    - Small Cup Cheddar: $0.8
+    - Large Cup Cheddar: $3.3
+    - Mozzarella Patty: $2.0
+    - Cheddar Patty: $2.0
+    - Chicken Patty: $2.0
+    - Beef Patty: $2.0
+    - Large Fries: $4.5
+    - Small Fries: $3.5
+    - Large Cheesy Fries: $5.7
+    - Small Cheesy Fries: $5.0
+    - Large Buffalo Fries: $5.8
+    - Small Buffalo Fries: $5.1
+    - Large Mushroom Fries: $5.9
+    - Small Mushroom Fries: $5.2
+    - Large Pepperoni Fries: $6.0
+    - Small Pepperoni Fries: $5.3
+    - Pepsi: $1.0
+    - 7up: $1.0
+    - Mirinda: $1.0
+    - Water: $0.4
+    - Classic Beef: $5.5
+    - Classic Chicken: $5.3
+    - Honey Mustard Chicken: $5.4
+    - Honey Mustard Beef: $5.6
+    - Smoke House Chicken: $5.5
+    - Smoke House Beef: $5.7
+    - Mushroom Chicken: $5.7
+    - Mushroom Beef: $5.9
+    - Buffalo Chicken: $5.5
+    - Buffalo Beef: $5.7
+    - BBQ Chicken: $5.5
+    - BBQ Beef: $5.7
+    - Uncle Chicken: $5.5
+    - Uncle Beef: $5.7
+    - Bazooka Burger: $6.0
+    - Fayez Burger: $5.7
+    - Crazy Burger: $5.7
+    - Bulldozer Burger: $5.8
+    - Fajita Burger: $5.5
+    - Truffle Chicken: $6.0
+    - Truffle Beef: $6.3
+    - Mini Burger: $4.5
+    - Tawouk: $4.7
+    - Francisco: $4.8
+    - Fajita: $5.3
+    - Crispy: $4.8
+    - Twister: $5.3
+    - Bazooka: $5.3
+    - Escalope: $4.8
+    - Chicken Sub: $4.7
+    - BBQ Chicken: $4.8
+    - Pika Sandwich: $4.9
+    - Chicken Mexican: $4.8
+    - Mushroom Sandwich: $4.9
+    - Steak Sandwich: $5.5
+    - Philadelphia Sandwich: $6.0
+    - Shrimp Sandwich: $6.0
+    - Fries Sandwich: $3.5
+
+  قسم: Appetizers
+    - Taquitos 4 pcs
+    - Fries Cheddar
+    - Fries Truffle
+    - Fries Bacon
+    - Shrimp Joe
+    - French Fries
+    - Wings 8 pcs
+    - Chicken Dynamite
+    - Wedges
+    - Curly Fries
+    - Crispy Chicken
+    - Mozzarella Sticks
+    - shrimp dynamite
+
+  قسم: Salads
+    - Shrimp Salad
+    - Greek Salad
+    - Green Salad
+    - Crab Salad
+    - Caesar Salad
+    - Chicken Caesar Salad
+
+  قسم: Papa Mimi (Sandwiches)
+    - Truffle Steak
+    - Melt Meat
+    - Spicy Chicken Ranch
+    - Swiss Mushroom
+    - Classic Melts
+    - Togarashi Chicken
+
+  قسم: Chicago Pizza
+    - Chicago Pepperoni
+    - Chicago Pesto
+    - Chicago 4 Cheese
+    - Chicago Truffle
+
+  قسم: Classic Pizza
+    - Margarita
+    - Four Cheese
+    - Vegetarian
+    - Greek
+    - Tartufo
+    - Milano
+    - Loaded Pizza
+    - Chicken Ranch
+    - Chicken Cheesy Truffle
+
+  قسم: Chicken Pizza
+    - Chicken B.B.Q
+    - Cordon Blue
+    - Teriyaki Chicken
+    - Sweet & Sour
+    - Spicy Chicken
+    - Fajitta
+    - Dynamite
+    - Chicken Honey Mustard
+    - Peri Peri
+    - Papa Joe
+    - Chicken Pesto
+    - Chicken Alfredo
+
+  قسم: Beef Pizza
+    - Philly Steack
+    - Black Pepper Steack
+    - Spicy Steak
+    - Pepperoni
+    - Pepperoni Supreme
+    - Bacon
+
+  قسم: Sea Food Pizza
+    - Spicy Shrimp
+    - Dynamite SeaFood
+    - Mix Sea Food
+    - Teriyaki Shrimp
+    - Shrimp Alfredo
+    - sweet and sour
+    - Sriracha Shrimp
+
+  قسم: Pasta
+    - Fettuccine Chicken
+    - Fettuccine Shrimp
+    - Fettuccine Chicken Truffle
+    - Penne Arrabbiata
+    - Fettucine Pesto
+
+  قسم: Baked Pasta
+    - Baked Alfredo Chicken
+    - Baked Alfredo Shrimp
+    - Baked Curry Chicken
+    - Baked Curry Shrimps
+    - Baked Pink Chicken
+    - Baked Pink Shrimps
+    - Baked Truffle Chicken
+
+  قسم: Make it Special
+    - Stuffed Crust
+    - Add Chicken
+    - Add Shrimps
+    - Add Cheese
+
+  قسم: Kids Meals
+    - Happy Face Pizza
+    - Nuggets
+    - Junior Crispy
+
+  قسم: Desserts
+    - Chocolate Junior
+    - Pistachio Junior
+
+  قسم: Dips
+    - Cocktail Sauce
+    - Cheddar Cheese
+    - Peri Peri
+    - Papa Joe
+    - Ranch
+    - Garlic Mayo
+    - BBQ
+    - Teriyaki
+    - Pesto
+    - Truffle
+    - Honey Mustard
+    - Dynamite
+    - Sweet & Sour Sauce
+    - Fajita
+
+  قسم: Drinks
+    - Soft Drink
+    - Sparkling Water
+    - Laziza
+    - Balkis Juice
+    - Boom Boom
+    - Ice Tea
+    - Kinza
+    - Maccaw
+    - Small Water
+    - Appetizers & Sides
+    - Cheese and Fries: $5.00
+    - Cheese Balls: $4.00
+    - Mozzarella Sticks: $4.00
+    - Nuggets 5 pieces: $4.00
+    - Hummus Box: $1.50
+    - Hummus Plate: $3.00
+    - Pickles 120g: $1.50
+    - Pickles 200g: $2.00
+    - French Fries Box: $3.33
+    - Wedges Box: $4.00
+    - Medium Fries: $5.56
+    - Large Fries: $8.89
+    - Coleslaw Box: $1.00
+    - Coleslaw Plate: $2.00
+    - Salads
+    - Chicken Ceaser: $6.50
+    - Fattouch: $4.50
+    - Sandwiches & Wraps
+    - Djej 3al Fahem: $5.00
+    - Tawouk: $5.00
+    - Seekh Tawouk: $3.00
+    - Charcoal Soujouk Warp: $5.00
+    - Makanek: $5.00
+    - Kafta: $5.00
+    - Charcoal Kafta Warp: $5.00
+    - Chicken Breast: $5.56
+    - Fajita: $5.56
+    - Chicken Sandwich: $3.50
+    - Francisco: $5.56
+    - Chicken Sub: $5.56
+    - Fries Sandwich: $3.00
+    - Fahita Tortilla: $7.00
+    - Twister: $6.00
+    - Twister Spicy: $6.00
+    - Zinger: $7.50
+    - Burgers
+    - American Burger: $5.50
+    - Chicken Burger: $4.50
+    - Crunchy BBQ: $7.00
+    - BBQ Burger: $6.50
+    - Lebanese Burger: $5.00
+    - Chicken & Grill Meals
+    - Half Farrouj 3al Fa7em: $7.78
+    - Farrouj 3al Fa7em: $15.56
+    - Half Farrouj Mesa7ab 3al Fa7em: $11.11
+    - Farrouj Mesa7ab 3al Fa7em: $22.22
+    - Farrouj On Gas: $11.11
+    - Half Farrouj On Gas: $5.56
+    - Tawouk Meal: $12.00
+    - Broasted & Wings
+    - Broasted Wings (8 piece): $5.00
+    - Buffalo Broasted Wings (8 piece): $5.00
+    - BBQ Broasted Wings (8 piece): $5.00
+    - Buffalo Broasted Wings (24 piece): $13.50
+    - Special Broasted Wings (24 piece): $13.50
+    - Family Broasted Chicken – 16 Pcs: $44.44
+    - Crispy Meal – 5 Pcs: $11.67
+    - Broasted Chicken Meal – 4 Pcs: $12.22
+    - Family Crispy Meal – 20 Pcs: $42.22
+    - Sauces (50cc)
+    - Spicy Garlic: $0.78
+    - Herb Garlic: $0.78
+    - Cheddar Sauce: $1.50
+    - Garlic: $0.78
+    - Cocktail Sauce: $1.50
+    - BBQ Sauce: $1.50
+    - Avoca Sauce: $1.50
+    - Buffalo Sauce: $1.50
+    - Cream Sauce: $1.50
+    - Drinks
+    - Water 500ml: $0.56
+    - Laban Ayran: $1.00
+    - Soft Drink: $1.00
+    - Linguine Menu
+
+  قسم: Pasta
+    - Fettuccine Alfredo
+    - Chicken Rose
+    - Chicken Curry
+    - Mac & cheese
+    - Lasagna
+    - Shrimp Rose
+    - Shrimp fettuccine
+
+  قسم: Wraps
+    - Double B
+    - Steak Betello
+    - Zinger
+    - Twister
+
+  قسم: Appetizers
+    - Loaded Fries
+    - Mozzarella sticks
+    - Curly Fries
+    - cheese Fries
+    - Fries
+    - Nachos
+    - Alfredo Fries
+
+  قسم: Add-Ons
+    - EXTRA chicken
+    - EXTRA shrimps
+    - EXTRA cheese on top
+
+  قسم: Drinks
+    - Soft Drinks
+    - Sparkling Water
+    - water
+
+  قسم: Delux Pizza
+    - Vegeterian
+    - Greek
+    - Margherita
+
+  قسم: Premium Chicken Pizza
+    - Four Cheese
+    - Pepperoni
+    - Pepperoni Supreme
+    - Chicken Fajita
+    - Dynamite Chicken
+    - Chicken Teriyaki
+    - Chicken Sweet & Sour
+    - Senor Special Pizza
+    - Chicken Honey Mustard
+    - BBQ Chicken
+    - Chicken Alfredo
+    - Chicken Philly
+    - Spicy Chicken
+    - Buffalo Chicken
+    - Chicken Cordon Bleu
+    - Chicken Ranch Chili
+    - Legend Pizza
+
+  قسم: Supreme Pizza (Beef)
+    - Philly Steak
+    - Spicy Steak
+    - Mexican
+    - Taco
+    - Special Steak
+
+  قسم: Supreme Pizza (Shrimp)
+    - Senor Shrimp Pizza
+    - Shrimp Sweet & Sour
+    - Spicy Shrimp
+    - Dynamite Shrimp
+    - Shrimp Teriyaki
+    - Shrimp Fajita
+
+  قسم: Penne Pasta
+    - AlFredo Al Forno \- Chicken
+    - AlFredo Al Forno \- Shrimp
+    - La Rosa \- Chicken
+    - La Rosa Shrimp
+    - Four Cheese \- Chicken
+    - Four Cheese \- Shrimp
+    - Pesto Di Penne \- Chicken
+    - Pesto Di Penne \- Shrimp
+    - Anacardio \- Chicken
+    - Anacardio \- Shrimp
+    - Penne Arrabiata
+
+  قسم: Appetizers
+    - Fries: $3.00
+    - Twisted Fries (Curly Fries): $6.00
+    - Wedges: $4.00
+    - Truffle Fries: $7.00
+    - Pepperoni Pizza Fries: $8.00
+    - Mozzarella Sticks (6 Pcs): $6.00
+    - Cheese Garlic Bread (3 Pcs): $5.50
+    - Buffalo Chicken Tortillas: $8.00
+    - Crispy Chicken Tenders (5 Pcs): $7.00
+    - Chicken Wings (6 Pcs \- Buffalo or BBQ): $8.00
+    - Classic Poutine: $5.00
+    - Cheddar Poutine: $5.00
+    - Chicken Poutine: $6.00
+    - Special Poutine: $7.00
+    - Dynamite Shrimp: $8.00
+    - Senor Shrimp: $8.00
+    - Truffle Shrimp: $8.00
+
+  قسم: Dips
+
+  قسم: Salads
+    - Mixed Green Salad
+    - Caesar Salad
+    - Senor Chicken Salad
+    - Senor Crab Salad
+    - Shrimp Salad
+
+  قسم: Nachos
+    - Classic Nachos
+    - Spicy Nachos
+    - Alfredo Nachos
+
+  قسم: Burgers
+    - Classic Chicken Burger
+    - Classic Beef Burger
+    - Zinger Burger
+    - Alfredo Burger
+    - Senor Special Burger
+    - Make it Combo: $3.00
+    - Add Mozarella Patty: $1.50
+
+  قسم: Dessert
+    - S'mores Pizza: $8.50
+
+  قسم: Drinks
+    - Small Water: $0.50
+    - Soft Drink (330ml): $1.50
+    - Kinza: $1.00
+    - Sparkling Water: $2.00
+    - Iced Tea: $2.00
+
+  قسم: Pizza Add-ons & Customization
+    - Add Cheese
+    - Stuffed Crust
+    - Half-Half Pizza
+    - Giant X-Large Pizza (40 cm)
+
+  قسم: Meals (Al Wajbat)
+
+  قسم: Frozen Items (Al Mufarrazat)
+
+  قسم: Burger
+
+  قسم: Sandwiches & Snacks
+
+  قسم: Shawarma
+
+  قسم: Hot Dog
+
+  قسم: Meals
+
+  قسم: French Fries
+
+  قسم: Add-ons
+    - SEEK
+    - Roast Beef: $6.67
+    - Beef Tongue: $6.67
+    - Nkhaat: $6.67
+    - Sujuk: $5.00
+    - Makanek: $5.00
+    - Chicken Liver: $3.89
+    - Sanesel: $6.67
+    - Philadelphia: $5.56
+    - Beef Shawarma: $5.00
+    - Francisco: $5.00
+    - Tawook: $5.00
+    - Fajita: $5.00
+    - Chicken Shawarma: $3.89
+    - Crispy: $3.33
+    - Escalope: $3.33
+    - Chinese Chicken: $5.56
+    - Chicken Sub: $5.00
+    - Carioti: $5.56
+    - Shrimp: $5.56
+    - Shrimp With Crab: $6.67
+    - Tuna: $3.89
+    - Special Seek: $8.89
+    - Lebanese Beef: $4.44
+    - Beef Cheese: $5.00
+    - Chicken: $4.44
+    - Mushroom: $6.67
+    - Chicken: $5.56
+    - Shrimp: $6.67
+    - Fries: $2.22
+    - Fries Plate (Medium): $3.89
+    - Mozzarella Stick (4 pieces): $3.89
+    - Tuna: $5.56
+    - Crab: $5.56
+    - Caesar: $5.56
+    - Lebanese Beef Burger: $7.78
+    - Chicken Burger: $6.67
+    - Beef Shawarma: $8.89
+    - Chicken Shawarma: $7.78
+    - Crispy: $7.78
+    - Escalope: $7.78
+    - Small Water: $0.56
+    - Pepsi/Diet: $1.11
+    - Mirinda: $1.11
+    - 7up/Diet: $1.11
+    - Sparkling Water: $1.11
+    - Juice: $0.89
+    - SUBMARINE
+    - Spicy Steak: $6.89
+    - Chinese: $5.56
+    - Mexican: $6.00
+    - Tawook: $5.44
+    - Francisco: $6.11
+    - Crab: $5.89
+    - Shrimp: $7.44
+    - Crab & Shrimp: $7.78
+    - Supreme: $6.33
+    - Makanek: $5.78
+    - Spicy Fajita: $7.22
+    - Philadelphia: $7.33
+    - Escalope: $5.56
+    - Twister: $6.11
+    - Rosto: $6.11
+    - Rosto & Cheese: $6.67
+    - Honey Mustard: $6.67
+    - Chicken Sub: $6.11
+    - Sojok: $5.78
+    - Dynamite Chicken: $7.22
+    - Truffle Steak: $8.67
+    - Dynamite Shrimp: $8.67
+    - Lebanese: $6.89
+    - Submarine: $8.44
+    - Classic Smash: $7.11
+    - Mozzarella: $8.44
+    - Krispy Tender
+    - Krispy Meal 3 Pcs (with drink): $10.00
+    - Krispy Meal 5 Pcs: $6.11
+    - Krispy Meal 8 Pcs: $20.00
+    - Twins Combo: $8.33
+    - Friends Meal: $21.11
+    - Family Meal: $37.22
+    - Cheese Royale Deluxe Combo: $10.56
+    - Cheese Royale Deluxe (Double Up) Combo: $12.22
+    - Krispy Tender Burger Combo: $9.44
+    - Combo Meal: $6.67
+    - Krispy Wrap Delight Combo: $9.44
+    - BBQ Wrap Combo: $9.44
+    - Double Combo Meal: $13.33
+    - Kids Meal Burger: $6.11
+    - Kids Meal Nuggets: $6.11
+    - Cheese Royale Deluxe (Sandwich): $6.67
+    - Royale Sandwich (Double Up): $9.44
+    - Delight Wrap Sandwich: $5.56
+    - BBQ Wrap Sandwich: $5.56
+    - KT Burger: $6.11
+    - Tender Loaded Fries: $6.67
+    - Krispy 1 Pc: $2.22
+    - Coleslaw: $2.22
+    - Cheese Fries: $4.89
+    - Fries: $3.67
+    - Mozzarella Sticks 3 Pcs: $3.67
+    - Pepsi: $1.22
+    - Diet Pepsi: $1.22
+    - 7up: $1.22
+    - Diet 7up: $1.22
+    - Mirinda: $1.22
+    - Small Water: $0.56
+    - Candia Juice: $0.61
+    - Krispy Tender
+    - Krispy Meal 3 Pcs (with drink): $10.00
+    - Krispy Meal 5 Pcs: $6.11
+    - Krispy Meal 8 Pcs: $20.00
+    - Twins Combo: $8.33
+    - Friends Meal: $21.11
+    - Family Meal: $37.22
+    - Cheese Royale Deluxe Combo: $10.56
+    - Cheese Royale Deluxe (Double Up) Combo: $12.22
+    - Krispy Tender Burger Combo: $9.44
+    - Combo Meal: $6.67
+    - Krispy Wrap Delight Combo: $9.44
+    - BBQ Wrap Combo: $9.44
+    - Double Combo Meal: $13.33
+    - Kids Meal Burger: $6.11
+    - Kids Meal Nuggets: $6.11
+    - Cheese Royale Deluxe (Sandwich): $6.67
+    - Royale Sandwich (Double Up): $9.44
+    - Delight Wrap Sandwich: $5.56
+    - BBQ Wrap Sandwich: $5.56
+    - KT Burger: $6.11
+    - Tender Loaded Fries: $6.67
+    - Krispy 1 Pc: $2.22
+    - Coleslaw: $2.22
+    - Cheese Fries: $4.89
+    - Fries: $3.67
+    - Mozzarella Sticks 3 Pcs: $3.67
+    - Pepsi: $1.22
+    - Diet Pepsi: $1.22
+    - 7up: $1.22
+    - Diet 7up: $1.22
+    - Mirinda: $1.22
+    - Small Water: $0.56
+    - Candia Juice: $0.61
+    - Smoking Hub
+    - French Fries 300g
+    - Wedges 300g
+    - Mozzarella Sticks 6 Pcs
+    - Curly Fries 300g
+    - Brisket Triangles 5 pieces
+    - Smoked Brisket Boat
+    - Noodles Salad
+    - Quinoa Salad
+    - Broccoli Salad
+    - Hotdog
+    - Special Hotdog
+    - Caramelized Burger (Smoked Patty 200g)
+    - Caramelized Burger (Shredded Beef 150g)
+    - Brisket Burger
+    - Texas Burger
+    - Classic Beef (Smoked Patty 200g)
+    - Classic Beef (Shredded Beef 150g)
+    - Mushroom Burger (Smoked Patty 200g)
+    - Mushroom Burger (Shredded Beef 150g)
+    - Brisket Plate 250g
+    - Cheeks Plate
+    - Combo Deal
+    - Honey Cup
+    - Cherry Barbeque Dip 50g
+    - Texas Dip 50g
+    - Jalapeno 50g
+
+  قسم: Appetizers
+    - Mozzarella Sticks
+    - Cheddar Bricks
+    - Halloumi Sticks
+    - Jalapenos Poppers
+    - Onion Rings
+    - BBQ/Buffalo Wings
+    - Chicken Tenders
+    - Chicken Nuggets
+    - Bangbang Shrimps
+    - Mini Burger
+
+  قسم: Fries
+    - Cheesy Fries
+    - Legendary Cheesy Fries
+    - Fries box \+ dip
+    - Fries plate \+ 2 dip
+    - Twister fries \+ 2 dip
+
+  قسم: Salads
+    - Kaniratcha Salad
+    - Penneto Salad
+    - Chicken Avocado Salad
+    - Tuna Rocca Salad
+    - Chicken Caesar Salad
+
+  قسم: Shawarma
+    - Chicken Shawarma (Sandwich)
+    - Chicken Shawarma Meal
+    - Beef Shawrma (Sandwich)
+    - Beef Shawarma Meal
+
+  قسم: Big Soubra's Meal
+    - Big Soubra's Chicken
+    - Big Soubra's Beef
+    - Soubra's Duo
+
+  قسم: Beef Burger
+    - Lebanese
+    - Soubra's Classic
+    - Pablo Beef
+    - Sauron Eye
+    - Mushroom Beef
+    - Honeymozz Beef
+    - Franchise
+    - 24k
+
+  قسم: Grilled Chicken Burgers
+    - Classic Grilled Chicken
+    - Caesar
+    - Pablo Chicken
+    - Honeymozz Chicken
+    - Mushroom Chicken
+
+  قسم: Fried Chicken Burgers
+    - Classic Fried Chicken
+    - Crunchy
+    - Honey Bunny
+    - Zeus
+    - Old School
+
+  قسم: Sandwiches
+    - Tawouk Sandwich
+    - Chicken Sub
+    - Avocado Chicken
+    - Fajita
+    - Soubra's Steak
+
+  قسم: Wraps
+    - Tawouk Wrap
+    - Crispy Chicken Wrapper
+    - Chicken Cheese
+    - Chicken Esco
+
+  قسم: Platters
+    - Tawouk Platter
+    - Grilled Chicken Platter
+    - Escalope Platter
+    - Fish & Chips
+    - Crispy Platter
+    - Entrecote Steak
+    - Soubra's Majesty Steak
+
+  قسم: Kids Meal
+    - Burger kids' meal
+    - Crispy kids' meal
+    - Chicken nuggets kids' meal
+
+  قسم: Drinks
+    - Soft Drinks: $1.5$
+    - Ice Tea: $1.5$
+    - Water: $0.5$
+    - Laban Ayran: $1.5$
+    - Juice: $1$
+
+  قسم: Add Ons
+    - Extra chicken: $2.5$
+    - Extra beef: $3$
+    - Replace by black angus beef patty (160gr): $4$
+    - Extra black angus beef patty (160gr): $7$
+    - Extra cheddar patty: $2.5$
+    - Extra mozzarella patty: $2$
+    - Extra beef bacon: $2$
+    - Extra turkey: $1.5$
+    - Extra cheese slice: $1$
+    - Extra cheddar cup: $1.5$
+    - Extra dip: $0.5$
+    - Combo fries+drink: $4.5$
+    - Combo twister fries+drink: $5$
+
+  قسم: Burgers & Sandwiches
+    - Zinger Burger: $9.50
+    - Spicy Zinger: $9.50
+    - Honey Mustard Burger: $9.50
+    - BBQ Burger: $9.50
+    - Dynamite Burger: $9.50
+    - Fajita: $9.50
+    - Chicken Sub: $8.94
+
+  قسم: Wraps
+    - Zinger Wrap: $8.94
+    - Mix Boneless Wrap: $8.94
+    - BBQ Boneless Wrap: $8.94
+    - Buffalo Boneless Wrap: $8.94
+    - Twister Wrap: $8.94
+    - Classic Boneless Wrap: $8.94
+
+  قسم: Wings (Buffalo, BBQ, or Plain)
+    - 6 Pcs: $4.47
+    - 12 Pcs: $7.82
+    - 18 Pcs: $11.73
+    - 24 Pcs: $15.08
+    - Open Wings (All you can eat): $12.07
+    - Open Wings \+ Drink & Fries: $15.08
+
+  قسم: Crispy Meals
+    - Crispy Meal (3 pcs): $8.38
+    - Crispy Meal (5 pcs): $10.06
+    - Crispy Box (1 kg): $37.43
+
+  قسم: Singles (Mini)
+    - Mini Fajita: $2.79
+    - Mini Sub: $2.79
+    - Mini Honey Mustard Wrap: $2.79
+    - Mini BBQ Wrap: $2.79
+    - Mini Twister Wrap: $2.79
+    - Mini Buffalo Wrap: $2.79
+
+  قسم: Combos
+    - Mini Fajita Combo: $5.58
+    - Mini Honey Mustard Combo: $5.58
+    - Mini Sub Combo: $5.58
+    - Mini Twister Wrap Combo: $5.58
+    - Double Trouble (2 Mini Sandwiches \+ Fries \+ Drink): $6.69
+
+  قسم: Platters / Special
+    - Boneless Boom Small: $6.15
+    - Boneless Boom Large: $10.61
+
+  قسم: Sides & Appetizers
+    - Cheese Balls: $3.91
+    - Mozzarella Sticks: $3.91
+    - Curly Fries: $5.59
+    - Small Fries: $2.23
+    - Medium Fries: $3.91
+    - Wedges: $3.35
+    - Loaded Fries: $5.59
+    - Cheese Fries: $5.03
+
+  قسم: Drinks
+    - Pepsi: $1.34
+    - Kinza: $1.12
+    - Small Water: $0.45
+
+  قسم: Chicken & Sandwiches
+    - Large Sandwich: $4.44
+    - Large Sandwich (Breast): $5.00
+    - Medium Sandwich: $2.78
+    - Large Sandwich Meal: $6.11
+    - Medium Sandwich Meal: $4.44
+    - Shahine Kaak: $5.00
+    - Charcoal Chicken (Whole): $12.78
+    - Half Charcoal Chicken: $6.67
+    - Half Chicken (Breast): $7.22
+    - Half Chicken (Thighs): $6.67
+
+  قسم: Appetizers
+    - Small Fries Plate: $2.22
+    - Large Fries Plate: $3.89
+    - Garlic Container: $0.44
+    - Sauce Container: $0.44
+    - Service (Vegetables): $1.67
+    - Hummus with Tahini: $2.22
+    - Fattoush Plate: $3.33
+
+  قسم: Refreshments
+    - Small Soft Drink: $1.11
+    - Ayran (Yogurt Drink): $1.11
+    - Water: $0.44
+
+  قسم: Sandwiches
+    - Filet (Fatayel): $2.00
+    - Kafta: $2.00
+    - Makanek (Lebanese Sausage): $2.11
+    - Sujuk (Spicy Sausage): $2.11
+    - Sujuk Mad (Spread): $2.00
+    - Smoked Chicken: $2.11
+    - Chicken Liver (Sawda): $2.00
+    - Brains (Nakhaat): $2.22
+    - Spinal Cord (Sanasil): $2.22
+    - Tongues (Lisanat): $2.22
+    - Basturma: $2.22
+    - Roast Beef (Rosto): $2.56
+    - Extra Cheese (Add-on): $0.72
+
+  قسم: Grill Sandwiches (Mashawi)
+    - Kafta Sandwich: $1.11
+    - Meat Chunks (Sha2af) Sandwich: $1.11
+    - Chicken Liver (Sawda) Sandwich: $1.11
+    - Sujuk Sandwich: $1.11
+    - Kebab Sandwich: $1.11
+    - Taouk Sandwich: $1.11
+    - Makanek Sandwich: $1.11
+    - Lamb Testicles (Bayd) Sandwich: $1.11
+    - Brains (Nakhaat) Sandwich: $2.22
+    - Spinal Cord (Sanasil) Sandwich: $2.22
+
+  قسم: Shawarma
+    - Chicken Shawarma Sandwich: $1.11
+    - Meat Shawarma Sandwich: $1.11
+    - Chicken Shawarma Plate: $2.78
+    - Meat Shawarma Plate: $2.78
+    - Chicken Shawarma Burger: $1.11
+    - Meat Shawarma Burger: $1.11
+    - 1 Kilo Shawarma (Chicken or Meat): $25.56
+
+  قسم: Charcoal Burgers
+    - Meat Burger: $1.11
+    - Kafta Burger: $1.11
+
+  قسم: Sandwiches (Arabic & Markouk)
+    - Shawarma Chicken
+    - Shawarma Meat
+    - Mashawi Shaqaf (Meat Chunks)
+    - Mashawi (Musahab, Taouk, Kafta, Halabi, Sujuk, Makanek)
+    - Fries Sandwich
+
+  قسم: Combos (2 Sandwiches \+ Fries \+ Pepsi)
+    - 2 Shawarma Chicken Combo
+    - 2 Shawarma Meat Combo
+    - 2 Mashawi Shaqaf Combo
+    - 2 Mashawi Combo
+
+  قسم: Kilos (Sold in USD)
+    - Shawarma Meat (0.5 kg): $15.00
+    - Shawarma Meat (1 kg): $30.00
+    - Shawarma Chicken (0.5 kg): $11.00
+    - Shawarma Chicken (1 kg): $22.00
+
+  قسم: Fries Plates
+    - Fries Plate (Sahan): $3.89
+    - Fries Box (3albeh): $2.22
+
+  قسم: Manaqish (Classic)
+    - Zaatar: $0.67
+    - Zaatar Baladi: $1.00
+    - Cheese (Jibneh): $2.11
+    - Special Cheese (Naqa): $3.56
+    - Kashkaval: $2.89
+    - Bacon: $2.11
+    - Cocktail: $1.67
+    - Labneh: $2.11
+    - Halloumi: $2.56
+    - Bulgari Cheese: $2.56
+    - Special (Abo Malek): $5.33
+    - Meat (Lahmeh): $2.78
+    - Kishk: $1.78
+    - Muhammara: $1.56
+    - Nutella: $2.67
+    - Onion & Tomato: $1.78
+
+  قسم: Manaqish with Kashkaval Mix
+    - Akkawi & Kashkaval: $3.22
+    - Halloumi & Kashkaval: $3.22
+    - Bacon & Kashkaval: $3.22
+    - Bulgari & Kashkaval: $3.22
+    - Mortadella & Kashkaval: $4.00
+    - Sujuk & Kashkaval: $4.00
+    - Taouk & Kashkaval: $4.00
+    - Awarma (Preserved Meat) & Kashkaval: $5.00
+    - Turkey & Kashkaval: $5.00
+    - Fajita & Kashkaval: $5.00
+    - Tuna & Kashkaval: $5.00
+    - Pepperoni & Kashkaval: $5.00
+    - Hot Dog & Kashkaval: $5.00
+    - Meat & Kashkaval: $3.78
+    - Kishk & Kashkaval: $2.89
+    - Muhammara & Kashkaval: $2.33
+    - Onion/Tomato & Kashkaval: $2.89
+
+  قسم: Pizza
+    - Margherita: $5.78
+    - Vegetable: $6.11
+    - Mortadella: $6.11
+    - Sujuk: $6.11
+    - Pepperoni: $7.22
+    - Turkey (Habash): $7.22
+    - Chicken: $7.22
+    - Awarma: $7.22
+    - Tuna: $7.22
+    - Hot Dog: $7.22
+
+  قسم: Loaf (Ragheef)
+    - Cheese Loaf: $3.44
+    - Cheese & Zaatar Loaf: $3.89
+    - Mortadella Loaf: $4.00
+    - Sujuk Loaf: $4.00
+    - Awarma Loaf: $5.22
+    - Turkey Loaf: $5.22
+    - Pepperoni Loaf: $5.22
+
+  قسم: Fatayer (Pastries)
+    - Sujuk Fatayer: $1.22
+    - Mortadella Fatayer: $1.22
+    - Cheese Fatayer: $0.89
+    - Spinach Fatayer: $0.89
+
+  قسم: Misc
+    - Dozen Pastries (Mo3ajanat): $4.22
+    - Dough (Kg/Pack): $0.33
+    - Chicken Shawarma Sandwich (Large): $300000
+    - Chicken Shawarma Sandwich (Medium): $175000
+    - Chicken Shawarma Platter (Slices): $400000
+    - Double Shawarma Platter: $600000
+    - Chicken Shawarma Platter (Loose/Fart): $600000
+    - Doner Chicken: $400000
+    - Half Kilo Shawarma: $1000000
+    - Kilo Shawarma: $2000000
+    - Grilled Chicken (Farrouj Meshwi): $990000
+    - Broasted Chicken (Whole): $1150000
+    - Half Broasted Chicken: $575000
+    - Chicken on Charcoal (Ala Fahem): $1150000
+    - Half Chicken on Charcoal: $575000
+    - Beef Burger: $400000
+    - Breast Chicken Burger: $450000
+    - Mushroom Burger (Beef): $450000
+    - Chicken Mozzarella Burger: $450000
+    - Original Burger: $450000
+    - Zinger Burger: $400000
+    - Mozzarella Zinger Burger: $450000
+    - Tawouk Sandwich: $300000
+    - Fajita Sandwich: $450000
+    - Chicken Sub Sandwich: $450000
+    - Francisco Sandwich: $450000
+    - Chicken Mushroom: $450000
+    - Philadelphia Sandwich: $450000
+    - Steak Mushroom: $450000
+    - Cheese Steak: $450000
+    - Twister: $450000
+    - Crispy Sandwich: $450000
+    - Escalope Sandwich: $450000
+    - Chicken Cajun Sandwich: $450000
+    - Chicken on Charcoal Sandwich: $450000
+    - Spicy & Sour Chicken: $450000
+    - Chicken Quesadilla: $450000
+    - Crispy Meal (3 pieces): $450000
+    - Crispy Meal (5 pieces): $600000
+    - Half Kilo Crispy: $750000
+    - Doner Crispy: $400000
+    - Fattoush: $150000
+    - Tabbouleh: $200000
+    - Baba Ghannouj: $200000
+    - Mutabal Eggplant: $200000
+    - Mutabal Hummus: $150000
+    - Cheese Rolls (Rakaek): $200000
+    - Fried Kibbeh: $300000
+    - Mozzarella Sticks (4 pcs): $300000
+    - French Fries Plate: $350000
+    - French Fries Box: $200000
+    - Coleslaw: $200000
+    - Service Plate (Vegetables): $100000
+    - Sauce Box: $50000
+    - Nutella Waffle: $400000
+    - Lotus Waffle: $400000
+    - Oreo Waffle: $400000
+    - Nutella Crepe: $400000
+    - Lotus Crepe: $400000
+    - Oreo Crepe: $350000
+    - Nutella Pancake: $400000
+    - Oreo Pancake: $400000
+    - Lotus Pancake: $400000
+    - Pepsi / Mirinda / 7Up: $75000
+    - Laban: $75000
+    - Large Water: $75000
+    - Coffee: $75000
+    - Nescafe: $200000
+    - Cappuccino: $200000
+    - Tea: $200000
+    - Hot Chocolate: $200000
+    - Lemon: $250000
+    - Lemonade: $250000
+    - Lemonade Mint: $275000
+    - Carrot: $200000
+    - Strawberry: $300000
+    - Mango: $350000
+    - Banana Milk: $300000
+    - Banana Milk Strawberry: $300000
+    - Banana Milk Chocolate: $300000
+    - Banana Milk Honey: $325000
+    - Oreo Shake: $350000
+    - Strawberry Shake: $350000
+    - Berries Shake: $350000
+    - Chocolate Shake: $350000
+    - Milk Shake: $350000
+    - Lotus Shake: $350000
+    - Vanilla Shake: $350000
+    - Ice Cream with Fresco (Small): $175000
+    - Ice Cream with Fresco (Medium): $200000
+    - Ice Cream with Fresco (Large): $225000
+    - Ice Cream Cone (Cornet): $150000
+    - Ice Cream Cup: $175000
+    - Ice Cream Scoop (1 Boule): $125000
+    - Fresco Cup (Small): $150000
+    - Fresco Cup (Medium): $175000
+    - Fresco Cup (Large): $200000
+    - Double Apple (Tafahatain): $450000
+    - Lemon Mint (Hamod w Na'na): $450000
+    - Ajami: $500000
+    - Fajita: $4.22
+    - Chicken Sub: $3.89
+    - Chinese (Sini): $3.33
+    - Steak Sub: $4.22
+    - Crispy: $3.33
+    - Chicken Pesto: $4.22
+    - Crunchy Burger: $3.89
+    - Al Ghali Burger: $4.44
+    - Classico Burger: $4.44
+    - Lebanese Burger: $3.33
+    - Burger B: $5.00
+    - Mushroom Burger: $5.00
+    - Mac Burger: $3.89
+    - Honey Butter: $5.00
+    - Fried Potato (Large): $3.33
+    - Fried Potato (Small): $2.22
+    - Wedges: $2.78
+    - Mozzarella Sticks: $3.89
+    - Grilled Chicken Platter: $7.78
+    - Scaloppine Platter: $7.78
+    - Golden Chicken Potato: $3.89
+    - Cheese Potato: $3.33
+    - Chicken & BBQ Potato: $3.89
+    - Chicken & Spicy Sauce Potato: $3.89
+    - Boneless Chicken Meal (Musahab): $7.78
+    - Boneless Chicken Whole (Farrouj Musahab): $13.33
+    - Mixed Grill 1 Kilo: $13.89
+    - Mixed Grill Half Kilo: $7.78
+    - Half Chicken with Fries: $7.78
+    - Makanek: $1.11
+    - Sujuk: $1.11
+    - Khashkhash: $1.11
+    - Kafta: $1.11
+    - Shqaf (Meat Chunks): $1.11
+    - Tawouk White: $1.11
+    - Tawouk Red: $1.11
+    - Sawda (Liver): $1.11
+    - Bayd (Testicles): $1.11
+    - Snasel (Spinal Cord): $1.67
+    - Nkha'at (Brains): $1.67
+    - Add Combo (Fries \+ Pepsi): $2.22
+    - Extra Potato: $0.56
+    - Heartache
+
+  قسم: Appetizers
+    - Fries: $2.00
+    - Cheese & Fries: $3.00
+    - Crispy Loaded Fries: $4.50
+    - Beef Loaded Fries: $4.60
+
+  قسم: Sandwiches
+    - Escalope: $3.00
+    - Tawook: $2.80
+    - Fransisco: $3.70
+    - Crab: $3.80
+    - Shrimps: $4.00
+    - Crab & Shrimps: $4.20
+    - Sojok: $3.80
+    - Makanek: $3.80
+    - Fajita: $4.20
+    - Chicken Sub: $4.00
+    - Twister: $4.00
+    - Rosto: $3.30
+    - Rosto & Cheese: $3.50
+
+  قسم: Burgers
+    - Mushroom: $4.50
+    - Lebanese: $3.70
+    - Zinger: $4.15
+    - Honey Bunny: $3.90
+    - Crunchy: $4.00
+    - Smashed: $4.25
+
+  قسم: Meals
+    - Crispy Meal (6 pcs): $6.00
+    - Crispy Meal (4 pcs): $5.00
+
+  قسم: Drinks
+    - Pepsi: $0.70
+    - 7up: $0.70
+    - Miranda: $0.70
+    - Kinza: $0.50
+    - Water: $0.20
+
+  قسم: Add On
+    - Add chicken: $1.00
+    - Add beef: $1.20
+    - Add cup of sauce: $0.30
+    - Sandwich Abou Afif
+
+  قسم: Sandwiches
+    - Abou Afif Beef
+    - Abou Afif Chicken
+    - Francisco
+    - Spicy Chicken
+    - Luna
+    - Chicken Sub
+    - Garlic Chicken
+    - Escalope
+    - Tawouk
+    - Rosto
+    - Sujuk
+    - Makanek
+
+  قسم: Burgers
+    - Cheese Burger
+    - Escalope Bun
+
+  قسم: Fries
+    - Fries Sandwich
+    - Fries Box
+
+  قسم: Sweet Sandwiches
+    - Nutella
+    - Nutella Halawa
+    - Halawa & Butter
+
+  قسم: Beverages
+    - Soft Drinks
+    - Ayran
+    - Water
+    - فروجين عالغاز كبار (+سرفيس)
+    - منسف رز مع فروج عالغاز (+سرفيس وصوص رز)
+    - منسف رز مع فروج فحم (+سرفيس وصوص رز)
+    - منسف رز مع شاورما دجاج (+سرفيس وصوص رز)
+    - منسف رز مع 20 سيخ كباب دجاج \+ محمرة (وسرفيس كامل)
+    - عرض القرمشة (فروج بروستد \+ 8 قطع كرسبي)
+    - فروج فحم (مع بطاطا وسرفيس كامل) \+ نصف كيلو شاورما
+    - وجبة كرسبي 10 قطع (مع بطاطا و تشدر وسرفيس كامل)
+    - كيلو شاورما \+ محمرة (مع بطاطا وسرفيس كامل)
+    - فروج مشوي عالغاز مع فروج بروستد او فحم (مع بطاطا)
+    - بوكس ريزو ميكس (رز مع شاورما \+ رز مع كباب دجاج \+ صوص ارز...)
+    - بوكس التركي (سندويش تركس عدد 6 \+ بطاطا \+ سرفيس كامل)
+    - بوكس السناك (2 تشكن برغر \+ برغر لحمة \+ فاهيتا \+ بطاطا...)
+    - بوكس القرمشة (4 كرسبي \+ نصف بروستد \+ بطاطا \+ سرفيس)
+    - بوكس المشوي (فروجين عالغاز مع بطاطا وسرفيس)
+    - بوكس المرقوق (شاورما دجاج كبار عدد 4 \+ بطاطا \+ سرفيس)
+    - بوكس 2 / 3 (3 كايزر دجاج \+ 2 شاورما دجاج مرقوق مع بطاطا...)
+    - بوكس الكرم 1 (4 كرسبي \+ 2 شاورما دجاج مرقوق \+ سرفيس)
+    - بوكس الكرم 2 (4 كرسبي \+ 3 كايزر دجاج \+ سرفيس)
+    - بوكس الكايزر (6 ميكس)
+    - بوكس الكايزر (6 لحمة)
+    - بوكس الكايزر (6 دجاج)
+    - 2 برغر شاورما دجاج (كايزر المعلم صبحي)
+    - 2 برغر شاورما لحمة (كايزر المعلم صبحي)
+    - 2 سندويش كباب دجاج
+    - 2 تشكن برغر
+    - 2 سندويش شاورما (اكس لارج)
+    - 2 دونر شاورما تركي
+    - 2 سندويش (شاورما لحمة \+ شاورما دجاج)
+    - 2 سندويش دجاج فحم
+    - 2 سندويش طاووق
+    - 2 سندويش (فاهيتا \+ تشكن برغر)
+    - 2 سندويش (تشكن ساب \+ تشكن برغر)
+    - 2 سندويش (برغر لحمة \+ تشكن برغر)
+    - 2 سندويش (كرسبي \+ تشكن برغر)
+    - سندويش شاورما لارج
+    - سندويش شاورما اكس لارج
+    - سندويش شاورما تركي
+    - سندويش شاورما افرنجي
+    - برغر شاورما (كايزر المعلم صبحي)
+    - وجبة شاورما مقطعة
+    - وجبة شاورما دوبل
+    - وجبة شاورما تركي
+    - وجبة شاورما فرط
+    - وجبة شاورما مع رز (ريزو)
+    - نصف كيلو شاورما مع بطاطا ومحمرة
+    - كيلو شاورما مع بطاطا ومحمرة
+    - تشكن برغر
+    - برغر لحمة
+    - برغر زنجر
+    - سندويش كرسبي
+    - سندويش اسكالوب
+    - سندويش فاهيتا
+    - سندويش تشكن ساب
+    - سندويش دجاج على الغاز
+    - سندويش دجاج على الغاز افرنجي
+    - وجبة كرسبي 3 قطع مع بطاطا
+    - وجبة اسكالوب 3 قطع مع بطاطا
+    - وجبة زنجر 3 قطع مع بطاطا
+    - وجبة كرسبي 5 قطع مع بطاطا
+    - فروج مشوي غاز
+    - فروج مشوي غاز مع بطاطا
+    - فروج مشوي غاز مع صحن ارز
+    - نصف فروج غاز مع بطاطا
+    - فروج بروستد مع بطاطا
+    - نصف فروج بروستد مع بطاطا
+    - فروج فحم مع بطاطا
+    - فروج فحم مع صحن ارز
+    - نصف فروج فحم مع بطاطا او ارز
+    - سندويش دجاج على الفحم لارج
+    - سندويش دجاج على الفحم اكس لارج
+    - سندويش دجاج على الفحم افرنجي
+    - سندويش طاووق لارج
+    - سندويش طاووق اكس لارج
+    - سندويش طاووق افرنجي
+    - سندويش كباب لارج
+    - سندويش كباب اكس لارج
+    - وجبة دجاج على الفحم مع بطاطا
+    - وجبة دجاج على الفحم مع بطاطا دوبل
+    - وجبة كباب (6 اسياخ) مع بطاطا او ارز
+    - وجبة طاووق (3 اسياخ) مع بطاطا او ارز
+    - نصف كيلو كباب (10 اسياخ) مع بطاطا او ارز
+    - كيلو كباب مع بطاطا او ارز (20 سيخ)
+    - نصف كيلو طاووق مع بطاطا او ارز
+    - كيلو طاووق مع بطاطا او ارز
+    - فتوش
+    - تبولة
+    - سلطة سيزر
+    - سلطة روكا
+    - حمص
+    - بطاطا
+    - رقائق جبنة
+    - كبة لحم
+    - صحن ارز
+    - مياه
+    - بيبسي بلاستيك
+    - بيبسي تنك
+    - لبن عيران
+    - Mo Beef
+    - Big Mo Beef
+    - Double Mo Cheese Burger
+    - King-Mo Beef
+    - Smoky Mo Beef
+    - Mo Chicken
+    - Big Mo Chicken
+    - Spicy Mo Chicken
+    - Mighty Mo Chicken
+    - Mini-Mo Beef
+    - Mini-Mo Chicken
+    - Mini-Mo Cheese Burger
+    - زعتر (Zaatar)
+    - زعتر بلدي (Zaatar Baladi)
+    - جبنة عكاوي (Akkawi Cheese)
+    - قشقوان (Kashkawan)
+    - موزريلا (Mozzarella)
+    - حلوم (Halloumi)
+    - بيكون (Bacon)
+    - بوك (Puck Cheese)
+    - كيري (Kiri Cheese)
+    - جبنتين (Two Cheeses)
+    - 3 أجبان (3 Cheeses)
+    - Shawarma Abul El Oud
+
+  قسم: Chicken Shawarma
+    - Chicken Shawarma Regular
+    - Chicken Shawarma Large
+    - Chicken Shawarma Markouk
+    - Cut Chicken Markook Meal
+    - Chicken Shawarma Platter
+    - Cut Chicken Markook Meal Double
+    - A Half \- Kilo of Shawarma
+    - Kilo of Shawarma
+    - Mix
+
+  قسم: Beef Shawarma
+    - Beef Shawarma Regular
+    - Beef Shawarma Large
+    - Beef Shawarma Markouk
+    - Cut Markook Beef Meal
+    - Beef Shawarma Platter
+    - Cut Markook Beef Meal Double
+    - A Half Kilo of Beef Shawarma
+    - 1 Kilo of Beef Shawarma
+
+  قسم: Turkish Items
+    - Shawarma Wrap Chicken
+    - Chicken Döner Turkey
+    - Chicken Döner Combo
+    - Döner Sojouk
+    - Beef Döner Turkey
+    - Shawarma Wrap Beef
+
+  قسم: Fries
+    - Turkish Fries Sandwich
+    - Fries Sandwich
+    - Fries Regular
+
+  قسم: Salads
+    - Shawarma Ceasar Salad
+    - Ceasar Salad
+    - Fattoush
+
+  قسم: Offers
+    - The Combo Deal
+    - The Döner Deal
+    - Beef Döner Combo
+    - Kaizer Chicken
+    - Kaizer Bites Mix
+    - Kaizer Mix
+    - Abul El Oud Bites
+    - Kaizer Meat
+    - Abul El Oud Bites Chicken and Meat
+
+  قسم: Drinks
+    - Water
+    - Pepsi
+    - Seven Up
+    - Miranda
+    - Ice Tea
+    - Yohgurt
+
+  قسم: شاورما دجاج (Chicken Shawarma)
+
+  قسم: شاورما لحمة (Meat Shawarma)
+
+  قسم: برغر (Burgers)
+
+
+################################################################################
+# الملف الثاني: rest2.md
+# FILE 2: rest2.md
+################################################################################
+
+
+------------------------------------------------------------
+مطعم: Al Abdalla
+------------------------------------------------------------
+
+  قسم: BBQ Chicken
+
+  قسم: Specialty Bread
+
+  قسم: Sandwiches
+
+  قسم: Combos
+
+  قسم: Sides & Appetizers
+
+  الأصناف (37 صنف):
+    - Chicken - Whole: 18.00 
+    - Chicken - Half: 9.50 
+    - Chicken Legs - Whole: 18.00 
+    - Chicken Legs - Half: 9.50 
+    - Chicken Breasts - Whole: 19.00 
+    - Chicken Breasts - Half: 10.00 
+    - CHILLI BREAD: 2.50 
+    - GARLIC BREAD: 2.50 
+    - GARLIC & CHILLI BREAD: 2.50 
+    - GARLIC CHILLI & FRIES BREAD: 3.00 
+    - Chicken Brown Bread Sandwich: 8.00 
+    - Chicken Sandwich (Large): 7.50 
+    - Chicken Sandwich (Medium): 4.50 
+    - Fries Sandwich (Large): 3.00 
+    - Fries Sandwich (Medium): 2.50 
+    ... و 22 صنف آخر
+
+------------------------------------------------------------
+مطعم: Qarmash (Super Bits)
+------------------------------------------------------------
+
+  قسم: Chicken Broasted
+
+  قسم: Crispy Chicken
+
+  قسم: Boneless Chicken Meals
+
+  قسم: Mix Meals
+
+  قسم: Sea Meals
+
+  الأصناف (65 صنف):
+    - Broast (3 Pcs): 8.00
+
+    - Broast (4 Pcs): 9.00
+
+    - Broast (8 Pcs): 16.00
+
+    - Broast (12 Pcs): 24.00
+
+    - Family Broasted (16 Pcs): 30.00
+
+    - Jwenh Broast: 6.00
+
+    - Crispy (5 Pcs): 9.00
+
+    - Crispy (10 Pcs): 16.00
+
+    - Crispy (15 Pcs): 24.00
+
+    - Boneless Biek: 9.00
+
+    - Escalope: 9.00
+
+    - Crazy Bonless: 7.00
+
+    - Crispy + Broast 2*2: 9.00
+
+    - Family Mix: 16.00
+
+    - Shrimps: 8.00
+
+    ... و 50 صنف آخر
+
+------------------------------------------------------------
+مطعم: Qarmash (Super Bits)
+------------------------------------------------------------
+
+  قسم: Chicken Broasted
+
+  قسم: Crispy Chicken
+
+  قسم: Boneless Chicken Meals
+
+  قسم: Mix Meals
+
+  قسم: Sea Meals
+
+  الأصناف (65 صنف):
+    - Broast (3 Pcs): 8.00
+
+    - Broast (4 Pcs): 9.00
+
+    - Broast (8 Pcs): 16.00
+
+    - Broast (12 Pcs): 24.00
+
+    - Family Broasted (16 Pcs): 30.00
+
+    - Jwenh Broast: 6.00
+
+    - Crispy (5 Pcs): 9.00
+
+    - Crispy (10 Pcs): 16.00
+
+    - Crispy (15 Pcs): 24.00
+
+    - Boneless Biek: 9.00
+
+    - Escalope: 9.00
+
+    - Crazy Bonless: 7.00
+
+    - Crispy + Broast 2*2: 9.00
+
+    - Family Mix: 16.00
+
+    - Shrimps: 8.00
+
+    ... و 50 صنف آخر
+
+------------------------------------------------------------
+مطعم: Baba Ghanouj
+------------------------------------------------------------
+
+  قسم: Breakfast
+
+  قسم: Manakish
+
+  قسم: Baba Ghanouj Breakfast Set
+
+  قسم: Pizza
+
+  قسم: Burgers
+
+  الأصناف (13 صنف):
+    - Wagyu (MB 6-7): 18.00
+
+    - Green Salad: 7.00 
+    - Crazy Salad: 7.00 
+    - Goat Rocca Salad: 11.00 
+    - Potato Wedges: 4.00 
+    - Mozarrila Steak: 5.00 
+    - Cheesy Garlic Bread: 4.00 
+    - Tortilla Smoked: 6.00 
+    - Dr. Steak Fillet (Baladi): 19.00 
+    - Dr. Steak Fillet (Brazilian): 20.00 
+    - Dr. Steak Fillet (Australian): 35.00 
+    - Beef Sizzling (300g): 23.00 
+    - Dr. Ribs (6 pieces): 25.00 
+
+------------------------------------------------------------
+مطعم: Zaatar
+------------------------------------------------------------
+
+------------------------------------------------------------
+مطعم: Potato Sandwich
+------------------------------------------------------------
+
+
+################################################################################
+# الملف الثالث: Document (4).docx
+# FILE 3: Document (4).docx
+################################################################################
+
+
+------------------------------------------------------------
+مطعم: Moghrabi Cakes & More
+       مغربي كيك أند مور
+------------------------------------------------------------
+
+------------------------------------------------------------
+مطعم: Jarish Ibn Al Balad
+       جريش إبن البلد
+------------------------------------------------------------
+
+------------------------------------------------------------
+مطعم: Marinade
+       مارينيد
+------------------------------------------------------------
+
+------------------------------------------------------------
+مطعم: Soft Drink
+       مشروب غازي
+------------------------------------------------------------
+
+------------------------------------------------------------
+مطعم: Juice
+       عصير
+------------------------------------------------------------
+
+------------------------------------------------------------
+مطعم: Water
+       مياه
+------------------------------------------------------------
+
+
+################################################################################
+# الملف الرابع: Document (7).docx
+# FILE 4: Document (7).docx
+################################################################################

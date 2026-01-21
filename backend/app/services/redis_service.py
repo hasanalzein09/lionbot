@@ -197,21 +197,21 @@ class RedisService:
         """Add item to cart or update quantity if exists"""
         key = f"cart:{phone_number}"
         cart_items = await self.get_cart(phone_number)
-        
+
         # Check if item already exists in cart
         existing_index = None
         for i, cart_item in enumerate(cart_items):
             if cart_item.get("menu_item_id") == item.get("menu_item_id"):
                 existing_index = i
                 break
-        
+
         if existing_index is not None:
             # Update quantity
             cart_items[existing_index]["quantity"] += item.get("quantity", 1)
         else:
             # Add new item
             cart_items.append(item)
-        
+
         await self._execute("SET", key, json_dumps(cart_items), "EX", CART_EXPIRY_SECONDS)
 
     async def get_cart(self, phone_number: str) -> List[Dict]:

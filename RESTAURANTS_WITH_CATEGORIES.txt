@@ -1,0 +1,146 @@
+قائمة جميع المطاعم/المتاجر مع عدد الأصناف (categories)
+======================================================================
+
+من res.md:
+----------------------------------------------------------------------
+1. King Croissant
+   عدد الأصناف (categories): 33
+
+2. Furn Libnan (فرن لبنان)
+   عدد الأصناف (categories): 0
+
+3. BOUDI SANDWICH
+   عدد الأصناف (categories): 0
+
+4. KAAKÉ by meat chop
+   عدد الأصناف (categories): 0
+
+5. Bayt Al Nar \- House of Fire
+   عدد الأصناف (categories): 0
+
+6. Foul w Trawiqa
+   عدد الأصناف (categories): 43
+
+7. Spuntino
+   عدد الأصناف (categories): 45
+
+8. Linguine Menu
+   عدد الأصناف (categories): 31
+
+9. Hayat Doner
+   عدد الأصناف (categories): 36
+
+10. Popeyes
+   عدد الأصناف (categories): 24
+
+11. SEEK
+   عدد الأصناف (categories): 0
+
+12. SUBMARINE
+   عدد الأصناف (categories): 0
+
+13. Krispy Tender
+   عدد الأصناف (categories): 0
+
+14. Krispy Tender
+   عدد الأصناف (categories): 0
+
+15. Smoking Hub
+   عدد الأصناف (categories): 55
+
+16. Heartache
+   عدد الأصناف (categories): 6
+
+17. Sandwich Abou Afif
+   عدد الأصناف (categories): 5
+
+18. Shawarma Abul El Oud
+   عدد الأصناف (categories): 24
+
+
+من rest2.md:
+----------------------------------------------------------------------
+1. Al Abdalla
+   عدد الأصناف (categories): 23
+
+2. Check In
+   عدد الأصناف (categories): 0
+
+3. Aura
+   عدد الأصناف (categories): 8
+
+4. Unknown
+   عدد الأصناف (categories): 2
+
+5. Unknown
+   عدد الأصناف (categories): 6
+
+6. French Fries
+   عدد الأصناف (categories): 78
+
+7. Qarmash (Super Bits)
+   عدد الأصناف (categories): 39
+
+8. Qarmash (Super Bits)
+   عدد الأصناف (categories): 39
+
+9. Baba Ghanouj
+   عدد الأصناف (categories): 63
+
+10. Adi's
+   عدد الأصناف (categories): 12
+
+
+من Document (4).docx:
+----------------------------------------------------------------------
+1. Moghrabi Cakes & More
+   عدد الأصناف (categories): 6
+
+2. Jarish Ibn Al Balad
+   عدد الأصناف (categories): 12
+
+3. Marinade
+   عدد الأصناف (categories): 30
+
+4. Majed Zuheir
+   عدد الأصناف (categories): 17
+
+5. Hamada Bakery
+   عدد الأصناف (categories): 184
+
+6. صحة وهنا
+   عدد الأصناف (categories): 3
+
+7. Submarine
+   عدد الأصناف (categories): 12
+
+8. مطعم وشاورما الأخوين الجمل
+   عدد الأصناف (categories): 9
+
+9. شاورما غسان
+   عدد الأصناف (categories): 15
+
+
+من Document (7).docx:
+----------------------------------------------------------------------
+1. مطعم دجاج شعبان
+   عدد الأصناف (categories): 8
+
+2. لوفي كرواسون
+   عدد الأصناف (categories): 8
+
+3. مناقيش ومعجنات أبو مازن الفاخرة
+   عدد الأصناف (categories): 8
+
+4. مطاعم فلافل عكاوي
+   عدد الأصناف (categories): 14
+
+5. مناقيش أبو العز الممتازة
+   عدد الأصناف (categories): 12
+
+
+======================================================================
+الملخص:
+- مجموع المطاعم/المتاجر: 42
+- مجموع الأصناف (categories): 910
+======================================================================
