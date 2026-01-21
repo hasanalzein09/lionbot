@@ -1,16 +1,19 @@
 from fastapi import APIRouter
 from app.api.v1.endpoints import (
-    webhook, login, restaurants, menus, orders, branches, users, stats, 
-    settings, websocket, loyalty, driver_assignment, inventory, notifications, 
+    webhook, login, restaurants, menus, orders, branches, users, stats,
+    settings, websocket, loyalty, driver_assignment, inventory, notifications,
     customers, cart, reviews, favorites, addresses, coupons, search, reorder,
     delivery, cancellation, scheduling, referrals, analytics, tips,
     notification_preferences, support, banners, customizations, health,
     live_tracking, working_hours, exports, payouts, audit, webhooks_external,
     notification_templates, faq, app_config, receipts, driver_earnings,
-    dashboard_stats, feature_flags
+    dashboard_stats, feature_flags, public
 )
 
 api_router = APIRouter()
+
+# Public API (No authentication required) - For liondelivery-saida.com website
+api_router.include_router(public.router, prefix="/public", tags=["public"])
 
 # Auth
 api_router.include_router(login.router, tags=["login"])
