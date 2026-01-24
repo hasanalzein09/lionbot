@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "npx opennextjs-cloudflare build",
+    "build:cloudflare": "npx opennextjs-cloudflare build && cp .open-next/worker.js .open-next/assets/_worker.js",
     "preview": "npx wrangler dev",
     "deploy": "npx wrangler deploy",
     "start": "next start",
