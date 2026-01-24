@@ -8,8 +8,8 @@ import type { MenuCategory } from "@/types/menu";
 
 interface MenuCategoryNavProps {
   categories: MenuCategory[];
-  activeCategory: string;
-  onCategoryClick: (categoryId: string) => void;
+  activeCategory: string | number;
+  onCategoryClick: (categoryId: string | number) => void;
 }
 
 export function MenuCategoryNav({
@@ -46,7 +46,7 @@ export function MenuCategoryNav({
     }
   };
 
-  const handleCategoryClick = (categoryId: string) => {
+  const handleCategoryClick = (categoryId: string | number) => {
     onCategoryClick(categoryId);
 
     // Scroll the element into view
@@ -101,9 +101,9 @@ export function MenuCategoryNav({
           className="scrollbar-hide flex gap-2 overflow-x-auto px-1"
         >
           {categories.map((category) => {
-            const displayName =
-              locale === "ar" && category.nameAr ? category.nameAr : category.name;
-            const isActive = activeCategory === category.id;
+            const nameAr = category.nameAr || category.name_ar;
+            const displayName = locale === "ar" && nameAr ? nameAr : category.name;
+            const isActive = String(activeCategory) === String(category.id);
 
             return (
               <button

@@ -7,6 +7,7 @@ import { Plus, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils/formatters";
+import { cn } from "@/lib/utils/cn";
 import type { MenuItem } from "@/types/menu";
 
 interface MenuItemCardProps {
@@ -19,22 +20,34 @@ export function MenuItemCard({ item, onSelect, index = 0 }: MenuItemCardProps) {
   const locale = useLocale();
   const t = useTranslations("menu");
 
-  const displayName = locale === "ar" && item.nameAr ? item.nameAr : item.name;
-  const displayDescription =
-    locale === "ar" && item.descriptionAr ? item.descriptionAr : item.description;
+  // Handle both camelCase and snake_case from API
+  const nameAr = item.nameAr || item.name_ar;
+  const descriptionAr = item.descriptionAr || item.description_ar;
+  const price = item.price ?? item.price_min ?? 0;
+  const isPopular = item.isPopular || item.is_popular;
+  const hasVariants = item.hasVariants || item.has_variants;
+  const isAvailable = item.isAvailable ?? item.is_available ?? true;
 
-  const hasDiscount = item.originalPrice && item.originalPrice > item.price;
+  const displayName = locale === "ar" && nameAr ? nameAr : item.name;
+  const displayDescription =
+    locale === "ar" && descriptionAr ? descriptionAr : item.description;
+
+  const hasDiscount = item.originalPrice && item.originalPrice > price;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="group"
+      className={cn("group", !isAvailable && "opacity-50")}
     >
       <button
-        onClick={() => onSelect(item)}
-        className="flex w-full gap-4 rounded-2xl bg-secondary-800 p-4 text-start transition-all hover:bg-secondary-700 hover:shadow-lg"
+        onClick={() => isAvailable && onSelect(item)}
+        disabled={!isAvailable}
+        className={cn(
+          "flex w-full gap-4 rounded-2xl bg-secondary-800 p-4 text-start transition-all",
+          isAvailable ? "hover:bg-secondary-700 hover:shadow-lg" : "cursor-not-allowed"
+        )}
       >
         {/* Content */}
         <div className="flex-1 min-w-0">
@@ -42,7 +55,12 @@ export function MenuItemCard({ item, onSelect, index = 0 }: MenuItemCardProps) {
             <h3 className="font-semibold text-foreground group-hover:text-primary-500 transition-colors line-clamp-1">
               {displayName}
             </h3>
-            {item.isPopular && (
+            {!isAvailable && (
+              <Badge variant="secondary" className="flex-shrink-0">
+                {locale === "ar" ? "غير متوفر" : "Unavailable"}
+              </Badge>
+            )}
+            {isAvailable && isPopular && (
               <Badge variant="warning" className="flex-shrink-0">
                 <Flame className="mr-1 h-3 w-3" />
                 {locale === "ar" ? "مميز" : "Popular"}
@@ -59,7 +77,9 @@ export function MenuItemCard({ item, onSelect, index = 0 }: MenuItemCardProps) {
           {/* Price */}
           <div className="flex items-center gap-2">
             <span className="font-semibold text-primary-500">
-              {formatPrice(item.price)}
+              {hasVariants && item.price_min && item.price_max && item.price_min !== item.price_max
+                ? `${formatPrice(item.price_min)} - ${formatPrice(item.price_max)}`
+                : formatPrice(price)}
             </span>
             {hasDiscount && (
               <span className="text-sm text-muted-foreground line-through">

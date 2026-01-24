@@ -21,35 +21,52 @@ export interface SearchSuggestion {
 export const searchApi = {
   /**
    * Global search across restaurants and menu items
+   * Uses public API - no authentication required
    */
   search: async (query: string, limit = 20): Promise<SearchResults> => {
-    const response = await get<SearchResults>("/search", {
+    const response = await get<SearchResults>("/public/search/", {
       q: query,
       limit,
     });
     return {
       restaurants: response.restaurants || [],
       items: response.items || [],
-      total: response.total || 0,
+      total: (response.restaurants?.length || 0) + (response.items?.length || 0),
     };
   },
 
   /**
    * Get search suggestions (autocomplete)
+   * Note: This endpoint doesn't exist in backend yet, using search as fallback
    */
   getSuggestions: async (query: string, limit = 8): Promise<SearchSuggestion[]> => {
-    const response = await get<{ suggestions: SearchSuggestion[] }>("/search/suggestions", {
-      q: query,
-      limit,
-    });
-    return response.suggestions || [];
+    try {
+      const response = await get<SearchResults>("/public/search/", {
+        q: query,
+        limit,
+      });
+      // Convert search results to suggestions format
+      const suggestions: SearchSuggestion[] = [];
+      response.restaurants?.forEach(r => {
+        suggestions.push({
+          type: "restaurant",
+          id: String(r.id),
+          name: r.name,
+          nameAr: r.name_ar,
+          image: r.image,
+        });
+      });
+      return suggestions.slice(0, limit);
+    } catch {
+      return [];
+    }
   },
 
   /**
    * Search restaurants only
    */
   searchRestaurants: async (query: string, limit = 10): Promise<Restaurant[]> => {
-    const response = await get<{ restaurants: Restaurant[] }>("/search/restaurants", {
+    const response = await get<SearchResults>("/public/search/", {
       q: query,
       limit,
     });
@@ -60,7 +77,7 @@ export const searchApi = {
    * Search menu items only
    */
   searchItems: async (query: string, limit = 10): Promise<MenuItem[]> => {
-    const response = await get<{ items: MenuItem[] }>("/search/items", {
+    const response = await get<SearchResults>("/public/search/", {
       q: query,
       limit,
     });
@@ -69,11 +86,9 @@ export const searchApi = {
 
   /**
    * Get popular searches
+   * Note: Using static list for now
    */
-  getPopular: async (limit = 5): Promise<string[]> => {
-    const response = await get<{ searches: string[] }>("/search/popular", {
-      limit,
-    });
-    return response.searches || [];
+  getPopular: async (): Promise<string[]> => {
+    return ["Burger", "Shawarma", "Pizza", "Coffee", "Sweets"];
   },
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -9,53 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RestaurantGrid } from "@/components/restaurants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
-import type { Restaurant } from "@/types/restaurant";
-
-// Mock data for development
-const mockRestaurants: Restaurant[] = [
-  {
-    id: "1",
-    name: "Burgero",
-    nameAr: "برغيرو",
-    slug: "burgero",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Burger",
-    categoryAr: "برغر",
-    rating: 4.8,
-    reviewCount: 120,
-    priceRange: "$$",
-    deliveryTime: { min: 25, max: 35 },
-    isOpen: true,
-  },
-  {
-    id: "2",
-    name: "Baba Ghanouj",
-    nameAr: "بابا غنوج",
-    slug: "baba-ghanouj",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Grills",
-    categoryAr: "مشاوي",
-    rating: 4.9,
-    reviewCount: 200,
-    priceRange: "$$$",
-    deliveryTime: { min: 30, max: 45 },
-    isOpen: true,
-  },
-  {
-    id: "7",
-    name: "Shawarma King",
-    nameAr: "ملك الشاورما",
-    slug: "shawarma-king",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Shawarma",
-    categoryAr: "شاورما",
-    rating: 4.7,
-    reviewCount: 220,
-    priceRange: "$",
-    deliveryTime: { min: 20, max: 30 },
-    isOpen: true,
-  },
-];
+import { useSearch } from "@/lib/hooks/use-search";
 
 export default function SearchPage() {
   const locale = useLocale();
@@ -65,21 +19,16 @@ export default function SearchPage() {
 
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
-  const [isSearching, setIsSearching] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
 
-  // Filter restaurants based on search query
-  const filteredRestaurants = debouncedQuery
-    ? mockRestaurants.filter((r) => {
-        const searchLower = debouncedQuery.toLowerCase();
-        return (
-          r.name.toLowerCase().includes(searchLower) ||
-          r.nameAr?.includes(debouncedQuery) ||
-          r.category.toLowerCase().includes(searchLower) ||
-          r.categoryAr?.includes(debouncedQuery)
-        );
-      })
-    : [];
+  // Use real API for search
+  const { data: searchResults, isLoading, isFetching } = useSearch(debouncedQuery);
+
+  // Get restaurants from search results
+  const restaurants = searchResults?.restaurants || [];
+
+  // Determine if we're searching (typing or fetching)
+  const isSearching = query !== debouncedQuery || isFetching;
 
   // Update URL when query changes
   useEffect(() => {
@@ -91,15 +40,6 @@ export default function SearchPage() {
       router.replace(`/${locale}/search`, { scroll: false });
     }
   }, [debouncedQuery, locale, router]);
-
-  // Simulate loading state
-  useEffect(() => {
-    if (query !== debouncedQuery) {
-      setIsSearching(true);
-    } else {
-      setIsSearching(false);
-    }
-  }, [query, debouncedQuery]);
 
   const handleClear = () => {
     setQuery("");
@@ -160,14 +100,18 @@ export default function SearchPage() {
               className="mb-6"
             >
               <p className="text-muted-foreground">
-                {filteredRestaurants.length}{" "}
+                {restaurants.length}{" "}
                 {locale === "ar" ? "نتيجة" : "results"}{" "}
                 {locale === "ar" ? "لـ" : "for"} "{debouncedQuery}"
               </p>
             </motion.div>
 
-            {filteredRestaurants.length > 0 ? (
-              <RestaurantGrid restaurants={filteredRestaurants} />
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+              </div>
+            ) : restaurants.length > 0 ? (
+              <RestaurantGrid restaurants={restaurants} />
             ) : (
               <motion.div
                 initial={{ opacity: 0 }}

@@ -13,7 +13,8 @@ interface MenuCategoryProps {
 export function MenuCategory({ category, onSelectItem }: MenuCategoryProps) {
   const locale = useLocale();
 
-  const displayName = locale === "ar" && category.nameAr ? category.nameAr : category.name;
+  const nameAr = category.nameAr || category.name_ar;
+  const displayName = locale === "ar" && nameAr ? nameAr : category.name;
   const items = category.items || [];
 
   if (items.length === 0) {

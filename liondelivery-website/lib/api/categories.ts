@@ -4,7 +4,7 @@ import { get } from "./client";
 const PUBLIC_PREFIX = "/public";
 
 export interface Category {
-  id: string;
+  id: number;
   name: string;
   nameAr?: string;
   name_ar?: string;

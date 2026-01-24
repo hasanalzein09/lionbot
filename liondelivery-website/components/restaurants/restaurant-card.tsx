@@ -17,8 +17,14 @@ export function RestaurantCard({ restaurant, index = 0 }: RestaurantCardProps) {
   const locale = useLocale();
   const t = useTranslations("restaurants");
 
-  const displayName = locale === "ar" && restaurant.nameAr ? restaurant.nameAr : restaurant.name;
-  const displayCategory = locale === "ar" && restaurant.categoryAr ? restaurant.categoryAr : restaurant.category;
+  // Handle both camelCase and snake_case from API
+  const nameAr = restaurant.nameAr || restaurant.name_ar;
+  const categoryAr = restaurant.categoryAr || restaurant.category_ar;
+  const isOpen = restaurant.isOpen ?? restaurant.is_open;
+  const isFeatured = restaurant.isFeatured ?? restaurant.is_featured;
+
+  const displayName = locale === "ar" && nameAr ? nameAr : restaurant.name;
+  const displayCategory = locale === "ar" && categoryAr ? categoryAr : restaurant.category;
 
   return (
     <motion.div
@@ -39,13 +45,13 @@ export function RestaurantCard({ restaurant, index = 0 }: RestaurantCardProps) {
 
             {/* Status Badge */}
             <div className="absolute left-3 top-3">
-              <Badge variant={restaurant.isOpen ? "success" : "secondary"}>
-                {restaurant.isOpen ? t("openNow") : t("closed")}
+              <Badge variant={isOpen ? "success" : "secondary"}>
+                {isOpen ? t("openNow") : t("closed")}
               </Badge>
             </div>
 
             {/* Featured Badge */}
-            {restaurant.isFeatured && (
+            {isFeatured && (
               <div className="absolute right-3 top-3">
                 <Badge variant="warning">🔥</Badge>
               </div>

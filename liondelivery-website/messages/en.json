@@ -148,6 +148,14 @@
       "address": "Detailed Address",
       "addressPlaceholder": "City, street, building, floor..."
     },
+    "scheduling": {
+      "title": "Delivery Time",
+      "asap": "As Soon As Possible",
+      "schedule": "Schedule for Later",
+      "selectDate": "Select Date",
+      "selectTime": "Select Time",
+      "scheduled": "Scheduled for"
+    },
     "payment": {
       "title": "Payment Method",
       "cash": "Cash on Delivery",
@@ -172,7 +180,8 @@
       "title": "Order Received!",
       "orderNumber": "Order Number",
       "estimatedTime": "Estimated Time",
-      "minutes": "minutes"
+      "minutes": "minutes",
+      "scheduledFor": "Scheduled for"
     },
     "status": {
       "pending": "Pending",
@@ -181,16 +190,19 @@
       "ready": "Ready",
       "delivering": "Delivering",
       "delivered": "Delivered",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "new": "New"
     },
     "details": {
       "title": "Order Details",
-      "deliveryAddress": "Delivery Address"
+      "deliveryAddress": "Delivery Address",
+      "scheduledTime": "Scheduled Delivery Time"
     },
     "track": "Track Order",
     "contactWhatsapp": "Contact via WhatsApp",
     "backHome": "Back to Home",
-    "reorder": "Reorder"
+    "reorder": "Reorder",
+    "liveTracking": "Live Tracking"
   },
   "search": {
     "title": "Search Results",

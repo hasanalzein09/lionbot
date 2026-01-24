@@ -52,15 +52,21 @@ export function MenuItemModal({
 
   if (!item) return null;
 
-  const displayName = locale === "ar" && item.nameAr ? item.nameAr : item.name;
+  // Handle both camelCase and snake_case from API
+  const nameAr = item.nameAr || item.name_ar;
+  const descriptionAr = item.descriptionAr || item.description_ar;
+  const price = item.price ?? item.price_min ?? 0;
+  const isAvailable = item.isAvailable ?? item.is_available ?? true;
+
+  const displayName = locale === "ar" && nameAr ? nameAr : item.name;
   const displayDescription =
-    locale === "ar" && item.descriptionAr ? item.descriptionAr : item.description;
+    locale === "ar" && descriptionAr ? descriptionAr : item.description;
 
   // Calculate total price
-  const basePrice = selectedVariant?.price || item.price;
+  const basePrice = selectedVariant?.price || price;
   const addonsTotal = Array.from(selectedAddons.entries()).reduce(
     (total, [addonId, qty]) => {
-      const addon = item.addons?.find((a) => a.id === addonId);
+      const addon = item.addons?.find((a) => String(a.id) === addonId);
       return total + (addon?.price || 0) * qty;
     },
     0
@@ -68,39 +74,40 @@ export function MenuItemModal({
   const itemTotal = (basePrice + addonsTotal) * quantity;
 
   const toggleAddon = (addon: MenuItemAddon) => {
+    const addonId = String(addon.id);
     const newAddons = new Map(selectedAddons);
-    if (newAddons.has(addon.id)) {
-      newAddons.delete(addon.id);
+    if (newAddons.has(addonId)) {
+      newAddons.delete(addonId);
     } else {
-      newAddons.set(addon.id, 1);
+      newAddons.set(addonId, 1);
     }
     setSelectedAddons(newAddons);
   };
 
   const handleAddToCart = () => {
     const cartAddons = item.addons
-      ?.filter((addon) => selectedAddons.has(addon.id))
+      ?.filter((addon) => selectedAddons.has(String(addon.id)))
       .map((addon) => ({
-        id: addon.id,
+        id: String(addon.id),
         name: addon.name,
-        nameAr: addon.nameAr,
+        nameAr: addon.nameAr || addon.name_ar,
         price: addon.price,
-        quantity: selectedAddons.get(addon.id) || 1,
+        quantity: selectedAddons.get(String(addon.id)) || 1,
       }));
 
     addItem({
-      productId: item.id,
+      productId: String(item.id),
       name: item.name,
-      nameAr: item.nameAr,
+      nameAr: nameAr,
       description: item.description,
       image: item.image,
-      price: item.price,
+      price: price,
       quantity,
       variant: selectedVariant
         ? {
-            id: selectedVariant.id,
+            id: String(selectedVariant.id),
             name: selectedVariant.name,
-            nameAr: selectedVariant.nameAr,
+            nameAr: selectedVariant.nameAr || selectedVariant.name_ar,
             price: selectedVariant.price,
           }
         : undefined,
@@ -178,11 +185,12 @@ export function MenuItemModal({
                     </h3>
                     <div className="space-y-2">
                       {item.variants.map((variant) => {
+                        const variantNameAr = variant.nameAr || variant.name_ar;
                         const variantName =
-                          locale === "ar" && variant.nameAr
-                            ? variant.nameAr
+                          locale === "ar" && variantNameAr
+                            ? variantNameAr
                             : variant.name;
-                        const isSelected = selectedVariant?.id === variant.id;
+                        const isSelected = String(selectedVariant?.id) === String(variant.id);
 
                         return (
                           <button
@@ -226,11 +234,12 @@ export function MenuItemModal({
                     <h3 className="mb-3 font-semibold">{t("selectOptions")}</h3>
                     <div className="space-y-2">
                       {item.addons.map((addon) => {
+                        const addonNameAr = addon.nameAr || addon.name_ar;
                         const addonName =
-                          locale === "ar" && addon.nameAr
-                            ? addon.nameAr
+                          locale === "ar" && addonNameAr
+                            ? addonNameAr
                             : addon.name;
-                        const isSelected = selectedAddons.has(addon.id);
+                        const isSelected = selectedAddons.has(String(addon.id));
 
                         return (
                           <button
@@ -311,9 +320,11 @@ export function MenuItemModal({
                 onClick={handleAddToCart}
                 className="w-full"
                 size="lg"
-                disabled={item.variants && item.variants.length > 0 && !selectedVariant}
+                disabled={!isAvailable || (item.variants && item.variants.length > 0 && !selectedVariant)}
               >
-                {t("addToCart")} • {formatPrice(itemTotal)}
+                {!isAvailable
+                  ? locale === "ar" ? "غير متوفر" : "Unavailable"
+                  : `${t("addToCart")} • ${formatPrice(itemTotal)}`}
               </Button>
             </div>
           </motion.div>

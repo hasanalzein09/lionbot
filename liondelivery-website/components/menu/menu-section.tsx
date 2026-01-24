@@ -26,7 +26,7 @@ export function MenuSection({
   const locale = useLocale();
   const t = useTranslations("restaurant");
 
-  const [activeCategory, setActiveCategory] = useState(menu.categories[0]?.id || "");
+  const [activeCategory, setActiveCategory] = useState<string | number>(menu.categories[0]?.id || "");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,11 +40,13 @@ export function MenuSection({
 
       const filteredItems = category.items?.filter((item) => {
         const searchLower = debouncedSearch.toLowerCase();
+        const nameAr = item.nameAr || item.name_ar;
+        const descriptionAr = item.descriptionAr || item.description_ar;
         return (
           item.name.toLowerCase().includes(searchLower) ||
-          item.nameAr?.includes(debouncedSearch) ||
+          nameAr?.includes(debouncedSearch) ||
           item.description?.toLowerCase().includes(searchLower) ||
-          item.descriptionAr?.includes(debouncedSearch)
+          descriptionAr?.includes(debouncedSearch)
         );
       });
 

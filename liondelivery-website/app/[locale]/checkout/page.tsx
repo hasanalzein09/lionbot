@@ -15,11 +15,14 @@ import {
   Wallet,
   Loader2,
   Check,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { DeliveryTimeSelector } from "@/components/checkout/delivery-time-selector";
 import { useCartStore } from "@/lib/stores/cart-store";
+import { ordersApi } from "@/lib/api/orders";
 import { formatPrice } from "@/lib/utils/formatters";
 import { cn } from "@/lib/utils/cn";
 
@@ -44,6 +47,7 @@ export default function CheckoutPage() {
 
   const {
     items,
+    restaurantId,
     restaurantName,
     restaurantNameAr,
     notes,
@@ -59,8 +63,10 @@ export default function CheckoutPage() {
     address: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scheduledTime, setScheduledTime] = useState<string | null>(null);
 
   const displayRestaurantName =
     locale === "ar" && restaurantNameAr ? restaurantNameAr : restaurantName;
@@ -97,31 +103,51 @@ export default function CheckoutPage() {
 
     if (!validateForm()) return;
 
+    if (!restaurantId) {
+      setSubmitError(locale === "ar" ? "خطأ في السلة" : "Cart error");
+      return;
+    }
+
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
-      // In production, call the orders API
-      // const response = await ordersApi.create({
-      //   restaurantId,
-      //   items,
-      //   customer: formData,
-      //   notes,
-      //   paymentMethod,
-      // });
+      // Prepare order items for API
+      const orderItems = items.map((item) => ({
+        product_id: parseInt(item.productId),
+        name: item.name,
+        name_ar: item.nameAr || null,
+        price: item.variant?.price || item.price,
+        quantity: item.quantity,
+        variant_id: item.variant?.id ? parseInt(item.variant.id) : null,
+        variant_name: item.variant?.name || null,
+        variant_price: item.variant?.price || null,
+        notes: item.notes || null,
+      }));
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Call the real orders API
+      const response = await ordersApi.create({
+        restaurant_id: parseInt(restaurantId),
+        items: orderItems,
+        customer: formData,
+        notes: notes || null,
+        payment_method: paymentMethod,
+        scheduled_time: scheduledTime,
+      });
 
-      // Generate a mock order number
-      const orderNumber = `LN-${Date.now().toString().slice(-6)}`;
+      if (response.success) {
+        // Clear cart
+        clearCart();
 
-      // Clear cart
-      clearCart();
-
-      // Redirect to order confirmation
-      router.push(`/${locale}/orders/${orderNumber}`);
+        // Redirect to order confirmation
+        router.push(`/${locale}/orders/${response.order.order_number}`);
+      } else {
+        setSubmitError(response.message || (locale === "ar" ? "فشل في إرسال الطلب" : "Failed to place order"));
+        setIsSubmitting(false);
+      }
     } catch (error) {
       console.error("Order submission failed:", error);
+      setSubmitError(locale === "ar" ? "حدث خطأ، الرجاء المحاولة مرة أخرى" : "An error occurred, please try again");
       setIsSubmitting(false);
     }
   };
@@ -230,11 +256,27 @@ export default function CheckoutPage() {
                 </div>
               </motion.div>
 
-              {/* Payment Method */}
+              {/* Delivery Time (Scheduling) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
+                className="rounded-2xl bg-secondary-800 p-6"
+              >
+                {restaurantId && (
+                  <DeliveryTimeSelector
+                    restaurantId={parseInt(restaurantId)}
+                    onSelect={setScheduledTime}
+                    selectedTime={scheduledTime}
+                  />
+                )}
+              </motion.div>
+
+              {/* Payment Method */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
                 className="rounded-2xl bg-secondary-800 p-6"
               >
                 <h2 className="mb-6 flex items-center gap-2 text-lg font-semibold">
@@ -353,6 +395,14 @@ export default function CheckoutPage() {
                     <span className="text-primary-500">{formatPrice(getTotal())}</span>
                   </div>
                 </div>
+
+                {/* Error Message */}
+                {submitError && (
+                  <div className="mt-4 flex items-center gap-2 rounded-lg bg-error-500/10 p-3 text-sm text-error-500">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <Button

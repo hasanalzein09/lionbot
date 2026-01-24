@@ -148,6 +148,14 @@
       "address": "العنوان بالتفصيل",
       "addressPlaceholder": "المدينة، الشارع، البناية، الطابق..."
     },
+    "scheduling": {
+      "title": "وقت التوصيل",
+      "asap": "في أقرب وقت",
+      "schedule": "جدولة لوقت لاحق",
+      "selectDate": "اختر التاريخ",
+      "selectTime": "اختر الوقت",
+      "scheduled": "موعد التوصيل"
+    },
     "payment": {
       "title": "طريقة الدفع",
       "cash": "الدفع عند الاستلام (نقداً)",
@@ -172,7 +180,8 @@
       "title": "تم استلام طلبك!",
       "orderNumber": "رقم الطلب",
       "estimatedTime": "الوقت المتوقع",
-      "minutes": "دقيقة"
+      "minutes": "دقيقة",
+      "scheduledFor": "مجدول لـ"
     },
     "status": {
       "pending": "قيد الانتظار",
@@ -181,16 +190,19 @@
       "ready": "جاهز",
       "delivering": "قيد التوصيل",
       "delivered": "تم التوصيل",
-      "cancelled": "ملغي"
+      "cancelled": "ملغي",
+      "new": "جديد"
     },
     "details": {
       "title": "تفاصيل الطلب",
-      "deliveryAddress": "عنوان التوصيل"
+      "deliveryAddress": "عنوان التوصيل",
+      "scheduledTime": "وقت التوصيل المحدد"
     },
     "track": "تتبع الطلب",
     "contactWhatsapp": "تواصل عبر واتساب",
     "backHome": "العودة للرئيسية",
-    "reorder": "إعادة الطلب"
+    "reorder": "إعادة الطلب",
+    "liveTracking": "تتبع مباشر"
   },
   "search": {
     "title": "نتائج البحث",

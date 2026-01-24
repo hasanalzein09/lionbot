@@ -4,21 +4,8 @@ import { useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-
-const categories = [
-  { id: "all", nameAr: "الكل", nameEn: "All", icon: "🍽️" },
-  { id: "burger", nameAr: "برغر", nameEn: "Burger", icon: "🍔" },
-  { id: "shawarma", nameAr: "شاورما", nameEn: "Shawarma", icon: "🥙" },
-  { id: "pizza", nameAr: "بيتزا", nameEn: "Pizza", icon: "🍕" },
-  { id: "coffee", nameAr: "قهوة", nameEn: "Coffee", icon: "☕" },
-  { id: "sweets", nameAr: "حلويات", nameEn: "Sweets", icon: "🍰" },
-  { id: "juice", nameAr: "عصائر", nameEn: "Juice", icon: "🥤" },
-  { id: "chicken", nameAr: "دجاج", nameEn: "Chicken", icon: "🍗" },
-  { id: "seafood", nameAr: "بحري", nameEn: "Seafood", icon: "🦐" },
-  { id: "grills", nameAr: "مشاوي", nameEn: "Grills", icon: "🥩" },
-  { id: "sandwich", nameAr: "ساندويش", nameEn: "Sandwich", icon: "🥪" },
-  { id: "salad", nameAr: "سلطة", nameEn: "Salad", icon: "🥗" },
-];
+import { useCategories } from "@/lib/hooks/use-categories";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CategoryFilterProps {
   selectedCategory: string | null;
@@ -29,6 +16,9 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
   const locale = useLocale();
   const t = useTranslations("restaurants.filters");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch real categories from API
+  const { data: apiCategories, isLoading } = useCategories();
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -62,29 +52,55 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
         className="scrollbar-hide flex gap-2 overflow-x-auto px-1 py-2"
         style={{ scrollSnapType: "x mandatory" }}
       >
-        {categories.map((category) => {
-          const isSelected =
-            (category.id === "all" && !selectedCategory) ||
-            selectedCategory === category.id;
-
-          return (
+        {isLoading ? (
+          // Loading skeletons
+          Array.from({ length: 8 }).map((_, index) => (
+            <Skeleton key={index} className="h-10 w-24 flex-shrink-0 rounded-full" />
+          ))
+        ) : (
+          <>
+            {/* "All" option */}
             <button
-              key={category.id}
-              onClick={() => onCategoryChange(category.id === "all" ? null : category.id)}
+              onClick={() => onCategoryChange(null)}
               className={cn(
                 "flex flex-shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
                 "scroll-snap-align-start",
-                isSelected
+                !selectedCategory
                   ? "bg-primary-500 text-white shadow-lg shadow-primary-500/25"
                   : "bg-secondary-800 text-muted-foreground hover:bg-secondary-700 hover:text-foreground"
               )}
               style={{ scrollSnapAlign: "start" }}
             >
-              <span>{category.icon}</span>
-              <span>{locale === "ar" ? category.nameAr : category.nameEn}</span>
+              <span>🍽️</span>
+              <span>{locale === "ar" ? "الكل" : "All"}</span>
             </button>
-          );
-        })}
+
+            {/* API Categories */}
+            {apiCategories?.map((category) => {
+              const nameAr = category.nameAr || category.name_ar;
+              const displayName = locale === "ar" && nameAr ? nameAr : category.name;
+              const isSelected = selectedCategory === String(category.id);
+
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => onCategoryChange(String(category.id))}
+                  className={cn(
+                    "flex flex-shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
+                    "scroll-snap-align-start",
+                    isSelected
+                      ? "bg-primary-500 text-white shadow-lg shadow-primary-500/25"
+                      : "bg-secondary-800 text-muted-foreground hover:bg-secondary-700 hover:text-foreground"
+                  )}
+                  style={{ scrollSnapAlign: "start" }}
+                >
+                  <span>{category.icon || "🍽️"}</span>
+                  <span>{displayName}</span>
+                </button>
+              );
+            })}
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,127 +1,111 @@
 import { get, post } from "./client";
-import type { CartItem } from "@/lib/stores/cart-store";
+
+// Using /public endpoints - no authentication required
+const PUBLIC_PREFIX = "/public";
 
 export type OrderStatus =
-  | "pending"
-  | "confirmed"
+  | "new"
+  | "accepted"
   | "preparing"
   | "ready"
-  | "delivering"
+  | "out_for_delivery"
   | "delivered"
   | "cancelled";
 
 export interface OrderItem {
-  id: string;
-  productId: string;
+  id: number;
   name: string;
-  nameAr?: string;
-  price: number;
+  name_ar?: string;
   quantity: number;
-  variant?: {
-    id: string;
-    name: string;
-    nameAr?: string;
-    price: number;
-  };
-  addons?: {
-    id: string;
-    name: string;
-    nameAr?: string;
-    price: number;
-    quantity: number;
-  }[];
-  notes?: string;
-  total: number;
+  unit_price: number;
+  total_price: number;
 }
 
 export interface Order {
-  id: string;
-  orderNumber: string;
+  id: number;
+  order_number: string;
   status: OrderStatus;
-  items: OrderItem[];
+  total: number;
+  delivery_fee: number;
+  subtotal?: number;
+  address?: string;
+  is_scheduled?: boolean;
+  scheduled_time?: string | null;
   restaurant: {
-    id: string;
+    id: number;
     name: string;
-    nameAr?: string;
-    image?: string;
+    name_ar?: string;
     phone?: string;
-  };
+  } | null;
   customer: {
     name: string;
     phone: string;
-    address: string;
-  };
-  subtotal: number;
-  deliveryFee: number;
-  discount: number;
-  total: number;
-  paymentMethod: "cash" | "card";
-  notes?: string;
-  estimatedDeliveryTime?: number;
-  createdAt: string;
-  updatedAt: string;
+  } | null;
+  items: OrderItem[];
+  created_at: string;
 }
 
 export interface CreateOrderPayload {
-  restaurantId: string;
-  items: Omit<CartItem, "id" | "restaurantId" | "restaurantName" | "restaurantNameAr">[];
+  restaurant_id: number;
+  items: {
+    product_id: number;
+    name: string;
+    name_ar: string | null;
+    price: number;
+    quantity: number;
+    variant_id: number | null;
+    variant_name: string | null;
+    variant_price: number | null;
+    notes: string | null;
+  }[];
   customer: {
     name: string;
     phone: string;
     address: string;
   };
-  notes?: string;
-  promoCode?: string;
-  paymentMethod: "cash" | "card";
+  notes: string | null;
+  payment_method: "cash" | "card";
+  scheduled_time: string | null;
 }
 
 export interface CreateOrderResponse {
   success: boolean;
-  order: Order;
+  order: {
+    id: number;
+    order_number: string;
+    status: string;
+    total: number;
+    delivery_fee: number;
+    subtotal: number;
+    is_scheduled?: boolean;
+    scheduled_time?: string | null;
+    restaurant: {
+      id: number;
+      name: string;
+      name_ar?: string;
+    };
+    customer: {
+      name: string;
+      phone: string;
+      address: string;
+    };
+    created_at: string;
+  };
   message?: string;
 }
 
 export const ordersApi = {
   /**
-   * Create a new order
+   * Create a new order (public endpoint - no auth required)
    */
   create: async (payload: CreateOrderPayload): Promise<CreateOrderResponse> => {
-    return post<CreateOrderResponse>("/orders", payload);
+    return post<CreateOrderResponse>(`${PUBLIC_PREFIX}/orders/`, payload);
   },
 
   /**
-   * Get order by ID
-   */
-  getById: async (orderId: string): Promise<Order> => {
-    return get<Order>(`/orders/${orderId}`);
-  },
-
-  /**
-   * Get order by order number
+   * Get order by order number (public endpoint)
    */
   getByNumber: async (orderNumber: string): Promise<Order> => {
-    return get<Order>(`/orders/number/${orderNumber}`);
-  },
-
-  /**
-   * Get orders by phone number (for order history)
-   */
-  getByPhone: async (phone: string): Promise<Order[]> => {
-    const response = await get<{ orders: Order[] }>("/orders", { phone });
-    return response.orders || [];
-  },
-
-  /**
-   * Track order status
-   */
-  trackOrder: async (orderId: string): Promise<Order> => {
-    return get<Order>(`/orders/${orderId}/track`);
-  },
-
-  /**
-   * Cancel order
-   */
-  cancel: async (orderId: string, reason?: string): Promise<Order> => {
-    return post<Order>(`/orders/${orderId}/cancel`, { reason });
+    return get<Order>(`${PUBLIC_PREFIX}/orders/${orderNumber}`);
   },
 };

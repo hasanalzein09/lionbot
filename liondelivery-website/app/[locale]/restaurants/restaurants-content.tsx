@@ -16,130 +16,6 @@ import {
 import { useRestaurants } from "@/lib/hooks/use-restaurants";
 import type { Restaurant } from "@/types/restaurant";
 
-// Mock data for development
-const mockRestaurants: Restaurant[] = [
-  {
-    id: "1",
-    name: "Burgero",
-    nameAr: "برغيرو",
-    slug: "burgero",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Burger",
-    categoryAr: "برغر",
-    rating: 4.8,
-    reviewCount: 120,
-    priceRange: "$$",
-    deliveryTime: { min: 25, max: 35 },
-    isOpen: true,
-    isFeatured: true,
-  },
-  {
-    id: "2",
-    name: "Baba Ghanouj",
-    nameAr: "بابا غنوج",
-    slug: "baba-ghanouj",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Grills",
-    categoryAr: "مشاوي",
-    rating: 4.9,
-    reviewCount: 200,
-    priceRange: "$$$",
-    deliveryTime: { min: 30, max: 45 },
-    isOpen: true,
-    isFeatured: true,
-  },
-  {
-    id: "3",
-    name: "Twist Cafe",
-    nameAr: "تويست كافيه",
-    slug: "twist-cafe",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Coffee",
-    categoryAr: "قهوة",
-    rating: 4.7,
-    reviewCount: 85,
-    priceRange: "$$",
-    deliveryTime: { min: 15, max: 25 },
-    isOpen: false,
-    isFeatured: true,
-  },
-  {
-    id: "4",
-    name: "Submarine",
-    nameAr: "صب مارين",
-    slug: "submarine",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Sandwich",
-    categoryAr: "ساندويش",
-    rating: 4.5,
-    reviewCount: 95,
-    priceRange: "$$",
-    deliveryTime: { min: 20, max: 30 },
-    isOpen: true,
-    isFeatured: false,
-  },
-  {
-    id: "5",
-    name: "Al-Aqqad",
-    nameAr: "العقاد",
-    slug: "al-aqqad",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Juice",
-    categoryAr: "عصائر",
-    rating: 4.6,
-    reviewCount: 150,
-    priceRange: "$",
-    deliveryTime: { min: 15, max: 25 },
-    isOpen: true,
-    isFeatured: false,
-  },
-  {
-    id: "6",
-    name: "Pizza House",
-    nameAr: "بيتزا هاوس",
-    slug: "pizza-house",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Pizza",
-    categoryAr: "بيتزا",
-    rating: 4.4,
-    reviewCount: 80,
-    priceRange: "$$",
-    deliveryTime: { min: 30, max: 45 },
-    isOpen: true,
-    isFeatured: false,
-  },
-  {
-    id: "7",
-    name: "Shawarma King",
-    nameAr: "ملك الشاورما",
-    slug: "shawarma-king",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Shawarma",
-    categoryAr: "شاورما",
-    rating: 4.7,
-    reviewCount: 220,
-    priceRange: "$",
-    deliveryTime: { min: 20, max: 30 },
-    isOpen: true,
-    isFeatured: true,
-  },
-  {
-    id: "8",
-    name: "Sweet Dreams",
-    nameAr: "أحلام حلوة",
-    slug: "sweet-dreams",
-    image: "/images/placeholder-restaurant.webp",
-    category: "Sweets",
-    categoryAr: "حلويات",
-    rating: 4.8,
-    reviewCount: 100,
-    priceRange: "$$",
-    deliveryTime: { min: 25, max: 35 },
-    isOpen: true,
-    isFeatured: false,
-  },
-];
-
 interface RestaurantsContentProps {
   initialCategory?: string;
   initialSearch?: string;
@@ -160,33 +36,15 @@ export function RestaurantsContent({
   const [search, setSearch] = useState(initialSearch || "");
   const [sort, setSort] = useState<SortOption>((initialSort as SortOption) || "newest");
 
-  // Use real API data when available, fallback to mock
+  // Use real API data
   const { data, isLoading, isFetching } = useRestaurants({
     category: category || undefined,
     search: search || undefined,
     sortBy: sort,
   });
 
-  // Filter mock data based on category and search
-  const filteredRestaurants = mockRestaurants.filter((r) => {
-    if (category && r.category.toLowerCase() !== category.toLowerCase() &&
-        r.categoryAr !== category) {
-      return false;
-    }
-    if (search) {
-      const searchLower = search.toLowerCase();
-      return (
-        r.name.toLowerCase().includes(searchLower) ||
-        r.nameAr?.includes(search) ||
-        r.category.toLowerCase().includes(searchLower) ||
-        r.categoryAr?.includes(search)
-      );
-    }
-    return true;
-  });
-
-  // Use API data if available, otherwise use mock data
-  const restaurants = data?.restaurants || filteredRestaurants;
+  // Use API data
+  const restaurants = data?.restaurants || [];
 
   // Update URL when filters change
   useEffect(() => {

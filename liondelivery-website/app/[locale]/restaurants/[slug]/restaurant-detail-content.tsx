@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ShoppingCart,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,139 +22,10 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { MenuSection } from "@/components/menu/menu-section";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { formatPrice } from "@/lib/utils/formatters";
+import { useRestaurant } from "@/lib/hooks/use-restaurants";
+import { useMenu } from "@/lib/hooks/use-menu";
 import type { Restaurant } from "@/types/restaurant";
 import type { Menu, MenuCategory, MenuItem } from "@/types/menu";
-
-// Mock data for development
-const mockRestaurant: Restaurant = {
-  id: "1",
-  name: "Burgero",
-  nameAr: "برغيرو",
-  slug: "burgero",
-  description: "The best burgers in Saida. Fresh ingredients, amazing taste.",
-  descriptionAr: "أفضل برغر في صيدا. مكونات طازجة، طعم مذهل.",
-  image: "/images/placeholder-restaurant.webp",
-  coverImage: "/images/placeholder-restaurant.webp",
-  category: "Burger",
-  categoryAr: "برغر",
-  rating: 4.8,
-  reviewCount: 120,
-  priceRange: "$$",
-  deliveryTime: { min: 25, max: 35 },
-  deliveryFee: 2,
-  isOpen: true,
-  phone: "+96170000000",
-  address: "Saida, Lebanon",
-};
-
-const mockMenu: Menu = {
-  restaurantId: "1",
-  categories: [
-    {
-      id: "burgers",
-      name: "Burgers",
-      nameAr: "برغر",
-      items: [
-        {
-          id: "1",
-          name: "Classic Burger",
-          nameAr: "كلاسيك برغر",
-          description: "100% beef patty with fresh lettuce, tomato, and special sauce",
-          descriptionAr: "لحم بقري 100% مع خس طازج وطماطم وصوص خاص",
-          price: 5.0,
-          image: "/images/placeholder-food.webp",
-          categoryId: "burgers",
-          restaurantId: "1",
-          isPopular: true,
-          variants: [
-            { id: "single", name: "Single", nameAr: "سينجل", price: 5.0, isDefault: true },
-            { id: "double", name: "Double", nameAr: "دبل", price: 7.0 },
-            { id: "triple", name: "Triple", nameAr: "تربل", price: 9.0 },
-          ],
-          addons: [
-            { id: "cheese", name: "Extra Cheese", nameAr: "جبنة إضافية", price: 1.0 },
-            { id: "egg", name: "Fried Egg", nameAr: "بيض مقلي", price: 0.5 },
-            { id: "bacon", name: "Bacon", nameAr: "بيكون", price: 1.5 },
-          ],
-        },
-        {
-          id: "2",
-          name: "Cheese Burger",
-          nameAr: "تشيز برغر",
-          description: "Double cheddar cheese with beef patty",
-          descriptionAr: "جبنة شيدر مزدوجة مع لحم بقري",
-          price: 6.0,
-          image: "/images/placeholder-food.webp",
-          categoryId: "burgers",
-          restaurantId: "1",
-        },
-        {
-          id: "3",
-          name: "Mushroom Burger",
-          nameAr: "ماشروم برغر",
-          description: "Fresh mushrooms with special mushroom sauce",
-          descriptionAr: "فطر طازج مع صوص فطر خاص",
-          price: 7.0,
-          image: "/images/placeholder-food.webp",
-          categoryId: "burgers",
-          restaurantId: "1",
-        },
-      ],
-    },
-    {
-      id: "sides",
-      name: "Sides",
-      nameAr: "جانبية",
-      items: [
-        {
-          id: "4",
-          name: "French Fries",
-          nameAr: "بطاطا مقلية",
-          description: "Crispy golden fries",
-          descriptionAr: "بطاطا مقرمشة ذهبية",
-          price: 2.5,
-          image: "/images/placeholder-food.webp",
-          categoryId: "sides",
-          restaurantId: "1",
-        },
-        {
-          id: "5",
-          name: "Onion Rings",
-          nameAr: "حلقات البصل",
-          description: "Crispy onion rings",
-          descriptionAr: "حلقات بصل مقرمشة",
-          price: 3.0,
-          image: "/images/placeholder-food.webp",
-          categoryId: "sides",
-          restaurantId: "1",
-        },
-      ],
-    },
-    {
-      id: "drinks",
-      name: "Drinks",
-      nameAr: "مشروبات",
-      items: [
-        {
-          id: "6",
-          name: "Coca Cola",
-          nameAr: "كوكا كولا",
-          price: 1.5,
-          categoryId: "drinks",
-          restaurantId: "1",
-        },
-        {
-          id: "7",
-          name: "Fresh Orange Juice",
-          nameAr: "عصير برتقال طازج",
-          price: 3.0,
-          categoryId: "drinks",
-          restaurantId: "1",
-        },
-      ],
-    },
-  ],
-};
 
 interface RestaurantDetailContentProps {
   slug: string;
@@ -164,20 +36,47 @@ export function RestaurantDetailContent({ slug }: RestaurantDetailContentProps) 
   const t = useTranslations("restaurant");
   const tCommon = useTranslations("common");
 
-  // In production, use useRestaurant hook
-  // const { data: restaurant, isLoading } = useRestaurant(slug);
-  const restaurant = mockRestaurant;
-  const menu = mockMenu;
+  // Fetch real data from API
+  const { data: restaurant, isLoading: isLoadingRestaurant, error: restaurantError } = useRestaurant(slug);
+  const { data: menu, isLoading: isLoadingMenu } = useMenu(restaurant?.id?.toString() || "");
 
   const { items: cartItems, getSubtotal, getTotalItems } = useCartStore();
 
-  const displayName = locale === "ar" && restaurant.nameAr ? restaurant.nameAr : restaurant.name;
+  // Loading state
+  if (isLoadingRestaurant) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (restaurantError || !restaurant) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4">
+        <p className="text-lg text-muted-foreground">
+          {locale === "ar" ? "لم يتم العثور على المطعم" : "Restaurant not found"}
+        </p>
+        <Link href={`/${locale}/restaurants`}>
+          <Button>{locale === "ar" ? "عرض جميع المطاعم" : "View All Restaurants"}</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  // Handle both camelCase and snake_case from API
+  const nameAr = restaurant.nameAr || restaurant.name_ar;
+  const descriptionAr = restaurant.descriptionAr || restaurant.description_ar;
+  const categoryAr = restaurant.categoryAr || restaurant.category_ar;
+
+  const displayName = locale === "ar" && nameAr ? nameAr : restaurant.name;
   const displayDescription =
-    locale === "ar" && restaurant.descriptionAr
-      ? restaurant.descriptionAr
+    locale === "ar" && descriptionAr
+      ? descriptionAr
       : restaurant.description;
   const displayCategory =
-    locale === "ar" && restaurant.categoryAr ? restaurant.categoryAr : restaurant.category;
+    locale === "ar" && categoryAr ? categoryAr : restaurant.category;
 
   const cartItemsCount = getTotalItems();
   const cartTotal = getSubtotal();
@@ -227,8 +126,8 @@ export function RestaurantDetailContent({ slug }: RestaurantDetailContentProps) 
                 {/* Info */}
                 <div className="flex-1">
                   <div className="mb-2 flex items-center gap-2">
-                    <Badge variant={restaurant.isOpen ? "success" : "secondary"}>
-                      {restaurant.isOpen
+                    <Badge variant={restaurant.isOpen !== false ? "success" : "secondary"}>
+                      {restaurant.isOpen !== false
                         ? locale === "ar"
                           ? "مفتوح الآن"
                           : "Open Now"
@@ -236,9 +135,11 @@ export function RestaurantDetailContent({ slug }: RestaurantDetailContentProps) 
                         ? "مغلق"
                         : "Closed"}
                     </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {displayCategory}
-                    </span>
+                    {displayCategory && (
+                      <span className="text-sm text-muted-foreground">
+                        {displayCategory}
+                      </span>
+                    )}
                   </div>
 
                   <h1 className="mb-2 text-2xl font-bold md:text-3xl">{displayName}</h1>
@@ -305,12 +206,24 @@ export function RestaurantDetailContent({ slug }: RestaurantDetailContentProps) 
         </div>
 
         {/* Menu */}
-        <MenuSection
-          menu={menu}
-          restaurantId={restaurant.id}
-          restaurantName={restaurant.name}
-          restaurantNameAr={restaurant.nameAr}
-        />
+        {isLoadingMenu ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+          </div>
+        ) : menu && menu.categories && menu.categories.length > 0 ? (
+          <MenuSection
+            menu={menu}
+            restaurantId={String(restaurant.id)}
+            restaurantName={restaurant.name}
+            restaurantNameAr={nameAr}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-lg text-muted-foreground">
+              {locale === "ar" ? "لا توجد قائمة متاحة" : "No menu available"}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Sticky Cart Bar */}
