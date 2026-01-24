@@ -1,32 +1,25 @@
 "use client";
 
-import { use } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import {
   CheckCircle,
   Clock,
-  MapPin,
-  Phone,
   MessageCircle,
   Home,
   Package,
   ChefHat,
   Truck,
-  Loader2,
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SITE_CONFIG } from "@/lib/utils/constants";
-import { ordersApi, type Order, type OrderStatus } from "@/lib/api/orders";
+import { ordersApi, type OrderStatus } from "@/lib/api/orders";
 import { formatPrice } from "@/lib/utils/formatters";
-
-interface OrderPageProps {
-  params: Promise<{ locale: string; id: string }>;
-}
 
 // Map API status to display
 const statusConfig: Record<OrderStatus, { step: number; labelKey: string }> = {
@@ -39,8 +32,10 @@ const statusConfig: Record<OrderStatus, { step: number; labelKey: string }> = {
   cancelled: { step: 0, labelKey: "cancelled" },
 };
 
-export default function OrderPage({ params }: OrderPageProps) {
-  const { locale, id: orderId } = use(params);
+export default function OrderPage() {
+  const params = useParams();
+  const locale = params.locale as string;
+  const orderId = params.id as string;
   const t = useTranslations("order");
 
   // Fetch order data from API
