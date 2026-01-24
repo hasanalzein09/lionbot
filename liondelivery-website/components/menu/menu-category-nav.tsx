@@ -18,6 +18,7 @@ export function MenuCategoryNav({
   onCategoryClick,
 }: MenuCategoryNavProps) {
   const locale = useLocale();
+  const isRTL = locale === "ar";
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
@@ -25,8 +26,11 @@ export function MenuCategoryNav({
   const checkArrows = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 1);
+      const scrollStart = isRTL ? scrollWidth - clientWidth + scrollLeft : scrollLeft;
+      const scrollEnd = isRTL ? -scrollLeft : scrollWidth - clientWidth - scrollLeft;
+
+      setShowLeftArrow(Math.abs(scrollStart) > 1);
+      setShowRightArrow(scrollEnd > 1);
     }
   };
 
@@ -39,8 +43,12 @@ export function MenuCategoryNav({
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
       const scrollAmount = 150;
+      const actualDirection = isRTL
+        ? direction === "left" ? scrollAmount : -scrollAmount
+        : direction === "left" ? -scrollAmount : scrollAmount;
+
       scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
+        left: actualDirection,
         behavior: "smooth",
       });
     }
@@ -64,15 +72,27 @@ export function MenuCategoryNav({
   };
 
   return (
-    <div className="sticky top-16 z-30 -mx-4 bg-background/95 backdrop-blur-lg px-4 py-3 border-b border-border">
+    <div className={cn(
+      "sticky top-16 z-30 -mx-4 px-4 py-3",
+      "bg-white/95 backdrop-blur-md",
+      "border-b border-gray-100",
+      "shadow-sm"
+    )}>
       <div className="relative">
         {/* Left Arrow */}
         {showLeftArrow && (
           <button
             onClick={() => scroll("left")}
-            className="absolute -left-1 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-secondary-800 text-foreground shadow-lg transition-colors hover:bg-secondary-700"
+            className={cn(
+              "absolute top-1/2 z-10 -translate-y-1/2",
+              "flex h-8 w-8 items-center justify-center rounded-full",
+              "bg-white text-gray-600 shadow-md",
+              "transition-all hover:bg-gray-50 hover:shadow-lg",
+              "border border-gray-100",
+              isRTL ? "-right-1" : "-left-1"
+            )}
           >
-            {locale === "ar" ? (
+            {isRTL ? (
               <ChevronRight className="h-4 w-4" />
             ) : (
               <ChevronLeft className="h-4 w-4" />
@@ -84,9 +104,16 @@ export function MenuCategoryNav({
         {showRightArrow && (
           <button
             onClick={() => scroll("right")}
-            className="absolute -right-1 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-secondary-800 text-foreground shadow-lg transition-colors hover:bg-secondary-700"
+            className={cn(
+              "absolute top-1/2 z-10 -translate-y-1/2",
+              "flex h-8 w-8 items-center justify-center rounded-full",
+              "bg-white text-gray-600 shadow-md",
+              "transition-all hover:bg-gray-50 hover:shadow-lg",
+              "border border-gray-100",
+              isRTL ? "-left-1" : "-right-1"
+            )}
           >
-            {locale === "ar" ? (
+            {isRTL ? (
               <ChevronLeft className="h-4 w-4" />
             ) : (
               <ChevronRight className="h-4 w-4" />
@@ -110,17 +137,24 @@ export function MenuCategoryNav({
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
                 className={cn(
-                  "flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all whitespace-nowrap",
+                  "relative flex-shrink-0 px-4 py-2 text-sm font-medium transition-all whitespace-nowrap rounded-full",
                   isActive
-                    ? "bg-primary-500 text-white shadow-lg shadow-primary-500/25"
-                    : "bg-secondary-800 text-muted-foreground hover:bg-secondary-700 hover:text-foreground"
+                    ? "text-emerald-600 bg-emerald-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 )}
               >
                 {displayName}
-                {category.itemCount && (
-                  <span className="ml-1.5 text-xs opacity-70">
+                {category.itemCount !== undefined && category.itemCount > 0 && (
+                  <span className={cn(
+                    "text-xs opacity-70",
+                    isRTL ? "mr-1.5" : "ml-1.5"
+                  )}>
                     ({category.itemCount})
                   </span>
+                )}
+                {/* Active Underline */}
+                {isActive && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-emerald-500 rounded-full" />
                 )}
               </button>
             );

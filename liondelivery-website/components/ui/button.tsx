@@ -6,27 +6,31 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 btn-press",
   {
     variants: {
       variant: {
         default:
-          "bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 shadow-md hover:shadow-lg",
+          "bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 shadow-soft hover:shadow-primary active:shadow-sm",
         destructive:
-          "bg-error-500 text-white hover:bg-error-600 active:bg-error-700",
+          "bg-gradient-to-r from-error-500 to-error-600 text-white hover:from-error-600 hover:to-error-700 shadow-soft hover:shadow-md",
         outline:
-          "border border-border bg-transparent hover:bg-secondary-800 hover:border-border-hover",
+          "border border-border bg-white text-foreground hover:bg-secondary-50 hover:border-primary-300 hover:text-primary-600",
         secondary:
-          "bg-secondary-800 text-foreground hover:bg-secondary-700 active:bg-secondary-600",
-        ghost: "hover:bg-secondary-800 active:bg-secondary-700",
-        link: "text-primary-500 underline-offset-4 hover:underline",
+          "bg-secondary-100 text-secondary-700 hover:bg-secondary-200 active:bg-secondary-300",
+        ghost:
+          "text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 active:bg-secondary-200",
+        link:
+          "text-primary-600 underline-offset-4 hover:underline hover:text-primary-700",
+        accent:
+          "bg-gradient-to-r from-accent-500 to-accent-600 text-white hover:from-accent-600 hover:to-accent-700 shadow-soft hover:shadow-md",
       },
       size: {
-        default: "h-11 px-5 py-2",
-        sm: "h-9 rounded-lg px-3 text-xs",
-        lg: "h-12 rounded-xl px-8 text-base",
-        xl: "h-14 rounded-2xl px-10 text-lg",
-        icon: "h-10 w-10",
+        default: "h-11 px-6 py-2.5",
+        sm: "h-9 rounded-[var(--radius-md)] px-4 text-xs",
+        lg: "h-12 rounded-[var(--radius-lg)] px-8 text-base",
+        xl: "h-14 rounded-[var(--radius-xl)] px-10 text-lg",
+        icon: "h-10 w-10 rounded-[var(--radius-md)]",
       },
     },
     defaultVariants: {
@@ -78,7 +82,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <span>جاري التحميل...</span>
+            <span>Loading...</span>
           </>
         ) : (
           children

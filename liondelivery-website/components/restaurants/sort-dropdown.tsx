@@ -16,6 +16,7 @@ interface SortDropdownProps {
 export function SortDropdown({ value, onChange }: SortDropdownProps) {
   const locale = useLocale();
   const t = useTranslations("restaurants.filters");
+  const isRTL = locale === "ar";
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -41,49 +42,71 @@ export function SortDropdown({ value, onChange }: SortDropdownProps) {
 
   return (
     <div ref={dropdownRef} className="relative">
+      {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-xl bg-secondary-800 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary-700"
+        className={cn(
+          "flex items-center gap-2 rounded-full bg-white px-4 py-2.5",
+          "text-sm font-medium text-gray-700",
+          "border border-gray-200 shadow-sm",
+          "hover:shadow-md hover:border-gray-300",
+          "transition-all duration-200",
+          isOpen && "border-emerald-500 ring-2 ring-emerald-500/20"
+        )}
       >
-        <span className="text-muted-foreground">{t("sortBy")}:</span>
-        <span>{selectedOption?.label}</span>
+        <span className="text-gray-500">{t("sortBy")}:</span>
+        <span className="text-gray-900">{selectedOption?.label}</span>
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform",
+            "h-4 w-4 text-gray-400 transition-transform duration-200",
             isOpen && "rotate-180"
           )}
         />
       </button>
 
+      {/* Dropdown Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
             className={cn(
-              "absolute top-full z-20 mt-2 min-w-[160px] overflow-hidden rounded-xl bg-secondary-800 py-1 shadow-xl",
-              locale === "ar" ? "left-0" : "right-0"
+              "absolute top-full z-20 mt-2 min-w-[180px]",
+              "overflow-hidden rounded-xl bg-white",
+              "border border-gray-100 shadow-lg",
+              isRTL ? "left-0" : "right-0"
             )}
           >
-            {options.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => {
-                  onChange(option.value);
-                  setIsOpen(false);
-                }}
-                className={cn(
-                  "flex w-full items-center justify-between px-4 py-2 text-sm transition-colors",
-                  value === option.value
-                    ? "bg-primary-500/10 text-primary-500"
-                    : "text-foreground hover:bg-secondary-700"
-                )}
-              >
-                <span>{option.label}</span>
-                {value === option.value && <Check className="h-4 w-4" />}
-              </button>
-            ))}
+            <div className="py-1">
+              {options.map((option) => {
+                const isSelected = value === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      onChange(option.value);
+                      setIsOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center justify-between px-4 py-2.5 text-sm",
+                      "transition-colors duration-150",
+                      isSelected
+                        ? "bg-emerald-50 text-emerald-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    )}
+                  >
+                    <span className={isSelected ? "font-medium" : ""}>
+                      {option.label}
+                    </span>
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-emerald-500" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

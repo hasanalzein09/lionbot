@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Clock, Calendar, Loader2 } from "lucide-react";
+import { Clock, Calendar, Loader2, Zap, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { schedulingApi, type DateSlots, type TimeSlot } from "@/lib/api/scheduling";
@@ -21,6 +21,7 @@ export function DeliveryTimeSelector({
 }: DeliveryTimeSelectorProps) {
   const locale = useLocale();
   const t = useTranslations("checkout.scheduling");
+  const isRTL = locale === "ar";
   const [isScheduled, setIsScheduled] = useState(false);
   const [dates, setDates] = useState<DateSlots[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -44,13 +45,13 @@ export function DeliveryTimeSelector({
         })
         .catch((err) => {
           console.error("Failed to fetch delivery slots:", err);
-          setError(locale === "ar" ? "فشل في تحميل الأوقات" : "Failed to load time slots");
+          setError(isRTL ? "فشل في تحميل الاوقات" : "Failed to load time slots");
         })
         .finally(() => {
           setIsLoading(false);
         });
     }
-  }, [isScheduled, restaurantId, locale]);
+  }, [isScheduled, restaurantId, isRTL]);
 
   const handleAsapClick = () => {
     setIsScheduled(false);
@@ -82,15 +83,15 @@ export function DeliveryTimeSelector({
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     if (date.toDateString() === today.toDateString()) {
-      return locale === "ar" ? "اليوم" : "Today";
+      return isRTL ? "اليوم" : "Today";
     }
     if (date.toDateString() === tomorrow.toDateString()) {
-      return locale === "ar" ? "غداً" : "Tomorrow";
+      return isRTL ? "غدا" : "Tomorrow";
     }
 
     // Format as day name in Arabic
-    if (locale === "ar") {
-      const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+    if (isRTL) {
+      const days = ["الاحد", "الاثنين", "الثلاثاء", "الاربعاء", "الخميس", "الجمعة", "السبت"];
       return days[date.getDay()];
     }
 
@@ -100,37 +101,56 @@ export function DeliveryTimeSelector({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-2">
-        <Clock className="h-5 w-5 text-primary-500" />
-        <h3 className="font-semibold">{t("title")}</h3>
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
+          <Clock className="h-5 w-5 text-emerald-600" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-900">{t("title")}</h3>
+          <p className="text-sm text-gray-500">
+            {isRTL ? "متى تريد استلام طلبك؟" : "When would you like your order?"}
+          </p>
+        </div>
       </div>
 
       {/* ASAP vs Schedule Toggle */}
       <div className="flex gap-3">
-        <Button
+        <button
           type="button"
-          variant={!isScheduled ? "default" : "outline"}
-          className={cn(
-            "flex-1 transition-all",
-            !isScheduled && "ring-2 ring-primary-500 ring-offset-2 ring-offset-background"
-          )}
           onClick={handleAsapClick}
-        >
-          <span className="mr-2">⚡</span>
-          {t("asap")}
-        </Button>
-        <Button
-          type="button"
-          variant={isScheduled ? "default" : "outline"}
           className={cn(
-            "flex-1 transition-all",
-            isScheduled && "ring-2 ring-primary-500 ring-offset-2 ring-offset-background"
+            "flex flex-1 items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 font-medium transition-all",
+            !isScheduled
+              ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+              : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
           )}
-          onClick={handleScheduleClick}
         >
-          <Calendar className="mr-2 h-4 w-4" />
+          <Zap className={cn("h-5 w-5", !isScheduled ? "text-emerald-500" : "text-gray-400")} />
+          {t("asap")}
+          {!isScheduled && (
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500">
+              <Check className="h-3 w-3 text-white" />
+            </div>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={handleScheduleClick}
+          className={cn(
+            "flex flex-1 items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 font-medium transition-all",
+            isScheduled
+              ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+              : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+          )}
+        >
+          <Calendar className={cn("h-5 w-5", isScheduled ? "text-emerald-500" : "text-gray-400")} />
           {t("schedule")}
-        </Button>
+          {isScheduled && (
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500">
+              <Check className="h-3 w-3 text-white" />
+            </div>
+          )}
+        </button>
       </div>
 
       {/* Scheduling Options */}
@@ -145,65 +165,87 @@ export function DeliveryTimeSelector({
           >
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                  <p className="text-sm text-gray-500">
+                    {isRTL ? "جاري التحميل..." : "Loading..."}
+                  </p>
+                </div>
               </div>
             ) : error ? (
-              <div className="rounded-lg bg-error-500/10 p-3 text-center text-sm text-error-500">
+              <div className="rounded-xl bg-red-50 p-4 text-center text-sm text-red-600">
                 {error}
               </div>
             ) : (
               <>
                 {/* Date Selection */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
+                  <label className="mb-3 block text-sm font-medium text-gray-700">
                     {t("selectDate")}
                   </label>
                   <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-2">
-                    {dates.slice(0, 7).map((dateData) => (
-                      <button
-                        key={dateData.date}
-                        type="button"
-                        onClick={() => handleDateSelect(dateData.date)}
-                        className={cn(
-                          "flex min-w-[80px] flex-col items-center rounded-xl border-2 px-3 py-2 transition-all",
-                          selectedDate === dateData.date
-                            ? "border-primary-500 bg-primary-500/10 text-primary-500"
-                            : "border-border hover:border-primary-500/50"
-                        )}
-                      >
-                        <span className="text-xs text-muted-foreground">
-                          {formatDateDisplay(dateData.date, dateData.date_display).split(",")[0]}
-                        </span>
-                        <span className="font-medium">
-                          {new Date(dateData.date).getDate()}
-                        </span>
-                      </button>
-                    ))}
+                    {dates.slice(0, 7).map((dateData) => {
+                      const isSelected = selectedDate === dateData.date;
+                      return (
+                        <button
+                          key={dateData.date}
+                          type="button"
+                          onClick={() => handleDateSelect(dateData.date)}
+                          className={cn(
+                            "flex min-w-[85px] flex-col items-center rounded-xl border-2 px-4 py-3 transition-all",
+                            isSelected
+                              ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                              : "border-gray-200 bg-white hover:border-emerald-300 hover:bg-gray-50"
+                          )}
+                        >
+                          <span className={cn(
+                            "text-xs font-medium",
+                            isSelected ? "text-emerald-600" : "text-gray-500"
+                          )}>
+                            {formatDateDisplay(dateData.date, dateData.date_display).split(",")[0]}
+                          </span>
+                          <span className={cn(
+                            "mt-1 text-lg font-bold",
+                            isSelected ? "text-emerald-700" : "text-gray-900"
+                          )}>
+                            {new Date(dateData.date).getDate()}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
                 {/* Time Selection */}
                 {selectedDateData && (
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-muted-foreground">
+                    <label className="mb-3 block text-sm font-medium text-gray-700">
                       {t("selectTime")}
                     </label>
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                      {selectedDateData.slots.map((slot) => (
-                        <button
-                          key={slot.datetime}
-                          type="button"
-                          onClick={() => handleTimeSelect(slot)}
-                          className={cn(
-                            "rounded-lg border-2 px-3 py-2 text-sm transition-all",
-                            selectedTime === slot.datetime
-                              ? "border-primary-500 bg-primary-500/10 font-medium text-primary-500"
-                              : "border-border hover:border-primary-500/50"
-                          )}
-                        >
-                          {locale === "ar" ? slot.display_ar : slot.display}
-                        </button>
-                      ))}
+                      {selectedDateData.slots.map((slot) => {
+                        const isSelected = selectedTime === slot.datetime;
+                        return (
+                          <button
+                            key={slot.datetime}
+                            type="button"
+                            onClick={() => handleTimeSelect(slot)}
+                            className={cn(
+                              "relative rounded-xl border-2 px-3 py-3 text-sm font-medium transition-all",
+                              isSelected
+                                ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+                                : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300 hover:bg-gray-50"
+                            )}
+                          >
+                            {isRTL ? slot.display_ar : slot.display}
+                            {isSelected && (
+                              <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500">
+                                <Check className="h-3 w-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -213,15 +255,22 @@ export function DeliveryTimeSelector({
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-lg bg-success-500/10 p-3 text-center text-sm text-success-500"
+                    className="flex items-center gap-3 rounded-xl bg-emerald-50 p-4"
                   >
-                    {t("scheduled")}:{" "}
-                    <span className="font-medium">
-                      {formatDateDisplay(selectedDate!, "")} -{" "}
-                      {selectedDateData?.slots.find((s) => s.datetime === selectedTime)?.[
-                        locale === "ar" ? "display_ar" : "display"
-                      ]}
-                    </span>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500">
+                      <Check className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-emerald-800">
+                        {t("scheduled")}
+                      </p>
+                      <p className="text-sm text-emerald-600">
+                        {formatDateDisplay(selectedDate!, "")} -{" "}
+                        {selectedDateData?.slots.find((s) => s.datetime === selectedTime)?.[
+                          isRTL ? "display_ar" : "display"
+                        ]}
+                      </p>
+                    </div>
                   </motion.div>
                 )}
               </>

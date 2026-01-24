@@ -8,6 +8,7 @@ import { MenuCategory } from "./menu-category";
 import { MenuCategoryNav } from "./menu-category-nav";
 import { MenuItemModal } from "./menu-item-modal";
 import { useDebounce } from "@/lib/hooks/use-debounce";
+import { cn } from "@/lib/utils/cn";
 import type { Menu, MenuCategory as MenuCategoryType, MenuItem } from "@/types/menu";
 
 interface MenuSectionProps {
@@ -24,6 +25,7 @@ export function MenuSection({
   restaurantNameAr,
 }: MenuSectionProps) {
   const locale = useLocale();
+  const isRTL = locale === "ar";
   const t = useTranslations("restaurant");
 
   const [activeCategory, setActiveCategory] = useState<string | number>(menu.categories[0]?.id || "");
@@ -86,20 +88,32 @@ export function MenuSection({
   };
 
   return (
-    <div>
+    <div className="bg-gray-50/50 -mx-4 px-4 py-6 rounded-3xl">
       {/* Search Bar */}
-      <div className="relative mb-4">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+      <div className="relative mb-6">
+        <Search className={cn(
+          "absolute top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400",
+          isRTL ? "right-4" : "left-4"
+        )} />
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("searchMenu")}
-          className="h-12 pl-12 pr-10 rounded-xl"
+          className={cn(
+            "h-12 rounded-xl bg-white border-gray-200",
+            "focus:border-emerald-500 focus:ring-emerald-500/20",
+            "placeholder:text-gray-400",
+            isRTL ? "pr-12 pl-10" : "pl-12 pr-10"
+          )}
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground transition-colors hover:bg-secondary-700 hover:text-foreground"
+            className={cn(
+              "absolute top-1/2 -translate-y-1/2 rounded-full p-1.5",
+              "text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600",
+              isRTL ? "left-3" : "right-3"
+            )}
           >
             <X className="h-4 w-4" />
           </button>
@@ -119,7 +133,7 @@ export function MenuSection({
       )}
 
       {/* Menu Categories */}
-      <div className="mt-6 space-y-8">
+      <div className="mt-8 space-y-10">
         {filteredCategories.map((category) => (
           <MenuCategory
             key={category.id}
@@ -131,12 +145,14 @@ export function MenuSection({
         {/* Empty State */}
         {filteredCategories.length === 0 && (
           <div className="py-20 text-center">
-            <div className="mb-4 text-6xl">🔍</div>
-            <h3 className="mb-2 text-xl font-semibold">
-              {locale === "ar" ? "لا توجد نتائج" : "No results found"}
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+              <Search className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="mb-2 text-xl font-semibold text-gray-900">
+              {isRTL ? "لا توجد نتائج" : "No results found"}
             </h3>
-            <p className="text-muted-foreground">
-              {locale === "ar"
+            <p className="text-gray-500">
+              {isRTL
                 ? "جرب البحث بكلمات مختلفة"
                 : "Try different search terms"}
             </p>

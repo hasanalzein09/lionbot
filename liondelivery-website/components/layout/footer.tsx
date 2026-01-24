@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Facebook, Instagram, MapPin, Phone, Mail } from "lucide-react";
+import { Facebook, Instagram, MapPin, Phone, Mail, ArrowUpRight } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/utils/constants";
 
 export function Footer() {
@@ -17,45 +17,49 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-border bg-secondary-900">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+    <footer className="bg-secondary-50 border-t border-secondary-200">
+      <div className="container mx-auto px-4 py-12 lg:py-16">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
-          <div className="space-y-4">
-            <Link href={`/${locale}`} className="flex items-center gap-2">
-              <span className="text-3xl">🦁</span>
-              <span className="text-xl font-bold text-primary-500">
+          <div className="space-y-5">
+            <Link href={`/${locale}`} className="inline-flex items-center gap-2.5 group">
+              <span className="text-3xl group-hover:animate-bounce-soft transition-transform">
+                🦁
+              </span>
+              <span className="text-xl font-bold text-gradient">
                 Lion Delivery
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-secondary-600 leading-relaxed max-w-xs">
               {locale === "ar"
                 ? "أفضل خدمة توصيل طعام في صيدا. نوصل لك طعامك المفضل من أفضل المطاعم."
                 : "The best food delivery service in Saida. We deliver your favorite food from the best restaurants."}
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <a
                 href={SITE_CONFIG.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground transition-colors hover:text-primary-500"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-secondary-500 shadow-soft transition-all hover:text-primary-500 hover:shadow-md hover:-translate-y-0.5"
+                aria-label="Facebook"
               >
-                <Facebook className="h-5 w-5" />
+                <Facebook className="h-4 w-4" />
               </a>
               <a
                 href={SITE_CONFIG.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground transition-colors hover:text-primary-500"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-secondary-500 shadow-soft transition-all hover:text-primary-500 hover:shadow-md hover:-translate-y-0.5"
+                aria-label="Instagram"
               >
-                <Instagram className="h-5 w-5" />
+                <Instagram className="h-4 w-4" />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
+            <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-secondary-900">
               {locale === "ar" ? "روابط سريعة" : "Quick Links"}
             </h3>
             <ul className="space-y-3">
@@ -63,9 +67,10 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-primary-500"
+                    className="group inline-flex items-center gap-1 text-sm text-secondary-600 transition-colors hover:text-primary-500"
                   >
-                    {link.label}
+                    <span>{link.label}</span>
+                    <ArrowUpRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   </Link>
                 </li>
               ))}
@@ -74,35 +79,39 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
+            <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-secondary-900">
               {locale === "ar" ? "تواصل معنا" : "Contact Us"}
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               <li>
                 <a
                   href={`tel:${SITE_CONFIG.contact.phone}`}
-                  className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary-500"
+                  className="group flex items-center gap-3 text-sm text-secondary-600 transition-colors hover:text-primary-500"
                 >
-                  <Phone className="h-4 w-4" />
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-soft group-hover:shadow-md transition-shadow">
+                    <Phone className="h-4 w-4" />
+                  </span>
                   <span dir="ltr">{SITE_CONFIG.contact.phone}</span>
                 </a>
               </li>
               <li>
                 <a
                   href={`mailto:${SITE_CONFIG.contact.email}`}
-                  className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary-500"
+                  className="group flex items-center gap-3 text-sm text-secondary-600 transition-colors hover:text-primary-500"
                 >
-                  <Mail className="h-4 w-4" />
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-soft group-hover:shadow-md transition-shadow">
+                    <Mail className="h-4 w-4" />
+                  </span>
                   <span>{SITE_CONFIG.contact.email}</span>
                 </a>
               </li>
               <li>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                <div className="flex items-center gap-3 text-sm text-secondary-600">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-soft">
+                    <MapPin className="h-4 w-4" />
+                  </span>
                   <span>
-                    {locale === "ar"
-                      ? "صيدا، لبنان"
-                      : "Saida, Lebanon"}
+                    {locale === "ar" ? "صيدا، لبنان" : "Saida, Lebanon"}
                   </span>
                 </div>
               </li>
@@ -111,10 +120,10 @@ export function Footer() {
 
           {/* WhatsApp */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
+            <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-secondary-900">
               {locale === "ar" ? "اطلب عبر واتساب" : "Order via WhatsApp"}
             </h3>
-            <p className="mb-4 text-sm text-muted-foreground">
+            <p className="mb-5 text-sm text-secondary-600 leading-relaxed">
               {locale === "ar"
                 ? "تواصل معنا مباشرة عبر واتساب لأي استفسار أو طلب"
                 : "Contact us directly via WhatsApp for any inquiry or order"}
@@ -123,7 +132,7 @@ export function Footer() {
               href={`https://wa.me/${SITE_CONFIG.contact.whatsapp.replace(/[^0-9]/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
+              className="inline-flex items-center gap-2.5 rounded-full bg-primary-500 px-5 py-2.5 text-sm font-medium text-white shadow-primary transition-all hover:bg-primary-600 hover:shadow-primary-lg hover:-translate-y-0.5 btn-press"
             >
               <svg
                 className="h-5 w-5"
@@ -138,13 +147,13 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 border-t border-border pt-8">
+        <div className="mt-12 pt-8 border-t border-secondary-200">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-center text-sm text-muted-foreground">
-              © {currentYear} Lion Delivery.{" "}
+            <p className="text-center text-sm text-secondary-500">
+              &copy; {currentYear} Lion Delivery.{" "}
               {locale === "ar" ? "جميع الحقوق محفوظة" : "All rights reserved"}
             </p>
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-center text-xs text-secondary-400">
               {locale === "ar"
                 ? "صنع بـ ❤️ في صيدا"
                 : "Made with ❤️ in Saida"}

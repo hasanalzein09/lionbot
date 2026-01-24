@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, MapPin } from "lucide-react";
 
 export function HeroSearch() {
   const t = useTranslations("home.hero");
@@ -22,28 +21,55 @@ export function HeroSearch() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-xl">
-      <div className="relative flex items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+    <form onSubmit={handleSubmit} className="mx-auto max-w-2xl">
+      <div className="relative">
+        {/* Glassmorphism Container */}
+        <div className="relative flex items-center rounded-full bg-white/80 p-2 shadow-xl shadow-emerald-500/10 backdrop-blur-xl ring-1 ring-gray-200/50 transition-all duration-300 focus-within:ring-2 focus-within:ring-emerald-500/50 focus-within:shadow-emerald-500/20">
+          {/* Location Icon */}
+          <div className="flex items-center ps-4">
+            <MapPin className="h-5 w-5 text-emerald-500" />
+          </div>
+
+          {/* Search Input */}
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="h-14 w-full rounded-2xl border border-border bg-secondary-800/80 pl-12 pr-4 text-base backdrop-blur-sm transition-all placeholder:text-muted-foreground focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="h-12 flex-1 bg-transparent px-4 text-base text-gray-800 outline-none placeholder:text-gray-400"
           />
+
+          {/* Search Button */}
+          <button
+            type="submit"
+            className="flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 font-semibold text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:from-emerald-600 hover:to-emerald-700 hover:shadow-emerald-500/40 hover:scale-105 active:scale-100"
+          >
+            <Search className="h-5 w-5" />
+            <span className="hidden sm:inline">
+              {locale === "ar" ? "ابحث الآن" : "Search"}
+            </span>
+          </button>
         </div>
-        <Button
-          type="submit"
-          size="lg"
-          className="absolute right-2 h-10 rounded-xl px-6"
-        >
-          <Search className="h-4 w-4 md:mr-2" />
-          <span className="hidden md:inline">
-            {locale === "ar" ? "بحث" : "Search"}
+
+        {/* Quick Tags */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <span className="text-sm text-gray-500">
+            {locale === "ar" ? "الاكثر بحثا:" : "Popular:"}
           </span>
-        </Button>
+          {["Pizza", "Burger", "Sushi", "Shawarma"].map((tag, index) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => {
+                setQuery(tag);
+                router.push(`/${locale}/search?q=${encodeURIComponent(tag)}`);
+              }}
+              className="rounded-full bg-white/60 px-3 py-1.5 text-sm font-medium text-gray-600 ring-1 ring-gray-200/50 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 hover:ring-emerald-200"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
       </div>
     </form>
   );

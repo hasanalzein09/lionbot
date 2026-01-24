@@ -3,9 +3,9 @@
 import { useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import { useCategories } from "@/lib/hooks/use-categories";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface CategoryFilterProps {
   selectedCategory: string | null;
@@ -15,6 +15,7 @@ interface CategoryFilterProps {
 export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryFilterProps) {
   const locale = useLocale();
   const t = useTranslations("restaurants.filters");
+  const isRTL = locale === "ar";
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fetch real categories from API
@@ -23,8 +24,11 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
       const scrollAmount = 150;
+      const actualDirection = isRTL
+        ? direction === "left" ? scrollAmount : -scrollAmount
+        : direction === "left" ? -scrollAmount : scrollAmount;
       scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
+        left: actualDirection,
         behavior: "smooth",
       });
     }
@@ -32,48 +36,69 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
 
   return (
     <div className="relative">
-      {/* Scroll Buttons */}
+      {/* Scroll Button - Left */}
       <button
         onClick={() => scroll("left")}
-        className="absolute -left-2 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-secondary-800 text-foreground shadow-lg transition-colors hover:bg-secondary-700 md:flex"
+        className={cn(
+          "absolute top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2",
+          "items-center justify-center rounded-full",
+          "bg-white text-gray-600 shadow-md border border-gray-100",
+          "hover:bg-gray-50 hover:shadow-lg",
+          "transition-all duration-200 md:flex",
+          isRTL ? "-right-3" : "-left-3"
+        )}
       >
-        {locale === "ar" ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-      </button>
-      <button
-        onClick={() => scroll("right")}
-        className="absolute -right-2 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-secondary-800 text-foreground shadow-lg transition-colors hover:bg-secondary-700 md:flex"
-      >
-        {locale === "ar" ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
 
-      {/* Categories */}
+      {/* Scroll Button - Right */}
+      <button
+        onClick={() => scroll("right")}
+        className={cn(
+          "absolute top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2",
+          "items-center justify-center rounded-full",
+          "bg-white text-gray-600 shadow-md border border-gray-100",
+          "hover:bg-gray-50 hover:shadow-lg",
+          "transition-all duration-200 md:flex",
+          isRTL ? "-left-3" : "-right-3"
+        )}
+      >
+        {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+      </button>
+
+      {/* Categories Container */}
       <div
         ref={scrollRef}
         className="scrollbar-hide flex gap-2 overflow-x-auto px-1 py-2"
         style={{ scrollSnapType: "x mandatory" }}
+        dir={isRTL ? "rtl" : "ltr"}
       >
         {isLoading ? (
           // Loading skeletons
           Array.from({ length: 8 }).map((_, index) => (
-            <Skeleton key={index} className="h-10 w-24 flex-shrink-0 rounded-full" />
+            <div
+              key={index}
+              className="h-10 w-24 flex-shrink-0 rounded-full skeleton"
+            />
           ))
         ) : (
           <>
             {/* "All" option */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => onCategoryChange(null)}
               className={cn(
-                "flex flex-shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
-                "scroll-snap-align-start",
+                "flex flex-shrink-0 items-center gap-2 rounded-full px-5 py-2.5",
+                "text-sm font-medium transition-all duration-200",
                 !selectedCategory
-                  ? "bg-primary-500 text-white shadow-lg shadow-primary-500/25"
-                  : "bg-secondary-800 text-muted-foreground hover:bg-secondary-700 hover:text-foreground"
+                  ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/25"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-emerald-300 hover:text-emerald-600"
               )}
               style={{ scrollSnapAlign: "start" }}
             >
-              <span>🍽️</span>
               <span>{locale === "ar" ? "الكل" : "All"}</span>
-            </button>
+            </motion.button>
 
             {/* API Categories */}
             {apiCategories?.map((category) => {
@@ -82,21 +107,23 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
               const isSelected = selectedCategory === String(category.id);
 
               return (
-                <button
+                <motion.button
                   key={category.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => onCategoryChange(String(category.id))}
                   className={cn(
-                    "flex flex-shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
-                    "scroll-snap-align-start",
+                    "flex flex-shrink-0 items-center gap-2 rounded-full px-5 py-2.5",
+                    "text-sm font-medium transition-all duration-200",
                     isSelected
-                      ? "bg-primary-500 text-white shadow-lg shadow-primary-500/25"
-                      : "bg-secondary-800 text-muted-foreground hover:bg-secondary-700 hover:text-foreground"
+                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/25"
+                      : "bg-white text-gray-600 border border-gray-200 hover:border-emerald-300 hover:text-emerald-600"
                   )}
                   style={{ scrollSnapAlign: "start" }}
                 >
-                  <span>{category.icon || "🍽️"}</span>
+                  {category.icon && <span>{category.icon}</span>}
                   <span>{displayName}</span>
-                </button>
+                </motion.button>
               );
             })}
           </>

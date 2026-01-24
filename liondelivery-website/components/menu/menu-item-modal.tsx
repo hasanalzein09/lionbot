@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Minus, Plus, Check } from "lucide-react";
+import { X, Minus, Plus, Check, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useCartStore } from "@/lib/stores/cart-store";
@@ -30,6 +30,7 @@ export function MenuItemModal({
   restaurantNameAr,
 }: MenuItemModalProps) {
   const locale = useLocale();
+  const isRTL = locale === "ar";
   const t = useTranslations("menu");
   const addItem = useCartStore((state) => state.addItem);
 
@@ -131,7 +132,7 @@ export function MenuItemModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
           />
 
           {/* Modal */}
@@ -139,12 +140,20 @@ export function MenuItemModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-x-4 bottom-4 top-4 z-50 mx-auto flex max-w-lg flex-col overflow-hidden rounded-3xl bg-secondary-900 shadow-2xl md:inset-auto md:left-1/2 md:top-1/2 md:max-h-[90vh] md:-translate-x-1/2 md:-translate-y-1/2"
+            className={cn(
+              "fixed inset-x-4 bottom-4 top-4 z-50 mx-auto flex max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl",
+              "md:inset-auto md:left-1/2 md:top-1/2 md:max-h-[90vh] md:-translate-x-1/2 md:-translate-y-1/2"
+            )}
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
+              className={cn(
+                "absolute top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full",
+                "bg-white/90 text-gray-600 shadow-md backdrop-blur-sm",
+                "transition-all hover:bg-white hover:shadow-lg",
+                isRTL ? "left-4" : "right-4"
+              )}
             >
               <X className="h-5 w-5" />
             </button>
@@ -160,10 +169,12 @@ export function MenuItemModal({
                     fill
                     className="object-cover"
                   />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
                 </div>
               ) : (
-                <div className="flex aspect-video w-full items-center justify-center bg-secondary-800 text-7xl">
-                  🍽️
+                <div className="flex aspect-video w-full items-center justify-center bg-gray-100 text-7xl">
+                  <span role="img" aria-label="food">&#127869;</span>
                 </div>
               )}
 
@@ -171,17 +182,20 @@ export function MenuItemModal({
               <div className="p-6 space-y-6">
                 {/* Header */}
                 <div>
-                  <h2 className="mb-2 text-2xl font-bold">{displayName}</h2>
+                  <h2 className="mb-2 text-2xl font-bold text-gray-900">{displayName}</h2>
                   {displayDescription && (
-                    <p className="text-muted-foreground">{displayDescription}</p>
+                    <p className="text-gray-500">{displayDescription}</p>
                   )}
+                  <p className="mt-2 text-xl font-bold text-emerald-600">
+                    {formatPrice(basePrice)}
+                  </p>
                 </div>
 
-                {/* Variants */}
+                {/* Variants (Radio Buttons) */}
                 {item.variants && item.variants.length > 0 && (
                   <div>
-                    <h3 className="mb-3 font-semibold">
-                      {t("selectSize")} <span className="text-error-500">*</span>
+                    <h3 className="mb-3 font-semibold text-gray-900">
+                      {t("selectSize")} <span className="text-[#f43f5e]">*</span>
                     </h3>
                     <div className="space-y-2">
                       {item.variants.map((variant) => {
@@ -199,26 +213,32 @@ export function MenuItemModal({
                             className={cn(
                               "flex w-full items-center justify-between rounded-xl border-2 p-4 transition-all",
                               isSelected
-                                ? "border-primary-500 bg-primary-500/10"
-                                : "border-border hover:border-primary-500/50"
+                                ? "border-emerald-500 bg-emerald-50"
+                                : "border-gray-200 hover:border-emerald-300 hover:bg-gray-50"
                             )}
                           >
                             <div className="flex items-center gap-3">
+                              {/* Radio Button */}
                               <div
                                 className={cn(
-                                  "flex h-5 w-5 items-center justify-center rounded-full border-2",
+                                  "flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all",
                                   isSelected
-                                    ? "border-primary-500 bg-primary-500"
-                                    : "border-muted-foreground"
+                                    ? "border-emerald-500 bg-emerald-500"
+                                    : "border-gray-300"
                                 )}
                               >
                                 {isSelected && (
-                                  <Check className="h-3 w-3 text-white" />
+                                  <div className="h-2 w-2 rounded-full bg-white" />
                                 )}
                               </div>
-                              <span className="font-medium">{variantName}</span>
+                              <span className={cn(
+                                "font-medium",
+                                isSelected ? "text-gray-900" : "text-gray-700"
+                              )}>
+                                {variantName}
+                              </span>
                             </div>
-                            <span className="font-semibold text-primary-500">
+                            <span className="font-semibold text-emerald-600">
                               {formatPrice(variant.price)}
                             </span>
                           </button>
@@ -228,10 +248,10 @@ export function MenuItemModal({
                   </div>
                 )}
 
-                {/* Addons */}
+                {/* Addons (Checkboxes) */}
                 {item.addons && item.addons.length > 0 && (
                   <div>
-                    <h3 className="mb-3 font-semibold">{t("selectOptions")}</h3>
+                    <h3 className="mb-3 font-semibold text-gray-900">{t("selectOptions")}</h3>
                     <div className="space-y-2">
                       {item.addons.map((addon) => {
                         const addonNameAr = addon.nameAr || addon.name_ar;
@@ -248,26 +268,32 @@ export function MenuItemModal({
                             className={cn(
                               "flex w-full items-center justify-between rounded-xl border-2 p-4 transition-all",
                               isSelected
-                                ? "border-primary-500 bg-primary-500/10"
-                                : "border-border hover:border-primary-500/50"
+                                ? "border-emerald-500 bg-emerald-50"
+                                : "border-gray-200 hover:border-emerald-300 hover:bg-gray-50"
                             )}
                           >
                             <div className="flex items-center gap-3">
+                              {/* Checkbox */}
                               <div
                                 className={cn(
-                                  "flex h-5 w-5 items-center justify-center rounded border-2",
+                                  "flex h-5 w-5 items-center justify-center rounded border-2 transition-all",
                                   isSelected
-                                    ? "border-primary-500 bg-primary-500"
-                                    : "border-muted-foreground"
+                                    ? "border-emerald-500 bg-emerald-500"
+                                    : "border-gray-300"
                                 )}
                               >
                                 {isSelected && (
                                   <Check className="h-3 w-3 text-white" />
                                 )}
                               </div>
-                              <span className="font-medium">{addonName}</span>
+                              <span className={cn(
+                                "font-medium",
+                                isSelected ? "text-gray-900" : "text-gray-700"
+                              )}>
+                                {addonName}
+                              </span>
                             </div>
-                            <span className="text-sm text-primary-500">
+                            <span className="text-sm font-medium text-emerald-600">
                               +{formatPrice(addon.price)}
                             </span>
                           </button>
@@ -279,36 +305,51 @@ export function MenuItemModal({
 
                 {/* Special Instructions */}
                 <div>
-                  <h3 className="mb-3 font-semibold">{t("specialInstructions")}</h3>
+                  <h3 className="mb-3 font-semibold text-gray-900">{t("specialInstructions")}</h3>
                   <Textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder={t("specialInstructionsPlaceholder")}
                     rows={2}
+                    className={cn(
+                      "rounded-xl border-gray-200 bg-gray-50",
+                      "focus:border-emerald-500 focus:ring-emerald-500/20",
+                      "placeholder:text-gray-400"
+                    )}
                   />
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="border-t border-border bg-secondary-800/50 p-4">
+            <div className="border-t border-gray-100 bg-white p-4 shadow-lg shadow-gray-200/50">
               {/* Quantity */}
               <div className="mb-4 flex items-center justify-between">
-                <span className="font-medium">{t("quantity")}</span>
+                <span className="font-medium text-gray-700">{t("quantity")}</span>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     disabled={quantity <= 1}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary-700 text-foreground transition-colors hover:bg-secondary-600 disabled:opacity-50"
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-full",
+                      "border-2 border-gray-200 text-gray-600",
+                      "transition-all hover:border-emerald-500 hover:text-emerald-600",
+                      "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-600"
+                    )}
                   >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <span className="w-8 text-center text-lg font-semibold">
+                  <span className="w-8 text-center text-lg font-bold text-gray-900">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-white transition-colors hover:bg-primary-600"
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-full",
+                      "bg-emerald-500 text-white",
+                      "transition-all hover:bg-emerald-600",
+                      "shadow-md shadow-emerald-500/30"
+                    )}
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -318,13 +359,23 @@ export function MenuItemModal({
               {/* Add to Cart Button */}
               <Button
                 onClick={handleAddToCart}
-                className="w-full"
+                className={cn(
+                  "w-full h-14 text-base font-semibold rounded-xl",
+                  "bg-emerald-500 hover:bg-emerald-600",
+                  "shadow-lg shadow-emerald-500/30",
+                  "transition-all hover:shadow-xl hover:shadow-emerald-500/40"
+                )}
                 size="lg"
                 disabled={!isAvailable || (item.variants && item.variants.length > 0 && !selectedVariant)}
               >
-                {!isAvailable
-                  ? locale === "ar" ? "غير متوفر" : "Unavailable"
-                  : `${t("addToCart")} • ${formatPrice(itemTotal)}`}
+                {!isAvailable ? (
+                  isRTL ? "غير متوفر" : "Unavailable"
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    <ShoppingCart className="h-5 w-5" />
+                    {t("addToCart")} - {formatPrice(itemTotal)}
+                  </span>
+                )}
               </Button>
             </div>
           </motion.div>
