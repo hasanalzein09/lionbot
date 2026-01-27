@@ -83,7 +83,8 @@ class AIService:
         language: str = "ar",
         restaurant_id: Optional[int] = None,
         user_data: Optional[dict] = None,
-        conversation_history: str = ""
+        conversation_history: str = "",
+        cart_items: Optional[list] = None
     ) -> Dict[str, Any]:
         """
         Smart AI processing with intent detection and conversation memory:
@@ -103,11 +104,11 @@ class AIService:
             restaurants_context = await self._get_restaurants_with_categories()
             categories_context = await self._get_categories_context()
 
-            # Build smart prompt with conversation history
+            # Build smart prompt with conversation history and cart
             prompt = self._build_smart_prompt(
                 text, language, products_context,
                 restaurants_context, categories_context,
-                restaurant_id, conversation_history
+                restaurant_id, conversation_history, cart_items
             )
             
             response = self.model.generate_content(
@@ -137,11 +138,38 @@ class AIService:
         self, text: str, language: str,
         products: str, restaurants: str, categories: str,
         current_restaurant_id: Optional[int],
-        conversation_history: str = ""
+        conversation_history: str = "",
+        cart_items: Optional[list] = None
     ) -> str:
         """Build intelligent prompt for intent detection and smart responses with conversation memory"""
 
         restaurant_context = f"المستخدم حالياً في مطعم ID: {current_restaurant_id}" if current_restaurant_id else "المستخدم لم يختار مطعم بعد"
+
+        # Add cart context
+        cart_context = ""
+        if cart_items and len(cart_items) > 0:
+            cart_lines = []
+            for i, item in enumerate(cart_items, 1):
+                item_name = item.get("name", "صنف")
+                qty = item.get("quantity", 1)
+                price = item.get("price", 0)
+                variant = item.get("variant_name", "")
+                variant_str = f" ({variant})" if variant else ""
+                cart_lines.append(f"  {i}. {item_name}{variant_str} x{qty} - ${price:.2f}")
+            cart_context = f"""
+🛒 السلة الحالية:
+{chr(10).join(cart_lines)}
+
+ملاحظة مهمة عن السلة:
+- إذا قال "شيل وحدة" أو "نقص وحدة" يقصد نقص 1 من آخر صنف (decrease)
+- إذا قال "شيل الشاورما" يقصد إزالة الشاورما كلياً (remove)
+- إذا قال "حط محلها طاووق" يقصد استبدال آخر صنف بطاووق (replace)
+- إذا قال "بدل الدجاج بلحمة" يقصد تغيير النوع (replace_type)
+- إذا قال "زيد 2" يقصد زيادة الكمية (increase)
+- إذا السلة فاضية لا يمكن تعديلها
+"""
+        else:
+            cart_context = "\n🛒 السلة فارغة حالياً.\n"
 
         # Add conversation history context
         history_context = ""
@@ -167,6 +195,8 @@ class AIService:
 4. فهم السياق من المحادثة السابقة
 5. فهم الطلبات الكاملة (one-shot) التي تتضمن الصنف والمطعم والعنوان
 6. فهم الـ Arabizi (العربي بأحرف لاتينية) - مثلاً: "bade" = "بدي", "shawarma" = "شاورما", "men" = "من"
+7. فهم أوامر تعديل السلة (شيل، زيد، نقص، غير، بدل)
+{cart_context}
 
 ملاحظة مهمة: إذا كتب المستخدم بالأحرف اللاتينية (Arabizi)، افهمها كأنها عربي:
 - bade/badde/bde = بدي
@@ -267,6 +297,13 @@ class AIService:
 "ضيف كمان 2 بيبسي" → {{"intent": "modify_cart", "items": [{{"name": "بيبسي", "quantity": 2, "action": "increase"}}], "message": "تم ضفنا 2 بيبسي! 🥤"}}
 "شيل البطاطا من السلة" → {{"intent": "modify_cart", "items": [{{"name": "بطاطا", "action": "remove"}}], "message": "تم شيلنا البطاطا 👍"}}
 "نقص شاورما وحدة" → {{"intent": "modify_cart", "items": [{{"name": "شاورما", "quantity": 1, "action": "decrease"}}], "message": "تم نقصنا شاورما"}}
+"شيل وحدة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "quantity": 1, "action": "decrease"}}], "message": "تم نقصنا وحدة"}}
+"شيل الشاورما وخلي البطاطا" → {{"intent": "modify_cart", "items": [{{"name": "شاورما", "action": "remove"}}], "message": "تم شيلنا الشاورما وخلينا البطاطا 👍"}}
+"بس البيبسي ما بدي" → {{"intent": "modify_cart", "items": [{{"name": "بيبسي", "action": "remove"}}], "message": "تم شيلنا البيبسي 👍"}}
+"الغي كل شي" → {{"intent": "modify_cart", "items": [{{"name": "all", "action": "clear"}}], "message": "تم تفضيت السلة"}}
+"فضي السلة" → {{"intent": "modify_cart", "items": [{{"name": "all", "action": "clear"}}], "message": "تم تفضيت السلة 🗑️"}}
+"حط محلها طاووق" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "replace_with": "طاووق", "action": "replace_item"}}], "message": "تم! غيرناها لطاووق 🍗"}}
+"بدل الشاورما بطاووق" → {{"intent": "modify_cart", "items": [{{"name": "شاورما", "replace_with": "طاووق", "action": "replace_item"}}], "message": "تم! طاووق بدل الشاورما 🍗"}}
 
 أمثلة تعديل الحجم بكلمة واحدة (يغير آخر صنف مضاف):
 "كبيرة" → {{"intent": "modify_cart", "items": [{{"name": "آخر صنف مضاف", "size": "large", "action": "replace"}}], "message": "تم غيرناها لكبيرة! 👍"}}
