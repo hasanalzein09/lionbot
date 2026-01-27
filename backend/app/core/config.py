@@ -16,9 +16,6 @@ class Settings(BaseSettings):
     def cors_origins_list(self) -> List[str]:
         """Parse CORS_ORIGINS into a list"""
         if self.CORS_ORIGINS == "*":
-            if self.ENVIRONMENT == "production":
-                # In production, require explicit origins
-                return ["https://liondelivery.com", "https://admin.liondelivery.com"]
             return ["*"]
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
@@ -86,8 +83,8 @@ class Settings(BaseSettings):
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_DEFAULT: str = "100/minute"  # Default rate limit
     RATE_LIMIT_LOGIN: str = "5/minute"  # Stricter for login attempts
-    RATE_LIMIT_WEBHOOK: str = "200/minute"  # Higher for webhooks
-    RATE_LIMIT_API: str = "60/minute"  # Standard API endpoints
+    RATE_LIMIT_WEBHOOK: str = "400/minute"  # Higher for webhooks
+    RATE_LIMIT_API: str = "120/minute"  # Standard API endpoints
 
     # Security Headers
     ENABLE_SECURITY_HEADERS: bool = True

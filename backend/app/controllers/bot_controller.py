@@ -289,8 +289,26 @@ class BotController:
         """Handle list item selection"""
         logger.debug(f"List ID: {list_id}, State: {state}")
 
+        # Pagination handlers FIRST (before regular handlers)
+        # Restaurant categories pagination (restcat_page_pageNum)
+        if list_id.startswith("restcat_page_"):
+            page = int(list_id.split("_")[2])
+            await self._show_restaurant_categories(phone_number, lang, page)
+
+        # All restaurants pagination (all_rest_page_pageNum)
+        elif list_id.startswith("all_rest_page_"):
+            page = int(list_id.split("_")[3])
+            await self._show_restaurants(phone_number, lang, page)
+
+        # Menu categories pagination (menucat_page_restId_pageNum)
+        elif list_id.startswith("menucat_page_"):
+            parts = list_id.split("_")
+            restaurant_id = int(parts[2])
+            page = int(parts[3])
+            await self._show_categories(phone_number, restaurant_id, lang, page)
+
         # Restaurant Category Selection (Shawarma, Pizza, etc.)
-        if list_id.startswith("restcat_"):
+        elif list_id.startswith("restcat_"):
             category_id = int(list_id.split("_")[1])
             await self._show_restaurants_by_category(phone_number, category_id, lang)
 
@@ -576,10 +594,11 @@ class BotController:
         )
         await redis_service.set_user_state(phone_number, "MAIN_MENU", {"lang": lang})
 
-    async def _show_restaurant_categories(self, phone_number: str, lang: str):
-        """Show restaurant categories (Shawarma, Pizza, Snacks, etc.)"""
+    async def _show_restaurant_categories(self, phone_number: str, lang: str, page: int = 0):
+        """Show restaurant categories (Shawarma, Pizza, Snacks, etc.) with pagination"""
         import asyncio
-        
+        ITEMS_PER_PAGE = 9  # Leave room for navigation
+
         categories = None
         for attempt in range(3):
             try:
@@ -605,27 +624,57 @@ class BotController:
             await self._show_restaurants(phone_number, lang)
             return
 
+        # Pagination
+        total_categories = len(categories)
+        start_idx = page * ITEMS_PER_PAGE
+        end_idx = start_idx + ITEMS_PER_PAGE
+        categories_to_show = categories[start_idx:end_idx]
+        has_more = total_categories > end_idx
+        has_prev = page > 0
+
+        rows = [
+            {
+                "id": f"restcat_{c.id}",
+                "title": f"{c.icon} {c.name_ar if lang == 'ar' else c.name}"[:24],
+                "description": ""
+            }
+            for c in categories_to_show
+        ]
+
+        # Add navigation buttons
+        if has_prev:
+            rows.append({
+                "id": f"restcat_page_{page - 1}",
+                "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
+                "description": ""
+            })
+
+        if has_more:
+            remaining = total_categories - end_idx
+            rows.append({
+                "id": f"restcat_page_{page + 1}",
+                "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
+                "description": f"{remaining} {'تصنيف آخر' if lang == 'ar' else 'more categories'}"
+            })
+
+        # Build page info
+        total_pages = (total_categories + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
+        page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
+
         sections = [{
-            "title": get_text("select_category", lang) if lang == "ar" else "Select Category",
-            "rows": [
-                {
-                    "id": f"restcat_{c.id}",
-                    "title": f"{c.icon} {c.name_ar if lang == 'ar' else c.name}"[:24],
-                    "description": ""
-                }
-                for c in categories
-            ]
+            "title": f"{get_text('select_category', lang) if lang == 'ar' else 'Select Category'}{page_info}"[:24],
+            "rows": rows
         }]
 
         header = "🍽️ اختر نوع المطعم:" if lang == "ar" else "🍽️ Choose restaurant type:"
-        
+
         await whatsapp_service.send_interactive_list(
             phone_number,
             header,
             get_text("view_restaurants", lang),
             sections
         )
-        await redis_service.set_user_state(phone_number, "BROWSING_REST_CATEGORIES", {"lang": lang})
+        await redis_service.set_user_state(phone_number, "BROWSING_REST_CATEGORIES", {"lang": lang, "page": page})
 
     async def _show_restaurants_by_category(self, phone_number: str, category_id: int, lang: str, page: int = 0):
         """Show restaurants filtered by category with pagination"""
@@ -694,38 +743,63 @@ class BotController:
             )
             await redis_service.set_user_state(phone_number, "BROWSING_RESTAURANTS", {"lang": lang, "rest_category_id": category_id, "page": page})
 
-    async def _show_restaurants(self, phone_number: str, lang: str):
-        """Show available restaurants list"""
+    async def _show_restaurants(self, phone_number: str, lang: str, page: int = 0):
+        """Show available restaurants list with pagination (max 10 items per WhatsApp message)"""
+        ITEMS_PER_PAGE = 9  # Leave room for "More" button
+
         async with AsyncSessionLocal() as db:
             result = await db.execute(
                 select(Restaurant)
                 .where(Restaurant.is_active == True)
-                .limit(30)
             )
-            restaurants = result.scalars().all()
+            all_restaurants = result.scalars().all()
 
-            if not restaurants:
+            if not all_restaurants:
                 await whatsapp_service.send_text(phone_number, get_text("no_restaurants", lang))
                 await self._send_main_menu(phone_number, lang)
                 return
 
-            # Split into sections of 10 (WhatsApp limit per section)
-            sections = []
-            for i in range(0, len(restaurants), 10):
-                section_restaurants = restaurants[i:i+10]
-                section_num = (i // 10) + 1
-                section_title = get_text("restaurants", lang) if section_num == 1 else f"{get_text('restaurants', lang)} ({section_num})"
-                sections.append({
-                    "title": section_title[:24],
-                    "rows": [
-                        {
-                            "id": f"rest_{r.id}",
-                            "title": (r.name_ar if lang == 'ar' and r.name_ar else r.name)[:24],
-                            "description": ((r.description_ar if lang == 'ar' and r.description_ar else r.description) or "")[:70]
-                        }
-                        for r in section_restaurants
-                    ]
+            # Pagination
+            total_restaurants = len(all_restaurants)
+            start_idx = page * ITEMS_PER_PAGE
+            end_idx = start_idx + ITEMS_PER_PAGE
+            restaurants_to_show = all_restaurants[start_idx:end_idx]
+            has_more = total_restaurants > end_idx
+            has_prev = page > 0
+
+            rows = [
+                {
+                    "id": f"rest_{r.id}",
+                    "title": (r.name_ar if lang == 'ar' and r.name_ar else r.name)[:24],
+                    "description": ((r.description_ar if lang == 'ar' and r.description_ar else r.description) or "")[:70]
+                }
+                for r in restaurants_to_show
+            ]
+
+            # Add navigation buttons
+            if has_prev:
+                rows.append({
+                    "id": f"all_rest_page_{page - 1}",
+                    "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
+                    "description": f"صفحة {page}" if lang == 'ar' else f"Page {page}"
                 })
+
+            if has_more:
+                remaining = total_restaurants - end_idx
+                rows.append({
+                    "id": f"all_rest_page_{page + 1}",
+                    "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
+                    "description": f"{remaining} {'مطعم آخر' if lang == 'ar' else 'more restaurants'}"
+                })
+
+            # Build page info
+            total_pages = (total_restaurants + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
+            page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
+
+            sections = [{
+                "title": f"{get_text('restaurants', lang)}{page_info}"[:24],
+                "rows": rows
+            }]
 
             await whatsapp_service.send_interactive_list(
                 phone_number,
@@ -733,10 +807,12 @@ class BotController:
                 get_text("view_restaurants", lang),
                 sections
             )
-            await redis_service.set_user_state(phone_number, "BROWSING_RESTAURANTS", {"lang": lang})
+            await redis_service.set_user_state(phone_number, "BROWSING_RESTAURANTS", {"lang": lang, "page": page})
 
-    async def _show_categories(self, phone_number: str, restaurant_id: int, lang: str):
-        """Show menu categories for a restaurant"""
+    async def _show_categories(self, phone_number: str, restaurant_id: int, lang: str, page: int = 0):
+        """Show menu categories for a restaurant with pagination (max 10 items per WhatsApp message)"""
+        ITEMS_PER_PAGE = 9  # Leave room for navigation
+
         async with AsyncSessionLocal() as db:
             # Get restaurant info
             rest_result = await db.execute(
@@ -765,25 +841,48 @@ class BotController:
 
             # Get display name based on language
             rest_name = (restaurant.name_ar if lang == 'ar' and restaurant.name_ar else restaurant.name)
-            
-            # Split into sections of 10 (WhatsApp limit)
-            categories_to_show = categories[:30]
-            sections = []
-            for i in range(0, len(categories_to_show), 10):
-                section_cats = categories_to_show[i:i+10]
-                section_num = (i // 10) + 1
-                section_title = rest_name if section_num == 1 else f"{rest_name} ({section_num})"
-                sections.append({
-                    "title": section_title[:24],
-                    "rows": [
-                        {
-                            "id": f"cat_{c.id}",
-                            "title": (c.name_ar if lang == 'ar' and c.name_ar else c.name)[:24],
-                            "description": ""
-                        }
-                        for c in section_cats
-                    ]
+
+            # Pagination
+            total_categories = len(categories)
+            start_idx = page * ITEMS_PER_PAGE
+            end_idx = start_idx + ITEMS_PER_PAGE
+            categories_to_show = categories[start_idx:end_idx]
+            has_more = total_categories > end_idx
+            has_prev = page > 0
+
+            rows = [
+                {
+                    "id": f"cat_{c.id}",
+                    "title": (c.name_ar if lang == 'ar' and c.name_ar else c.name)[:24],
+                    "description": ""
+                }
+                for c in categories_to_show
+            ]
+
+            # Add navigation buttons
+            if has_prev:
+                rows.append({
+                    "id": f"menucat_page_{restaurant_id}_{page - 1}",
+                    "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
+                    "description": ""
                 })
+
+            if has_more:
+                remaining = total_categories - end_idx
+                rows.append({
+                    "id": f"menucat_page_{restaurant_id}_{page + 1}",
+                    "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
+                    "description": f"{remaining} {'فئة أخرى' if lang == 'ar' else 'more categories'}"
+                })
+
+            # Build page info
+            total_pages = (total_categories + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
+            page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
+
+            sections = [{
+                "title": f"{rest_name}{page_info}"[:24],
+                "rows": rows
+            }]
 
             await whatsapp_service.send_interactive_list(
                 phone_number,
@@ -794,7 +893,8 @@ class BotController:
             await redis_service.set_user_state(phone_number, "BROWSING_CATEGORIES", {
                 "lang": lang,
                 "restaurant_id": restaurant_id,
-                "restaurant_name": rest_name
+                "restaurant_name": rest_name,
+                "page": page
             })
 
     async def _show_menu_items(self, phone_number: str, category_id: int, lang: str, user_data: dict, page: int = 0):
@@ -1462,8 +1562,8 @@ https://maps.google.com/?q={lat},{lng}
     async def _process_ai_order(self, phone_number: str, text: str, lang: str, user_data: dict):
         """Process natural language with smart AI - handles search, order, and discovery intents"""
 
-        # Rate limiting check (15 AI calls per minute per user)
-        if not await redis_service.check_rate_limit(phone_number, "ai", limit=15, window=60):
+        # Rate limiting check (30 AI calls per minute per user)
+        if not await redis_service.check_rate_limit(phone_number, "ai", limit=30, window=60):
             rate_limit_msg = "⚠️ عم تبعت رسائل كتير بسرعة! انطر شوي وجرب كمان مرة 🙏" if lang == "ar" else "⚠️ Too many requests! Please wait a moment and try again."
             await whatsapp_service.send_text(phone_number, rate_limit_msg)
             return
@@ -1484,9 +1584,12 @@ https://maps.google.com/?q={lat},{lng}
         # Get selected restaurant if any
         restaurant_id = user_data.get("restaurant_id")
 
-        # Process with smart AI including conversation context
+        # Get current cart items for context
+        cart_items = await redis_service.get_cart(phone_number)
+
+        # Process with smart AI including conversation context and cart
         ai_result = await ai_service.process_smart_order(
-            text, lang, restaurant_id, user_data, conversation_history
+            text, lang, restaurant_id, user_data, conversation_history, cart_items
         )
 
         intent = ai_result.get("intent", "error")
@@ -1962,8 +2065,47 @@ https://maps.google.com/?q={lat},{lng}
             item_name = mod_item.get("name", "").lower()
             new_size = mod_item.get("size", "").lower() if mod_item.get("size") else None
 
+            # Handle clear all cart
+            if action == "clear" or item_name == "all":
+                await redis_service.clear_cart(phone_number)
+                modifications_made.append("🗑️ تم تفضيت السلة")
+                continue
+
             # Handle replace action (size or type change)
             replace_type = mod_item.get("replace_type", "").lower() if mod_item.get("replace_type") else None
+            replace_with = mod_item.get("replace_with", "").lower() if mod_item.get("replace_with") else None
+
+            # Handle replace_item (replace with different product)
+            if action == "replace_item" and replace_with:
+                target_item = None
+                # If name is generic (آخر صنف), get last item in cart
+                if "آخر" in item_name or not item_name or item_name == "آخر صنف مضاف":
+                    target_item = cart[-1] if cart else None
+                else:
+                    for cart_item in cart:
+                        cart_item_name = cart_item.get("name", "").lower()
+                        if item_name in cart_item_name or cart_item_name in item_name:
+                            target_item = cart_item
+                            break
+
+                if target_item:
+                    old_name = target_item.get("name", "")
+                    old_menu_item_id = target_item.get("menu_item_id")
+                    restaurant_id = target_item.get("restaurant_id")
+                    quantity = target_item.get("quantity", 1)
+
+                    # Find the new item by name
+                    new_item = await self._find_item_by_name(replace_with, restaurant_id)
+
+                    if new_item:
+                        await redis_service.remove_from_cart(phone_number, old_menu_item_id)
+                        new_item["quantity"] = quantity
+                        await redis_service.add_to_cart(phone_number, new_item)
+                        modifications_made.append(f"🔄 غيرنا {old_name} ← {new_item['name']}")
+                    else:
+                        modifications_made.append(f"⚠️ ما لقيت {replace_with} بنفس المطعم")
+                        ai_message = None
+                continue
 
             if action == "replace" and (new_size or replace_type):
                 target_item = None
@@ -2001,6 +2143,22 @@ https://maps.google.com/?q={lat},{lng}
                         modifications_made.append(f"⚠️ ما لقيت {search_term} بدل {old_name}")
                         # Clear AI message on failure so we show the actual error
                         ai_message = None
+                continue
+
+            # Handle decrease on "آخر صنف مضاف" (last item)
+            if action == "decrease" and ("آخر" in item_name or item_name == "آخر صنف مضاف"):
+                if cart:
+                    target_item = cart[-1]
+                    qty_to_remove = mod_item.get("quantity", 1)
+                    new_qty = target_item.get("quantity", 1) - qty_to_remove
+                    if new_qty <= 0:
+                        await redis_service.remove_from_cart(phone_number, target_item.get("menu_item_id"))
+                        modifications_made.append(f"❌ شلنا {target_item.get('name')}")
+                    else:
+                        await redis_service.update_cart_item_quantity(
+                            phone_number, target_item.get("menu_item_id"), new_qty
+                        )
+                        modifications_made.append(f"➖ نقصنا {target_item.get('name')} ({new_qty})")
                 continue
 
             for cart_item in cart:
@@ -2158,6 +2316,56 @@ https://maps.google.com/?q={lat},{lng}
                             }
         except Exception as e:
             logger.error(f"Error finding item with type: {e}")
+        return None
+
+    async def _find_item_by_name(self, item_name: str, restaurant_id: int) -> Optional[dict]:
+        """Find a menu item by name in a specific restaurant"""
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(MenuItem)
+                    .join(Category)
+                    .join(Menu)
+                    .where(Menu.restaurant_id == restaurant_id)
+                    .where(MenuItem.is_available == True)
+                )
+                menu_items = result.scalars().all()
+
+                search_term = item_name.lower()
+
+                # Find best match
+                for item in menu_items:
+                    item_name_ar = (item.name_ar or "").lower()
+                    item_name_en = (item.name or "").lower()
+
+                    # Check if search term is in item name
+                    if search_term in item_name_ar or search_term in item_name_en:
+                        return {
+                            "menu_item_id": item.id,
+                            "name": item.name_ar or item.name,
+                            "price": float(item.price) if item.price else 0.0,
+                            "quantity": 1,
+                            "restaurant_id": restaurant_id
+                        }
+
+                # Try partial match
+                for item in menu_items:
+                    item_name_ar = (item.name_ar or "").lower()
+                    item_name_en = (item.name or "").lower()
+
+                    # Check for partial match
+                    search_words = search_term.split()
+                    for word in search_words:
+                        if len(word) > 2 and (word in item_name_ar or word in item_name_en):
+                            return {
+                                "menu_item_id": item.id,
+                                "name": item.name_ar or item.name,
+                                "price": float(item.price) if item.price else 0.0,
+                                "quantity": 1,
+                                "restaurant_id": restaurant_id
+                            }
+        except Exception as e:
+            logger.error(f"Error finding item by name: {e}")
         return None
 
     # ==================== One-Shot Order Feature ====================
