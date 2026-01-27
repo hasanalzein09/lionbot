@@ -1757,21 +1757,29 @@ https://maps.google.com/?q={lat},{lng}
                 if len(by_restaurant[rest]) < 3:  # Max 3 per restaurant
                     by_restaurant[rest].append(s)
 
-            # Build interactive list
+            # Build interactive list (max 9 rows total for WhatsApp limit)
             sections = []
-            for rest_name, items in list(by_restaurant.items())[:3]:  # Max 3 restaurants
+            total_rows = 0
+            MAX_ROWS = 9
+            for rest_name, items in list(by_restaurant.items()):
+                if total_rows >= MAX_ROWS:
+                    break
                 rows = []
                 for item in items:
+                    if total_rows >= MAX_ROWS:
+                        break
                     price_str = f"${item['price']:.2f}" if item['price'] else ""
                     rows.append({
                         "id": f"item_{item['id']}",
                         "title": item["name"][:24],
                         "description": f"💰 {price_str}" if price_str else ""
                     })
-                sections.append({
-                    "title": rest_name[:24],
-                    "rows": rows
-                })
+                    total_rows += 1
+                if rows:
+                    sections.append({
+                        "title": rest_name[:24],
+                        "rows": rows
+                    })
 
             header = f"🤔 ما لقيت '{original_text}' بالضبط\n\n"
             header += "💡 بس ممكن تقصد:" if lang == "ar" else "Did you mean:"
@@ -1855,7 +1863,7 @@ https://maps.google.com/?q={lat},{lng}
         # Build header message
         header = ai_message or f"🔥 لقيتلك {len(restaurants)} مطعم عندهم {product}!"
         
-        # Build interactive list
+        # Build interactive list (max 9 rows for WhatsApp limit)
         sections = [{
             "title": f"🏪 مطاعم فيها {product}"[:24] if lang == "ar" else f"Restaurants with {product}"[:24],
             "rows": [
@@ -1864,7 +1872,7 @@ https://maps.google.com/?q={lat},{lng}
                     "title": r['name'][:24],
                     "description": f"{r.get('items_count', '')} أصناف متوفرة" if r.get('items_count') else ""
                 }
-                for r in restaurants[:10]
+                for r in restaurants[:9]
             ]
         }]
         
@@ -1902,7 +1910,7 @@ https://maps.google.com/?q={lat},{lng}
                     "title": r['name'][:24],
                     "description": ""
                 }
-                for r in restaurants[:10]
+                for r in restaurants[:9]
             ]
         }]
         
@@ -2743,21 +2751,29 @@ https://maps.google.com/?q={lat},{lng}
                     by_restaurant[rest] = []
                 by_restaurant[rest].append(item)
 
-            # Build interactive list
+            # Build interactive list (max 9 rows total for WhatsApp limit)
             sections = []
-            for rest_name, items in list(by_restaurant.items())[:3]:
+            total_rows = 0
+            MAX_ROWS = 9
+            for rest_name, items in list(by_restaurant.items()):
+                if total_rows >= MAX_ROWS:
+                    break
                 rows = []
-                for item in items[:4]:
+                for item in items:
+                    if total_rows >= MAX_ROWS:
+                        break
                     price_str = f"${item['price']:.2f}" if item['price'] else ""
                     rows.append({
                         "id": f"item_{item['id']}",
                         "title": item["name"][:24],
                         "description": f"💰 {price_str}" if price_str else ""
                     })
-                sections.append({
-                    "title": rest_name[:24],
-                    "rows": rows
-                })
+                    total_rows += 1
+                if rows:
+                    sections.append({
+                        "title": rest_name[:24],
+                        "rows": rows
+                    })
 
             if sections:
                 await whatsapp_service.send_interactive_list(
