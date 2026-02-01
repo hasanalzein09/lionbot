@@ -83,6 +83,25 @@ class BotController:
             return
         logger.debug(f"Text Body: {text}")
 
+        # Handle numbered menu states FIRST (before restart check catches "0")
+        if state == "BROWSING_NUMBERED_MENU":
+            await self._handle_numbered_menu_input(phone_number, text, lang, user_data)
+            return
+
+        if state == "AWAITING_NUMBERED_QUANTITY":
+            if text.strip().isdigit():
+                await self._handle_numbered_quantity(phone_number, int(text.strip()), lang, user_data)
+                return
+            # Non-numeric input in quantity state
+            if text.lower() in ["start", "restart", "بداية", "ابدأ", "menu", "قائمة"]:
+                await self._send_language_selection(phone_number)
+                return
+            await whatsapp_service.send_text(
+                phone_number,
+                "اكتب العدد فقط 🔢" if lang == "ar" else "Type the quantity number 🔢"
+            )
+            return
+
         # Check for restart commands
         if text.lower() in ["start", "restart", "بداية", "ابدأ", "0", "menu", "قائمة"]:
             await self._send_language_selection(phone_number)
@@ -363,9 +382,6 @@ class BotController:
         elif list_id == "reorder":
             await self._show_previous_orders(phone_number, lang)
 
-        elif list_id == "loyalty":
-            await self._show_loyalty_status(phone_number, lang)
-
         elif list_id == "favorites":
             await self._show_favorites(phone_number, lang)
 
@@ -533,20 +549,6 @@ class BotController:
         cart_count = await redis_service.get_cart_count(phone_number)
         cart_text = f" ({cart_count})" if cart_count > 0 else ""
 
-        # Get loyalty points for display
-        points_text = ""
-        async with AsyncSessionLocal() as db:
-            from app.models.loyalty import CustomerLoyalty
-            result = await db.execute(select(User).where(User.phone_number == phone_number))
-            user = result.scalars().first()
-            if user:
-                loyalty_result = await db.execute(
-                    select(CustomerLoyalty).where(CustomerLoyalty.user_id == user.id)
-                )
-                loyalty = loyalty_result.scalars().first()
-                if loyalty and loyalty.available_points > 0:
-                    points_text = f" ({loyalty.available_points})"
-
         # Use Interactive List for more options
         welcome_msg = "🦁 أهلاً فيك!\nشو بدك تعمل؟" if lang == "ar" else "🦁 Welcome!\nWhat would you like to do?"
 
@@ -567,11 +569,6 @@ class BotController:
                     "id": "reorder",
                     "title": get_text("btn_reorder", lang)[:24],
                     "description": "أعد طلبك السابق بسرعة" if lang == "ar" else "Quickly reorder previous"
-                },
-                {
-                    "id": "loyalty",
-                    "title": f"{get_text('btn_loyalty', lang)}{points_text}"[:24],
-                    "description": "اعرف رصيدك ومستواك" if lang == "ar" else "Check points & tier"
                 },
                 {
                     "id": "favorites",
@@ -1415,12 +1412,6 @@ class BotController:
 
             # Notify restaurant
             await self._notify_restaurant(order, cart, lat, lng)
-
-            # Award loyalty points
-            try:
-                await self._award_loyalty_points(phone_number, order, lang)
-            except Exception as e:
-                logger.error(f"Failed to award loyalty points: {e}")
 
             # Check if should suggest favorite
             try:
@@ -2479,6 +2470,173 @@ https://maps.google.com/?q={lat},{lng}
                 "restaurant_id": restaurant_id
             })
 
+    # ==================== Numbered Menu Ordering ====================
+    async def _handle_numbered_menu_input(self, phone_number: str, text: str, lang: str, user_data: dict):
+        """Handle text input when user is browsing a numbered menu"""
+        items_map = user_data.get("items_map", {})
+        restaurant_id = user_data.get("restaurant_id")
+        restaurant_name = user_data.get("restaurant_name", "")
+
+        # Check for cart/order commands
+        if text.lower() in ["طلب", "order", "سلة", "cart", "checkout"]:
+            await self._show_cart(phone_number, lang)
+            return
+
+        # Check for restart commands
+        if text.lower() in ["start", "restart", "بداية", "ابدأ", "0", "menu", "قائمة"]:
+            await self._send_language_selection(phone_number)
+            return
+
+        # Parse numbers from input: "1 3", "1,3", "1 و 3", "1+3", etc.
+        import re
+        numbers = re.findall(r'\d+', text)
+
+        if not numbers:
+            await whatsapp_service.send_text(
+                phone_number,
+                "اكتب أرقام الأصناف (مثلاً: 1 3) 🔢" if lang == "ar" else "Type item numbers (e.g.: 1 3) 🔢"
+            )
+            return
+
+        # Validate all numbers exist in items_map
+        valid_selections = []
+        invalid_nums = []
+        for num in numbers:
+            if num in items_map:
+                valid_selections.append(items_map[num])
+            else:
+                invalid_nums.append(num)
+
+        if invalid_nums and not valid_selections:
+            max_num = max(int(k) for k in items_map.keys()) if items_map else 0
+            await whatsapp_service.send_text(
+                phone_number,
+                f"أرقام غير صحيحة 🤔 اختار من 1 لـ {max_num}" if lang == "ar"
+                else f"Invalid numbers 🤔 Choose from 1 to {max_num}"
+            )
+            return
+
+        if invalid_nums:
+            await whatsapp_service.send_text(
+                phone_number,
+                f"⚠️ الأرقام {', '.join(invalid_nums)} غير موجودة، تم تجاهلها" if lang == "ar"
+                else f"⚠️ Numbers {', '.join(invalid_nums)} not found, skipped"
+            )
+
+        # Start asking quantity for each selected item
+        if len(valid_selections) == 1:
+            # Single item - ask quantity directly
+            selected = valid_selections[0]
+            msg = f"✅ *{selected['name']}* - ${selected['price']:.2f}\n\n"
+            msg += "كم واحد بدك؟ 🔢" if lang == "ar" else "How many? 🔢"
+            await whatsapp_service.send_text(phone_number, msg)
+            await redis_service.set_user_state(phone_number, "AWAITING_NUMBERED_QUANTITY", {
+                "lang": lang,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+                "items_map": items_map,
+                "selected_item": selected,
+                "pending_items": [],  # No more items pending
+            })
+        else:
+            # Multiple items - ask quantity for the first, queue the rest
+            first = valid_selections[0]
+            remaining = valid_selections[1:]
+            msg = f"✅ *{first['name']}* - ${first['price']:.2f}\n\n"
+            msg += "كم واحد بدك؟ 🔢" if lang == "ar" else "How many? 🔢"
+            await whatsapp_service.send_text(phone_number, msg)
+            await redis_service.set_user_state(phone_number, "AWAITING_NUMBERED_QUANTITY", {
+                "lang": lang,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+                "items_map": items_map,
+                "selected_item": first,
+                "pending_items": remaining,
+            })
+
+    async def _handle_numbered_quantity(self, phone_number: str, quantity: int, lang: str, user_data: dict):
+        """Handle quantity input after item selection from numbered menu"""
+        selected_item = user_data.get("selected_item")
+        restaurant_id = user_data.get("restaurant_id")
+        restaurant_name = user_data.get("restaurant_name", "")
+        items_map = user_data.get("items_map", {})
+        pending_items = user_data.get("pending_items", [])
+
+        if not selected_item:
+            await whatsapp_service.send_text(phone_number, "حصل خطأ، جرب كمان مرة 🤔")
+            await self._send_main_menu(phone_number, lang)
+            return
+
+        if quantity < 1 or quantity > 99:
+            await whatsapp_service.send_text(
+                phone_number,
+                "اكتب عدد بين 1 و 99 ☝️" if lang == "ar" else "Enter a number between 1 and 99 ☝️"
+            )
+            return
+
+        item_name = selected_item["name"]
+        item_price = selected_item["price"]
+        menu_item_id = selected_item["menu_item_id"]
+        variant_id = selected_item.get("variant_id")
+
+        # Build cart item
+        cart_item = {
+            "menu_item_id": menu_item_id,
+            "name": item_name,
+            "price": item_price,
+            "quantity": quantity,
+            "restaurant_id": restaurant_id
+        }
+        if variant_id:
+            cart_item["variant_id"] = variant_id
+
+        await redis_service.add_to_cart(phone_number, cart_item)
+
+        # Get cart info
+        cart_count = await redis_service.get_cart_count(phone_number)
+
+        if pending_items:
+            # More items to process - ask quantity for next one
+            next_item = pending_items[0]
+            rest_pending = pending_items[1:]
+
+            if lang == "ar":
+                msg = f"✅ {quantity}x {item_name}\n\n"
+                msg += f"*{next_item['name']}* - ${next_item['price']:.2f}\n"
+                msg += "كم واحد بدك؟ 🔢"
+            else:
+                msg = f"✅ {quantity}x {item_name}\n\n"
+                msg += f"*{next_item['name']}* - ${next_item['price']:.2f}\n"
+                msg += "How many? 🔢"
+
+            await whatsapp_service.send_text(phone_number, msg)
+            await redis_service.set_user_state(phone_number, "AWAITING_NUMBERED_QUANTITY", {
+                "lang": lang,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+                "items_map": items_map,
+                "selected_item": next_item,
+                "pending_items": rest_pending,
+            })
+        else:
+            # All items added - show confirmation and go back to menu state
+            if lang == "ar":
+                msg = f"✅ {quantity}x {item_name}\n"
+                msg += f"🛒 السلة: {cart_count} أصناف\n\n"
+                msg += "اكتب أرقام أصناف تانية أو *طلب* للإكمال 👆"
+            else:
+                msg = f"✅ {quantity}x {item_name}\n"
+                msg += f"🛒 Cart: {cart_count} items\n\n"
+                msg += "Type more item numbers or *order* to checkout 👆"
+
+            await whatsapp_service.send_text(phone_number, msg)
+            await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
+                "lang": lang,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+                "items_map": items_map
+            })
+
     # ==================== Menu Request Feature ====================
     async def _handle_menu_request(self, phone_number: str, ai_result: dict, lang: str):
         """Handle request to see a restaurant's full menu"""
@@ -2556,9 +2714,12 @@ https://maps.google.com/?q={lat},{lng}
                 )
                 return
 
-            # Build menu text
+            # Build numbered menu text and items map
+            from app.models.menu import MenuItemVariant
             menu_text = f"📋 *مانيو {rest_name}*\n"
             menu_text += "=" * 25 + "\n\n"
+            items_map = {}  # number -> item info for ordering
+            item_num = 0
 
             for category in categories:
                 cat_name = category.name_ar if lang == "ar" and category.name_ar else category.name
@@ -2572,40 +2733,68 @@ https://maps.google.com/?q={lat},{lng}
                 for item in available_items:
                     item_name = item.name_ar if lang == "ar" and item.name_ar else item.name
 
-                    # Handle price display
                     if hasattr(item, 'has_variants') and item.has_variants:
-                        # Get variants for price range
-                        from app.models.menu import MenuItemVariant
                         variants_result = await db.execute(
                             select(MenuItemVariant)
                             .where(MenuItemVariant.menu_item_id == item.id)
-                            .order_by(MenuItemVariant.price)
+                            .order_by(MenuItemVariant.order)
                         )
                         variants = variants_result.scalars().all()
                         if variants:
-                            min_price = float(min(v.price for v in variants))
-                            max_price = float(max(v.price for v in variants))
-                            if min_price == max_price:
-                                price_str = f"${min_price:.2f}"
-                            else:
-                                price_str = f"${min_price:.2f}-${max_price:.2f}"
+                            for v in variants:
+                                item_num += 1
+                                v_name = v.name_ar if lang == 'ar' and v.name_ar else v.name
+                                price = float(v.price)
+                                display_name = f"{item_name} ({v_name})"
+                                menu_text += f"  {item_num}. {display_name} - ${price:.2f}\n"
+                                items_map[str(item_num)] = {
+                                    "menu_item_id": item.id,
+                                    "variant_id": v.id,
+                                    "name": display_name,
+                                    "price": price,
+                                    "restaurant_id": restaurant_id
+                                }
                         else:
-                            price_str = "سعر متغير"
-                    elif item.price:
-                        price_str = f"${float(item.price):.2f}"
+                            item_num += 1
+                            price = float(item.price) if item.price else 0.0
+                            menu_text += f"  {item_num}. {item_name} - ${price:.2f}\n"
+                            items_map[str(item_num)] = {
+                                "menu_item_id": item.id,
+                                "variant_id": None,
+                                "name": item_name,
+                                "price": price,
+                                "restaurant_id": restaurant_id
+                            }
                     else:
-                        price_str = "-"
-
-                    menu_text += f"  • {item_name} - {price_str}\n"
+                        item_num += 1
+                        price = float(item.price) if item.price else 0.0
+                        price_str = f"${price:.2f}" if price > 0 else "-"
+                        menu_text += f"  {item_num}. {item_name} - {price_str}\n"
+                        items_map[str(item_num)] = {
+                            "menu_item_id": item.id,
+                            "variant_id": None,
+                            "name": item_name,
+                            "price": price,
+                            "restaurant_id": restaurant_id
+                        }
 
                 menu_text += "\n"
 
+            # Add instruction footer
+            if lang == "ar":
+                menu_text += "اكتب أرقام الأصناف يلي بدك ياها (مثلاً: 1 3) 👆\n"
+                menu_text += "أو اكتب *طلب* لعرض السلة 🛒"
+            else:
+                menu_text += "Type item numbers you want (e.g.: 1 3) 👆\n"
+                menu_text += "Or type *order* to view cart 🛒"
+
             # WhatsApp has a 4096 character limit, split if needed
             if len(menu_text) > 4000:
-                # Split into chunks
+                # Split into chunks by category sections
                 chunks = []
                 current_chunk = f"📋 *مانيو {rest_name}* (1)\n" + "=" * 25 + "\n\n"
                 chunk_num = 1
+                renumber = 0
 
                 for category in categories:
                     cat_name = category.name_ar if lang == "ar" and category.name_ar else category.name
@@ -2617,11 +2806,22 @@ https://maps.google.com/?q={lat},{lng}
                     cat_text = f"🔸 *{cat_name}*\n"
                     for item in available_items:
                         item_name = item.name_ar if lang == "ar" and item.name_ar else item.name
-                        if item.price:
-                            price_str = f"${float(item.price):.2f}"
+                        if hasattr(item, 'has_variants') and item.has_variants:
+                            v_result = await db.execute(
+                                select(MenuItemVariant)
+                                .where(MenuItemVariant.menu_item_id == item.id)
+                                .order_by(MenuItemVariant.order)
+                            )
+                            vrnts = v_result.scalars().all()
+                            for v in vrnts:
+                                renumber += 1
+                                v_name = v.name_ar if lang == 'ar' and v.name_ar else v.name
+                                cat_text += f"  {renumber}. {item_name} ({v_name}) - ${float(v.price):.2f}\n"
                         else:
-                            price_str = "-"
-                        cat_text += f"  • {item_name} - {price_str}\n"
+                            renumber += 1
+                            price = float(item.price) if item.price else 0.0
+                            price_str = f"${price:.2f}" if price > 0 else "-"
+                            cat_text += f"  {renumber}. {item_name} - {price_str}\n"
                     cat_text += "\n"
 
                     if len(current_chunk) + len(cat_text) > 3800:
@@ -2631,26 +2831,29 @@ https://maps.google.com/?q={lat},{lng}
 
                     current_chunk += cat_text
 
+                # Add footer to last chunk
+                if lang == "ar":
+                    current_chunk += "اكتب أرقام الأصناف يلي بدك ياها (مثلاً: 1 3) 👆\n"
+                    current_chunk += "أو اكتب *طلب* لعرض السلة 🛒"
+                else:
+                    current_chunk += "Type item numbers you want (e.g.: 1 3) 👆\n"
+                    current_chunk += "Or type *order* to view cart 🛒"
+
                 if current_chunk.strip():
                     chunks.append(current_chunk)
 
-                # Send all chunks
                 for chunk in chunks:
                     await whatsapp_service.send_text(phone_number, chunk)
             else:
                 await whatsapp_service.send_text(phone_number, menu_text)
 
-            # Ask if they want to order
-            await whatsapp_service.send_interactive_buttons(
-                phone_number,
-                "بدك تطلب شي من هالمطعم؟ 🍽️" if lang == "ar" else "Would you like to order from this restaurant?",
-                [
-                    {"id": f"rest_{restaurant_id}", "title": "نعم، اختار 👍" if lang == "ar" else "Yes, browse"},
-                    {"id": "show_restaurants", "title": "لا، مطعم تاني 🔙" if lang == "ar" else "No, another"}
-                ]
-            )
-
-            await redis_service.set_user_state(phone_number, "MAIN_MENU", {"lang": lang})
+            # Store items map in Redis and set state for numbered ordering
+            await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
+                "lang": lang,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": rest_name,
+                "items_map": items_map
+            })
 
     # ==================== Description Search Feature ====================
     async def _handle_description_search(self, phone_number: str, ai_result: dict, lang: str):
@@ -3288,9 +3491,6 @@ https://maps.google.com/?q={lat},{lng}
 
         if rating >= 4:
             await whatsapp_service.send_text(phone_number, get_text("thanks_for_review", lang))
-            # Award bonus points
-            bonus_msg = get_text("review_bonus", lang).format(points=10)
-            await whatsapp_service.send_text(phone_number, bonus_msg)
         else:
             await whatsapp_service.send_text(phone_number, get_text("sorry_bad_experience", lang))
 
