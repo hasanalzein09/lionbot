@@ -2624,11 +2624,11 @@ https://maps.google.com/?q={lat},{lng}
             if lang == "ar":
                 msg = f"✅ {quantity}x {item_name}\n"
                 msg += f"🛒 السلة: {cart_count} أصناف\n\n"
-                msg += "اكتب أرقام أصناف تانية أو *طلب* للإكمال 👆"
+                msg += "اكتب أرقام أصناف تانية، أو اكتب *تم* إذا بس بدك هيدول 👆"
             else:
                 msg = f"✅ {quantity}x {item_name}\n"
                 msg += f"🛒 Cart: {cart_count} items\n\n"
-                msg += "Type more item numbers or *order* to checkout 👆"
+                msg += "Type more item numbers, or type *done* if that's all you want 👆"
 
             await whatsapp_service.send_text(phone_number, msg)
             await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
