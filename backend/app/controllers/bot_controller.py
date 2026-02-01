@@ -550,7 +550,7 @@ class BotController:
         cart_text = f" ({cart_count})" if cart_count > 0 else ""
 
         # Use Interactive List for more options
-        welcome_msg = "🦁 أهلاً فيك!\nشو بدك تعمل؟" if lang == "ar" else "🦁 Welcome!\nWhat would you like to do?"
+        welcome_msg = "🦁 أهلا وسهلا، شو بتحب تاكل؟\nدوام العمل من 9 صباحاً لـ 1 بالليل" if lang == "ar" else "🦁 Welcome! What would you like to eat?\nWorking hours: 9 AM to 1 AM"
 
         sections = [{
             "title": "القائمة الرئيسية" if lang == "ar" else "Main Menu",
@@ -2789,64 +2789,8 @@ https://maps.google.com/?q={lat},{lng}
                 menu_text += "Type item numbers you want (e.g.: 1 3) 👆\n"
                 menu_text += "Or type *order* to view cart 🛒"
 
-            # Split menu into smaller chunks for better WhatsApp readability
-            # Use 1500 char limit so messages don't collapse with "Read more"
-            MAX_CHUNK = 1500
-            if len(menu_text) > MAX_CHUNK:
-                chunks = []
-                current_chunk = f"📋 *مانيو {rest_name}* (1)\n" + "=" * 25 + "\n\n"
-                chunk_num = 1
-                renumber = 0
-
-                for category in categories:
-                    cat_name = category.name_ar if lang == "ar" and category.name_ar else category.name
-                    available_items = [item for item in category.items if item.is_available]
-
-                    if not available_items:
-                        continue
-
-                    cat_text = f"🔸 *{cat_name}*\n"
-                    for item in available_items:
-                        item_name = item.name_ar if lang == "ar" and item.name_ar else item.name
-                        if hasattr(item, 'has_variants') and item.has_variants:
-                            v_result = await db.execute(
-                                select(MenuItemVariant)
-                                .where(MenuItemVariant.menu_item_id == item.id)
-                                .order_by(MenuItemVariant.order)
-                            )
-                            vrnts = v_result.scalars().all()
-                            for v in vrnts:
-                                renumber += 1
-                                v_name = v.name_ar if lang == 'ar' and v.name_ar else v.name
-                                cat_text += f"  {renumber}. {item_name} ({v_name}) - ${float(v.price):.2f}\n"
-                        else:
-                            renumber += 1
-                            price = float(item.price) if item.price else 0.0
-                            price_str = f"${price:.2f}" if price > 0 else "-"
-                            cat_text += f"  {renumber}. {item_name} - {price_str}\n"
-                    cat_text += "\n"
-
-                    if len(current_chunk) + len(cat_text) > MAX_CHUNK:
-                        chunks.append(current_chunk)
-                        chunk_num += 1
-                        current_chunk = f"📋 *مانيو {rest_name}* ({chunk_num})\n" + "=" * 25 + "\n\n"
-
-                    current_chunk += cat_text
-
-                if current_chunk.strip():
-                    chunks.append(current_chunk)
-
-                for chunk in chunks:
-                    await whatsapp_service.send_text(phone_number, chunk)
-            else:
-                await whatsapp_service.send_text(phone_number, menu_text)
-
-            # Send footer as separate message so it's always visible
-            if lang == "ar":
-                footer = "اكتب أرقام الأصناف يلي بدك ياها (مثلاً: 1 3) 👆\nأو اكتب *تم* للإكمال 🛒"
-            else:
-                footer = "Type item numbers you want (e.g.: 1 3) 👆\nOr type *done* to checkout 🛒"
-            await whatsapp_service.send_text(phone_number, footer)
+            # Send full menu as one message
+            await whatsapp_service.send_text(phone_number, menu_text)
 
             # Store items map in Redis and set state for numbered ordering
             await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
