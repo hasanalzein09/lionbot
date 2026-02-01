@@ -2477,8 +2477,9 @@ https://maps.google.com/?q={lat},{lng}
         restaurant_id = user_data.get("restaurant_id")
         restaurant_name = user_data.get("restaurant_name", "")
 
-        # Check for cart/order commands
-        if text.lower() in ["طلب", "order", "سلة", "cart", "checkout"]:
+        # Check for cart/order/done commands
+        done_words = ["طلب", "order", "سلة", "cart", "checkout", "done", "bas", "بس", "خلص", "تم", "كفي", "خلصت", "finish", "ok", "اوك", "tamam", "تمام", "enough", "yalla", "يلا"]
+        if text.lower().strip() in done_words:
             await self._show_cart(phone_number, lang)
             return
 
@@ -2788,9 +2789,10 @@ https://maps.google.com/?q={lat},{lng}
                 menu_text += "Type item numbers you want (e.g.: 1 3) 👆\n"
                 menu_text += "Or type *order* to view cart 🛒"
 
-            # WhatsApp has a 4096 character limit, split if needed
-            if len(menu_text) > 4000:
-                # Split into chunks by category sections
+            # Split menu into smaller chunks for better WhatsApp readability
+            # Use 1500 char limit so messages don't collapse with "Read more"
+            MAX_CHUNK = 1500
+            if len(menu_text) > MAX_CHUNK:
                 chunks = []
                 current_chunk = f"📋 *مانيو {rest_name}* (1)\n" + "=" * 25 + "\n\n"
                 chunk_num = 1
@@ -2824,20 +2826,12 @@ https://maps.google.com/?q={lat},{lng}
                             cat_text += f"  {renumber}. {item_name} - {price_str}\n"
                     cat_text += "\n"
 
-                    if len(current_chunk) + len(cat_text) > 3800:
+                    if len(current_chunk) + len(cat_text) > MAX_CHUNK:
                         chunks.append(current_chunk)
                         chunk_num += 1
                         current_chunk = f"📋 *مانيو {rest_name}* ({chunk_num})\n" + "=" * 25 + "\n\n"
 
                     current_chunk += cat_text
-
-                # Add footer to last chunk
-                if lang == "ar":
-                    current_chunk += "اكتب أرقام الأصناف يلي بدك ياها (مثلاً: 1 3) 👆\n"
-                    current_chunk += "أو اكتب *طلب* لعرض السلة 🛒"
-                else:
-                    current_chunk += "Type item numbers you want (e.g.: 1 3) 👆\n"
-                    current_chunk += "Or type *order* to view cart 🛒"
 
                 if current_chunk.strip():
                     chunks.append(current_chunk)
@@ -2846,6 +2840,13 @@ https://maps.google.com/?q={lat},{lng}
                     await whatsapp_service.send_text(phone_number, chunk)
             else:
                 await whatsapp_service.send_text(phone_number, menu_text)
+
+            # Send footer as separate message so it's always visible
+            if lang == "ar":
+                footer = "اكتب أرقام الأصناف يلي بدك ياها (مثلاً: 1 3) 👆\nأو اكتب *تم* للإكمال 🛒"
+            else:
+                footer = "Type item numbers you want (e.g.: 1 3) 👆\nOr type *done* to checkout 🛒"
+            await whatsapp_service.send_text(phone_number, footer)
 
             # Store items map in Redis and set state for numbered ordering
             await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
