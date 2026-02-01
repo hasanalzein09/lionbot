@@ -2478,7 +2478,7 @@ https://maps.google.com/?q={lat},{lng}
         restaurant_name = user_data.get("restaurant_name", "")
 
         # Check for cart/order/done commands
-        done_words = ["طلب", "order", "سلة", "cart", "checkout", "done", "bas", "بس", "خلص", "تم", "كفي", "خلصت", "finish", "ok", "اوك", "tamam", "تمام", "enough", "yalla", "يلا"]
+        done_words = ["طلب", "order", "سلة", "cart", "checkout", "done", "bas", "بس", "خلص", "تم", "كفي", "خلصت", "finish", "ok", "اوك", "tam", "tamam", "تمام", "enough", "yalla", "يلا"]
         if text.lower().strip() in done_words:
             await self._show_cart(phone_number, lang)
             return
