@@ -2493,10 +2493,8 @@ https://maps.google.com/?q={lat},{lng}
         numbers = re.findall(r'\d+', text)
 
         if not numbers:
-            await whatsapp_service.send_text(
-                phone_number,
-                "اكتب أرقام الأصناف (مثلاً: 1 3) 🔢" if lang == "ar" else "Type item numbers (e.g.: 1 3) 🔢"
-            )
+            # No numbers found - pass to AI for natural language processing
+            await self._process_ai_order(phone_number, text, lang, user_data)
             return
 
         # Validate all numbers exist in items_map
