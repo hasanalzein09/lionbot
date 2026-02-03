@@ -92,14 +92,9 @@ class BotController:
             if text.strip().isdigit():
                 await self._handle_numbered_quantity(phone_number, int(text.strip()), lang, user_data)
                 return
-            # Non-numeric input in quantity state
-            if text.lower() in ["start", "restart", "بداية", "ابدأ", "menu", "قائمة"]:
-                await self._send_language_selection(phone_number)
-                return
-            await whatsapp_service.send_text(
-                phone_number,
-                "اكتب العدد فقط 🔢" if lang == "ar" else "Type the quantity number 🔢"
-            )
+            # Non-numeric input in quantity state - route back to menu handler
+            # This lets AI handle things like "la sheel", "bde men mat3am tene", etc.
+            await self._handle_numbered_menu_input(phone_number, text, lang, user_data)
             return
 
         # Check for restart commands
@@ -1594,6 +1589,15 @@ https://maps.google.com/?q={lat},{lng}
 
         # Track AI usage for analytics
         await redis_service.track_ai_usage(phone_number, intent, ai_result.get("success", False))
+
+        # Handle sentiment
+        sentiment = ai_result.get("sentiment", "neutral")
+        if sentiment == "negative":
+            sorry_msg = "نعتذر عن أي إزعاج! 🙏 إذا بدك تحكي مع الإدارة اتصل على 71234567" if lang == "ar" else "We apologize for any inconvenience! 🙏 Contact management at 71234567"
+            await whatsapp_service.send_text(phone_number, sorry_msg)
+        elif sentiment == "positive":
+            thanks_msg = "شكراً لطيبتك! 😊🦁" if lang == "ar" else "Thank you! 😊🦁"
+            await whatsapp_service.send_text(phone_number, thanks_msg)
         
         # Handle different intents
         if intent == "search_product":
@@ -2488,44 +2492,112 @@ https://maps.google.com/?q={lat},{lng}
             await self._send_language_selection(phone_number)
             return
 
-        # Parse numbers from input: "1 3", "1,3", "1 و 3", "1+3", etc.
+        # Check if input is purely numbers (1 3, 1,3, 1+3, 1 و 3)
         import re
-        numbers = re.findall(r'\d+', text)
+        clean = re.sub(r'[\s,،وw+]+', '', text)
+        if clean.isdigit():
+            # Pure number input - use direct number matching
+            numbers = re.findall(r'\d+', text)
 
-        if not numbers:
-            # No numbers found - pass to AI for natural language processing
-            await self._process_ai_order(phone_number, text, lang, user_data)
-            return
+            # Validate all numbers exist in items_map
+            valid_selections = []
+            invalid_nums = []
+            for num in numbers:
+                if num in items_map:
+                    valid_selections.append(items_map[num])
+                else:
+                    invalid_nums.append(num)
 
-        # Validate all numbers exist in items_map
-        valid_selections = []
-        invalid_nums = []
-        for num in numbers:
-            if num in items_map:
-                valid_selections.append(items_map[num])
+            if invalid_nums and not valid_selections:
+                max_num = max(int(k) for k in items_map.keys()) if items_map else 0
+                await whatsapp_service.send_text(
+                    phone_number,
+                    f"أرقام غير صحيحة 🤔 اختار من 1 لـ {max_num}" if lang == "ar"
+                    else f"Invalid numbers 🤔 Choose from 1 to {max_num}"
+                )
+                return
+
+            if invalid_nums:
+                await whatsapp_service.send_text(
+                    phone_number,
+                    f"⚠️ الأرقام {', '.join(invalid_nums)} غير موجودة، تم تجاهلها" if lang == "ar"
+                    else f"⚠️ Numbers {', '.join(invalid_nums)} not found, skipped"
+                )
+        else:
+            # Text input (with or without numbers) - use AI to match against menu
+            ai_result = await self._match_menu_with_ai(text, items_map, restaurant_name, lang)
+
+            if ai_result.get("action") == "order" and ai_result.get("items"):
+                # AI matched items from the menu
+                valid_selections = []
+                for ai_item in ai_result["items"]:
+                    num_str = str(ai_item.get("number", ""))
+                    qty = ai_item.get("quantity", 1)
+                    if num_str in items_map:
+                        item_data = dict(items_map[num_str])
+                        if qty > 1:
+                            item_data["_ai_quantity"] = qty
+                        valid_selections.append(item_data)
+
+                if not valid_selections:
+                    await whatsapp_service.send_text(
+                        phone_number,
+                        "ما لقيت هالصنف بالمنيو 🤔\nاكتب رقم الصنف أو اسمو" if lang == "ar"
+                        else "Couldn't find that item 🤔\nType the item number or name"
+                    )
+                    return
+            elif ai_result.get("action") == "leave":
+                # User wants to leave menu - pass to general AI
+                await self._process_ai_order(phone_number, text, lang, user_data)
+                return
             else:
-                invalid_nums.append(num)
+                await whatsapp_service.send_text(
+                    phone_number,
+                    "ما لقيت هالصنف بالمنيو 🤔\nاكتب رقم الصنف أو اسمو" if lang == "ar"
+                    else "Couldn't find that item 🤔\nType the item number or name"
+                )
+                return
 
-        if invalid_nums and not valid_selections:
-            max_num = max(int(k) for k in items_map.keys()) if items_map else 0
-            await whatsapp_service.send_text(
-                phone_number,
-                f"أرقام غير صحيحة 🤔 اختار من 1 لـ {max_num}" if lang == "ar"
-                else f"Invalid numbers 🤔 Choose from 1 to {max_num}"
-            )
+        # Check if AI provided quantities - add directly without asking
+        ai_has_quantities = any(item.get("_ai_quantity") for item in valid_selections)
+        if ai_has_quantities:
+            # AI provided quantities - add all items directly
+            for selected in valid_selections:
+                qty = selected.pop("_ai_quantity", 1)
+                cart_item = {
+                    "menu_item_id": selected["menu_item_id"],
+                    "name": selected["name"],
+                    "price": selected["price"],
+                    "quantity": qty,
+                    "restaurant_id": restaurant_id
+                }
+                if selected.get("variant_id"):
+                    cart_item["variant_id"] = selected["variant_id"]
+                await redis_service.add_to_cart(phone_number, cart_item)
+
+            cart_count = await redis_service.get_cart_count(phone_number)
+            names = ", ".join(f"{s.get('_ai_quantity', 1) if '_ai_quantity' in s else qty}x {s['name']}" for s in valid_selections)
+            if lang == "ar":
+                msg = f"✅ تمت الإضافة\n🛒 السلة: {cart_count} أصناف\n\n"
+                msg += "اكتب أرقام أصناف تانية، أو اكتب *تم* إذا بس بدك هيدول 👆"
+            else:
+                msg = f"✅ Added to cart\n🛒 Cart: {cart_count} items\n\n"
+                msg += "Type more item numbers, or type *done* if that's all you want 👆"
+
+            await whatsapp_service.send_text(phone_number, msg)
+            await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
+                "lang": lang,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+                "items_map": items_map
+            })
             return
-
-        if invalid_nums:
-            await whatsapp_service.send_text(
-                phone_number,
-                f"⚠️ الأرقام {', '.join(invalid_nums)} غير موجودة، تم تجاهلها" if lang == "ar"
-                else f"⚠️ Numbers {', '.join(invalid_nums)} not found, skipped"
-            )
 
         # Start asking quantity for each selected item
         if len(valid_selections) == 1:
             # Single item - ask quantity directly
             selected = valid_selections[0]
+            selected.pop("_ai_quantity", None)
             msg = f"✅ *{selected['name']}* - ${selected['price']:.2f}\n\n"
             msg += "كم واحد بدك؟ 🔢" if lang == "ar" else "How many? 🔢"
             await whatsapp_service.send_text(phone_number, msg)
@@ -2535,12 +2607,15 @@ https://maps.google.com/?q={lat},{lng}
                 "restaurant_name": restaurant_name,
                 "items_map": items_map,
                 "selected_item": selected,
-                "pending_items": [],  # No more items pending
+                "pending_items": [],
             })
         else:
             # Multiple items - ask quantity for the first, queue the rest
             first = valid_selections[0]
+            first.pop("_ai_quantity", None)
             remaining = valid_selections[1:]
+            for r in remaining:
+                r.pop("_ai_quantity", None)
             msg = f"✅ *{first['name']}* - ${first['price']:.2f}\n\n"
             msg += "كم واحد بدك؟ 🔢" if lang == "ar" else "How many? 🔢"
             await whatsapp_service.send_text(phone_number, msg)
@@ -2629,12 +2704,124 @@ https://maps.google.com/?q={lat},{lng}
                 msg += "Type more item numbers, or type *done* if that's all you want 👆"
 
             await whatsapp_service.send_text(phone_number, msg)
+
+            # Smart upsell suggestion
+            try:
+                cart_items = await redis_service.get_cart(phone_number)
+                upsell = await self._get_menu_upsell(item_name, items_map, restaurant_name, cart_items)
+                if upsell:
+                    await whatsapp_service.send_text(phone_number, upsell)
+            except Exception as e:
+                logger.error(f"Upsell error: {e}")
+
             await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
                 "lang": lang,
                 "restaurant_id": restaurant_id,
                 "restaurant_name": restaurant_name,
                 "items_map": items_map
             })
+
+    async def _match_menu_with_ai(self, text: str, items_map: dict, restaurant_name: str, lang: str) -> dict:
+        """Match user text to items in the current numbered menu using AI"""
+        try:
+            import google.generativeai as genai
+
+            # Build items list from items_map
+            items_list = ""
+            for num, item in sorted(items_map.items(), key=lambda x: int(x[0])):
+                items_list += f"{num}. {item['name']} - ${item['price']:.2f}\n"
+
+            prompt = f"""أنت مساعد توصيل طعام. المستخدم عم يتصفح منيو "{restaurant_name}" وبدو يطلب.
+
+الأصناف المتاحة بالمنيو:
+{items_list}
+
+كلام المستخدم: "{text}"
+
+مهمتك: طابق كلام المستخدم مع أصناف من القائمة فوق بس (لا تخترع أصناف).
+
+قواعد:
+- افهم عربي، إنكليزي، وعربيزي (arabizi): bde=بدي، pepsi=بيبسي، burger=برغر، chicken=دجاج، fries=بطاطا، 7=ح، 3=ع، 5=خ، 8=غ، 2=أ
+- "l awwal" أو "الأول" = الصنف رقم 1
+- إذا ذكر كمية (مثلاً "2 بيبسي" أو "tnen shawarma") حطها بالـ quantity
+- إذا ما ذكر كمية، الافتراضي quantity = 1
+- إذا المستخدم بدو يطلع من المنيو أو يروح لمطعم تاني أو يعمل شي ما إلو علاقة بالمنيو → action = "leave"
+
+رد JSON فقط:
+{{"items": [{{"number": 1, "quantity": 1}}], "action": "order"}}
+
+إذا بدو يطلع من المنيو:
+{{"items": [], "action": "leave"}}
+
+إذا ما فهمت أو ما لقيت تطابق بالمنيو:
+{{"items": [], "action": "unknown"}}
+"""
+
+            response = ai_service.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.3,
+                    response_mime_type="application/json"
+                )
+            )
+
+            import json
+            result = json.loads(response.text)
+            return result
+
+        except Exception as e:
+            logger.error(f"Menu AI matching error: {e}")
+            return {"items": [], "action": "error"}
+
+    async def _get_menu_upsell(self, item_name: str, items_map: dict, restaurant_name: str, cart_items: list) -> str:
+        """Get AI upsell suggestion based on what was just added"""
+        try:
+            import google.generativeai as genai
+
+            # Build items list
+            items_list = ""
+            for num, item in sorted(items_map.items(), key=lambda x: int(x[0])):
+                items_list += f"{num}. {item['name']} - ${item['price']:.2f}\n"
+
+            # Build cart context
+            cart_text = ""
+            for ci in cart_items:
+                cart_text += f"- {ci.get('name', '')} x{ci.get('quantity', 1)}\n"
+
+            prompt = f"""أنت بائع ودود بمطعم "{restaurant_name}". المستخدم لسا ضاف "{item_name}" عالسلة.
+
+السلة الحالية:
+{cart_text}
+
+الأصناف المتاحة بالمنيو:
+{items_list}
+
+اقترح صنف واحد مكمّل من المنيو (مثلاً: مشروب مع أكل، بطاطا مع برغر، حلو بعد الأكل).
+لا تقترح شي موجود بالسلة.
+الجواب لازم يكون جملة قصيرة بالعامية اللبنانية مع رقم الصنف.
+
+رد JSON فقط:
+{{"suggestion": "شو رأيك تضيف بيبسي معون؟ (رقم 45) 🥤", "item_number": 45}}
+
+إذا ما في اقتراح مناسب:
+{{"suggestion": "", "item_number": 0}}
+"""
+
+            response = ai_service.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.7,
+                    response_mime_type="application/json"
+                )
+            )
+
+            import json
+            result = json.loads(response.text)
+            return result.get("suggestion", "")
+
+        except Exception as e:
+            logger.error(f"Upsell AI error: {e}")
+            return ""
 
     # ==================== Menu Request Feature ====================
     async def _handle_menu_request(self, phone_number: str, ai_result: dict, lang: str):

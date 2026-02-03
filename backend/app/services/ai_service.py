@@ -245,8 +245,15 @@ class AIService:
     "reference_position": null أو رقم (1, 2, 3) إذا أشار لنتيجة سابقة,
     "upsell_suggestions": ["بطاطا", "بيبسي", "صوص"],
     "message": "رد ودود وجذاب بالعامية اللبنانية",
+    "sentiment": "positive" | "negative" | "neutral" | "urgent",
     "needs_confirmation": true/false (true إذا كان طلب كامل يحتاج تأكيد)
 }}
+
+ملاحظة عن الـ sentiment:
+- "positive": المستخدم مبسوط أو شاكر (شكراً، ممتاز، حلو)
+- "negative": المستخدم زعلان أو معصب (شو هالخدمة، بطيء، سيء)
+- "urgent": المستخدم مستعجل (بسرعة، يلا، عجل)
+- "neutral": عادي (الأغلبية)
 
 أمثلة:
 "بدي برغر" → {{"intent": "search_product", "product_query": "برغر", "message": "تكرم! عنا كذا مطعم فيهم برغر 🍔"}}
