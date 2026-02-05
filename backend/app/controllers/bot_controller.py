@@ -2974,8 +2974,19 @@ https://maps.google.com/?q={lat},{lng}
                 menu_text += "Type item numbers you want (e.g.: 1 3) 👆\n"
                 menu_text += "Or type *order* to view cart 🛒"
 
-            # Send full menu as one message
-            await whatsapp_service.send_text(phone_number, menu_text)
+            # Send menu - split into 2 messages if > 4096 chars (WhatsApp limit)
+            if len(menu_text) > 4096:
+                # Split at a newline near the middle
+                mid = len(menu_text) // 2
+                split_pos = menu_text.rfind('\n', 0, mid + 500)
+                if split_pos == -1:
+                    split_pos = mid
+                part1 = menu_text[:split_pos]
+                part2 = menu_text[split_pos:].lstrip('\n')
+                await whatsapp_service.send_text(phone_number, part1)
+                await whatsapp_service.send_text(phone_number, part2)
+            else:
+                await whatsapp_service.send_text(phone_number, menu_text)
 
             # Store items map in Redis and set state for numbered ordering
             await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
