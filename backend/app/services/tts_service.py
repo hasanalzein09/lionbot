@@ -19,18 +19,16 @@ class TTSService:
     TTS_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent"
 
     WELCOME_TEXT = (
-        "Say in a warm, friendly Lebanese Arabic accent: "
-        "أهلا وسهلا ببوت ليون ديليفري بصيدا! "
-        "عنا أكتر من مية مطعم ومحل عصير وحلو وكل شي. "
-        "إذا عزو أي مساعدة بشرية أو في شي ما لقيتو هون، "
-        "تواصلو معنا على الرقم 0 7 6 0 8 2 8 0 4"
+        "أهلاً وسهلاً فيك ببوت ليون ديليفري بصيدا! "
+        "عنّا أكتر من مية مطعم ومحل عصير وحلو وكل شي. "
+        "إذا بدّك أي مساعدة أو في شي ما لقيتو هون، "
+        "تواصل معنا على الرقم: صفر ستة وسبعين، صفر تمنية اتنين، تمنمية وأربعة."
     )
 
     ORDER_COMPLETE_TEXT = (
-        "Say in a warm, friendly Lebanese Arabic accent: "
         "ألف صحة وهنا من ليون بوت ديليفري! "
-        "مطرح ما يصير يمري، بدنا نشوفك كل يوم عم تطلب من عنا. "
-        "وإذا في شي ما عجبك، فيك تواصل مع مكتبنا وتشكي عليي."
+        "مطرح ما يصير يمرّي! بدنا نشوفك كل يوم عم تطلب من عندنا. "
+        "وإذا في شي ما عجبك، فيك تتواصل مع مكتبنا وتحكيلنا."
     )
 
     def __init__(self):
@@ -45,7 +43,7 @@ class TTSService:
             self._client = httpx.AsyncClient(timeout=60.0)
         return self._client
 
-    async def generate_audio(self, text: str, voice: str = "Leda") -> Optional[bytes]:
+    async def generate_audio(self, text: str, voice: str = "Aoede") -> Optional[bytes]:
         """Generate audio from text using Gemini TTS. Returns raw PCM16 bytes."""
         if not self.api_key:
             logger.warning("GEMINI_API_KEY not set, TTS disabled")
@@ -94,7 +92,7 @@ class TTSService:
         )
         return header + pcm_data
 
-    async def generate_wav_file(self, text: str, output_path: str, voice: str = "Leda") -> Optional[str]:
+    async def generate_wav_file(self, text: str, output_path: str, voice: str = "Aoede") -> Optional[str]:
         """Generate and save a WAV audio file. Returns file path or None."""
         pcm_data = await self.generate_audio(text, voice)
         if not pcm_data:
@@ -124,7 +122,7 @@ class TTSService:
             logger.error(f"WAV to OGG conversion error: {e}")
             return None
 
-    async def generate_and_upload(self, text: str, voice: str = "Leda") -> Optional[str]:
+    async def generate_and_upload(self, text: str, voice: str = "Aoede") -> Optional[str]:
         """Generate TTS audio and upload to WhatsApp, returning media_id"""
         from app.services.whatsapp_service import whatsapp_service
 
