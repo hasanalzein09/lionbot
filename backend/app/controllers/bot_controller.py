@@ -66,6 +66,8 @@ class BotController:
         # TRACK: New session if user is in INIT state or no state
         if state == "INIT":
             await self._track_session_start(phone_number)
+            # Send welcome audio to first-time customers only
+            await self._send_welcome_audio(phone_number)
         
         # TRACK: All messages
         await redis_service.track_bot_activity(phone_number)
@@ -81,6 +83,9 @@ class BotController:
             await self._handle_interactive_message(phone_number, message_body, state, lang, user_data)
         elif message_type == "location":
             await self._handle_location_message(phone_number, message_body, state, lang, user_data)
+        elif message_type in ("image", "audio", "video", "document", "sticker"):
+            msg = "📝 نحنا منفهم رسائل نصية بس! اكتب شو بدك وبنساعدك 😊" if lang == "ar" else "📝 We only understand text messages! Type what you need and we'll help 😊"
+            await whatsapp_service.send_text(phone_number, msg)
 
     # ==================== Text Message Handler ====================
     async def _handle_text_message(self, phone_number: str, message_body: dict, state: str, lang: str, user_data: dict):
@@ -111,6 +116,16 @@ class BotController:
             await self._send_language_selection(phone_number)
             return
 
+        elif state == "AWAITING_LANG":
+            # Detect language from text input
+            if any(c in text for c in "ابتثجحخدذرزسشصضطظعغفقكلمنهوي"):
+                lang = "ar"
+            else:
+                lang = "en"
+            await redis_service.set_user_state(phone_number, "MAIN_MENU", {"lang": lang})
+            await self._send_main_menu(phone_number, lang)
+            return
+
         elif state == "AWAITING_LOCATION":
             # Hybrid: handle text address
             await self._process_text_location(phone_number, text, lang, user_data)
@@ -130,6 +145,10 @@ class BotController:
             # If not a valid rating, show main menu
             await self._send_main_menu(phone_number, lang)
 
+        elif state == "SUPPORT_CHAT":
+            await self._handle_support_message(phone_number, text, lang)
+            return
+
         elif state == "SELECTING_RESTAURANT_BY_SEARCH":
             # User selecting restaurant from search results
             await self._handle_restaurant_search_selection(phone_number, text, lang, user_data)
@@ -147,6 +166,23 @@ class BotController:
                     selected = suggestions[selection - 1]
                     await self._quick_add_suggestion(phone_number, selected, lang)
                     return
+
+                # Check if it's a category selection from main menu
+                try:
+                    async with AsyncSessionLocal() as db:
+                        cat_result = await db.execute(
+                            select(RestaurantCategory)
+                            .where(RestaurantCategory.is_active == True)
+                            .order_by(RestaurantCategory.order)
+                        )
+                        categories = cat_result.scalars().all()
+                        if categories and 1 <= selection <= len(categories):
+                            cat = categories[selection - 1]
+                            cat_name = cat.name_ar if lang == "ar" else cat.name
+                            await self._show_restaurants_in_category(phone_number, cat.id, cat_name, cat.icon, lang)
+                            return
+                except Exception as e:
+                    logger.error(f"Category selection error: {e}")
 
             # 🛡️ Cost Optimization: Avoid calling AI for short greetings or small talk
             greetings = ["hi", "hello", "سلام", "مرحبا", "هلا", "هاي", "hey", "test"]
@@ -222,6 +258,13 @@ class BotController:
         elif btn_id == "enter_new_info":
             await whatsapp_service.send_text(phone_number, get_text("share_location", lang))
             await redis_service.set_user_state(phone_number, "AWAITING_LOCATION", {"lang": lang})
+
+        elif btn_id.startswith("remove_item_"):
+            item_id = int(btn_id.replace("remove_item_", ""))
+            await redis_service.remove_from_cart(phone_number, item_id)
+            msg = "تم الحذف ✅" if lang == "ar" else "Removed ✅"
+            await whatsapp_service.send_text(phone_number, msg)
+            await self._show_cart(phone_number, lang)
 
         elif btn_id == "clear_cart":
             await redis_service.clear_cart(phone_number)
@@ -454,6 +497,53 @@ class BotController:
         await whatsapp_service.send_interactive_buttons(phone_number, msg, buttons)
         await redis_service.set_user_state(phone_number, "CONFIRMING_INFO", user_data)
 
+    async def _send_welcome_audio(self, phone_number: str):
+        """Send welcome audio only to first-time customers"""
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(select(User).where(User.phone_number == phone_number))
+                user = result.scalars().first()
+                if user:
+                    return  # Returning user, skip welcome audio
+
+            from app.services.tts_service import tts_service
+            media_id = await tts_service.get_welcome_media_id()
+            if media_id:
+                await whatsapp_service.send_audio(phone_number, media_id)
+                logger.info(f"Welcome audio sent to new user {phone_number}")
+        except Exception as e:
+            logger.error(f"Failed to send welcome audio: {e}")
+            # Non-critical: continue without audio
+
+    async def _send_order_completion_audio(self, phone_number: str, cart: list, total: float, lang: str):
+        """Generate and send personalized order completion audio"""
+        try:
+            from app.services.tts_service import tts_service
+
+            items_names = []
+            for item in cart[:5]:
+                qty = item.get("quantity", 1)
+                name = item.get("name", "")
+                if qty > 1:
+                    items_names.append(f"{qty} {name}")
+                else:
+                    items_names.append(name)
+            items_text = " و".join(items_names)
+
+            tts_text = (
+                f"ألف صحة وهنا! "
+                f"طلبت {items_text}. "
+                f"ليون ديليفري أسرع توصيل بصيدا! "
+                f"يسلمو إيديك وبالعافية!"
+            )
+
+            media_id = await tts_service.generate_and_upload(tts_text)
+            if media_id:
+                await whatsapp_service.send_audio(phone_number, media_id)
+                logger.info(f"Order completion audio sent to {phone_number}")
+        except Exception as e:
+            logger.error(f"Failed to send order completion audio: {e}")
+
     # ==================== Flow Methods ====================
     async def _send_language_selection(self, phone_number: str):
         """Send language selection buttons"""
@@ -507,7 +597,112 @@ class BotController:
             "اختر" if lang == "ar" else "Choose",
             sections
         )
+
+        # Send categories text message with hint
+        categories_text = await self._build_categories_text(lang)
+        if categories_text:
+            await whatsapp_service.send_text(phone_number, categories_text)
+
         await redis_service.set_user_state(phone_number, "MAIN_MENU", {"lang": lang})
+
+    async def _build_categories_text(self, lang: str) -> Optional[str]:
+        """Build numbered category list text for main menu"""
+        try:
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(
+                    select(RestaurantCategory)
+                    .where(RestaurantCategory.is_active == True)
+                    .order_by(RestaurantCategory.order)
+                )
+                categories = result.scalars().all()
+
+            if not categories:
+                return None
+
+            lines = []
+            if lang == "ar":
+                lines.append("📂 *تصفح حسب التصنيف:*")
+            else:
+                lines.append("📂 *Browse by category:*")
+            lines.append("")
+
+            for i, cat in enumerate(categories, 1):
+                name = cat.name_ar if lang == "ar" else cat.name
+                lines.append(f"{i}. {name} {cat.icon}")
+
+            lines.append("")
+            if lang == "ar":
+                lines.append("✏️ أو اكتبلي شو على بالك!")
+                lines.append('مثلاً: "بدي شاورما" 🌯 أو "برغر" 🍔')
+            else:
+                lines.append("✏️ Or type what you're craving!")
+                lines.append('e.g. "I want shawarma" 🌯 or "burger" 🍔')
+
+            return "\n".join(lines)
+        except Exception as e:
+            logger.error(f"Failed to build categories text: {e}")
+            return None
+
+    async def _show_restaurants_in_category(self, phone_number: str, category_id: int, category_name: str, category_icon: str, lang: str):
+        """Show numbered list of restaurants in a category"""
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(
+                select(Restaurant)
+                .where(Restaurant.category_id == category_id)
+                .where(Restaurant.is_active == True)
+                .order_by(Restaurant.name)
+            )
+            restaurants = result.scalars().all()
+
+        if not restaurants:
+            msg = f"ما في مطاعم ب{category_name} هلق 😕" if lang == "ar" else f"No restaurants in {category_name} currently 😕"
+            await whatsapp_service.send_text(phone_number, msg)
+            await self._send_main_menu(phone_number, lang)
+            return
+
+        restaurants_data = []
+        lines = [f"{category_icon} *{category_name}*", ""]
+
+        for i, rest in enumerate(restaurants, 1):
+            rest_name = rest.name_ar if lang == "ar" and rest.name_ar else rest.name
+            lines.append(f"{i}. {rest_name}")
+            restaurants_data.append({
+                "id": rest.id,
+                "name": rest_name,
+                "name_en": rest.name
+            })
+
+        lines.append("")
+        lines.append("✏️ اكتب رقم أو اسم المطعم 👆" if lang == "ar" else "Type number or restaurant name 👆")
+
+        full_text = "\n".join(lines)
+
+        # Split into 2 messages if too long
+        if len(full_text) > 4000:
+            mid = len(restaurants) // 2
+            lines1 = [f"{category_icon} *{category_name}*", ""]
+            for i, rest in enumerate(restaurants[:mid], 1):
+                rest_name = rest.name_ar if lang == "ar" and rest.name_ar else rest.name
+                lines1.append(f"{i}. {rest_name}")
+
+            lines2 = []
+            for i, rest in enumerate(restaurants[mid:], mid + 1):
+                rest_name = rest.name_ar if lang == "ar" and rest.name_ar else rest.name
+                lines2.append(f"{i}. {rest_name}")
+            lines2.append("")
+            lines2.append("✏️ اكتب رقم أو اسم المطعم 👆" if lang == "ar" else "Type number or restaurant name 👆")
+
+            await whatsapp_service.send_text(phone_number, "\n".join(lines1))
+            await whatsapp_service.send_text(phone_number, "\n".join(lines2))
+        else:
+            await whatsapp_service.send_text(phone_number, full_text)
+
+        # Reuse existing SELECTING_RESTAURANT_BY_SEARCH state
+        await redis_service.set_user_state(phone_number, "SELECTING_RESTAURANT_BY_SEARCH", {
+            "lang": lang,
+            "search_query": category_name,
+            "restaurants": restaurants_data
+        })
 
     async def _add_item_to_cart(self, phone_number: str, item_id: int, quantity: int, lang: str, user_data: dict):
         """Add item to cart - uses eager loading to avoid N+1 queries"""
@@ -527,12 +722,23 @@ class BotController:
             # Access eagerly loaded relationships
             menu = item.category.menu if item.category else None
 
+            new_restaurant_id = menu.restaurant_id if menu else user_data.get("restaurant_id")
+
+            # Check restaurant conflict
+            cart = await redis_service.get_cart(phone_number)
+            if cart:
+                existing_rest_id = cart[0].get("restaurant_id")
+                if existing_rest_id and new_restaurant_id and existing_rest_id != new_restaurant_id:
+                    await redis_service.clear_cart(phone_number)
+                    msg = "⚠️ تم تفريغ السلة (كانت من مطعم تاني)" if lang == "ar" else "⚠️ Cart cleared (was from another restaurant)"
+                    await whatsapp_service.send_text(phone_number, msg)
+
             cart_item = {
                 "menu_item_id": item.id,
-                "name": item.name,
+                "name": item.name_ar if lang == "ar" and item.name_ar else item.name,
                 "price": item.price,
                 "quantity": quantity,
-                "restaurant_id": menu.restaurant_id if menu else user_data.get("restaurant_id")
+                "restaurant_id": new_restaurant_id
             }
 
             await redis_service.add_to_cart(phone_number, cart_item)
@@ -599,6 +805,41 @@ class BotController:
             ]
         )
         await redis_service.set_user_state(phone_number, "VIEWING_CART", {"lang": lang})
+
+    async def _show_item_edit_options(self, phone_number: str, item_id: int, lang: str):
+        """Show edit options for a specific cart item"""
+        cart = await redis_service.get_cart(phone_number)
+        if not cart:
+            await whatsapp_service.send_text(phone_number, get_text("cart_empty", lang))
+            await self._send_main_menu(phone_number, lang)
+            return
+
+        target_item = None
+        for item in cart:
+            if item.get("menu_item_id") == item_id:
+                target_item = item
+                break
+
+        if not target_item:
+            msg = "الصنف مش موجود بالسلة 🤔" if lang == "ar" else "Item not in cart 🤔"
+            await whatsapp_service.send_text(phone_number, msg)
+            await self._show_cart(phone_number, lang)
+            return
+
+        item_name = target_item.get("name", "Item")
+        item_qty = target_item.get("quantity", 1)
+        item_price = float(target_item.get("price", 0))
+
+        msg = f"✏️ *{item_name}*\n"
+        msg += f"الكمية: {item_qty} | السعر: ${item_price * item_qty:.2f}" if lang == "ar" else f"Qty: {item_qty} | Price: ${item_price * item_qty:.2f}"
+
+        buttons = [
+            {"id": f"remove_item_{item_id}", "title": "❌ حذف" if lang == "ar" else "❌ Remove"},
+            {"id": "view_cart", "title": get_text("btn_cart", lang)[:24]},
+            {"id": "continue_shopping", "title": get_text("add_more", lang)[:24]}
+        ]
+
+        await whatsapp_service.send_interactive_buttons(phone_number, msg, buttons)
 
     async def _show_cart_edit_options(self, phone_number: str, lang: str):
         """Show cart items for editing"""
@@ -773,6 +1014,9 @@ class BotController:
             )
             await whatsapp_service.send_text(phone_number, f"🎉 {order_msg}")
 
+            # Send order completion audio (TTS)
+            await self._send_order_completion_audio(phone_number, cart, float(total_amount), lang)
+
             # Notify restaurant
             await self._notify_restaurant(order, cart, lat, lng)
 
@@ -790,19 +1034,10 @@ class BotController:
                 restaurant = rest_result.scalars().first()
                 if restaurant:
                     restaurant_name = restaurant.name
-            except:
-                pass
-
-            # Send push notification to admin app
-            try:
-                await fcm_service.notify_admins_new_order(
-                    order_id=order.id,
-                    restaurant_name=restaurant_name or "مطعم",
-                    total_amount=float(total_amount),
-                    restaurant_id=restaurant_id,
-                )
             except Exception as e:
-                logger.error(f"Failed to send push notification: {e}")
+                logger.error(f"Error getting restaurant name: {e}")
+
+            # FCM notification handled by _notify_restaurant (avoid duplicate)
 
             # TRACK: Order completed successfully
             await self._track_order_completed(phone_number, order.id, float(total_amount))
@@ -945,14 +1180,21 @@ https://maps.google.com/?q={lat},{lng}
         cart_items = await redis_service.get_cart(phone_number)
 
         # Process with smart AI including conversation context and cart
-        ai_result = await ai_service.process_smart_order(
-            text=text,
-            language=lang,
-            restaurant_id=restaurant_id,
-            user_data=user_data,
-            conversation_history=conversation_history,
-            cart_items=cart_items
-        )
+        try:
+            ai_result = await ai_service.process_smart_order(
+                text=text,
+                language=lang,
+                restaurant_id=restaurant_id,
+                user_data=user_data,
+                conversation_history=conversation_history,
+                cart_items=cart_items
+            )
+        except Exception as e:
+            logger.error(f"AI service failed: {e}")
+            error_msg = "عذراً صار في مشكلة، جرب كمان مرة! 🙏" if lang == "ar" else "Sorry, something went wrong. Please try again! 🙏"
+            await whatsapp_service.send_text(phone_number, error_msg)
+            await self._send_main_menu(phone_number, lang)
+            return
 
         intent = ai_result.get("intent", "error")
         ai_message = ai_result.get("message", "")
@@ -966,16 +1208,7 @@ https://maps.google.com/?q={lat},{lng}
         # Track AI usage for analytics
         await redis_service.track_ai_usage(phone_number, intent, ai_result.get("success", False))
 
-        # Handle sentiment
-        sentiment = ai_result.get("sentiment", "neutral")
-        if sentiment == "negative":
-            sorry_msg = "نعتذر عن أي إزعاج! 🙏 إذا بدك تحكي مع الإدارة اتصل على 71234567" if lang == "ar" else "We apologize for any inconvenience! 🙏 Contact management at 71234567"
-            await whatsapp_service.send_text(phone_number, sorry_msg)
-        elif sentiment == "positive":
-            thanks_msg = "شكراً لطيبتك! 😊🦁" if lang == "ar" else "Thank you! 😊🦁"
-            await whatsapp_service.send_text(phone_number, thanks_msg)
-        
-        # Handle different intents
+        # Handle different intents (sentiment handled AFTER to avoid confusing order)
         if intent == "search_product":
             # Show restaurants that have this product
             await self._handle_product_search(phone_number, ai_result, lang)
@@ -1042,6 +1275,15 @@ https://maps.google.com/?q={lat},{lng}
             # Error or unknown intent - provide smart recovery
             await self._handle_ai_error_recovery(phone_number, text, ai_result, lang)
 
+        # Handle sentiment AFTER intent (so it doesn't appear before results)
+        sentiment = ai_result.get("sentiment", "neutral")
+        if sentiment == "negative":
+            sorry_msg = "نعتذر عن أي إزعاج! 🙏 إذا بدك تحكي مع الإدارة اتصل على 71234567" if lang == "ar" else "We apologize for any inconvenience! 🙏 Contact management at 71234567"
+            await whatsapp_service.send_text(phone_number, sorry_msg)
+        elif sentiment == "positive":
+            thanks_msg = "شكراً لطيبتك! 😊🦁" if lang == "ar" else "Thank you! 😊🦁"
+            await whatsapp_service.send_text(phone_number, thanks_msg)
+
     async def _handle_ai_error_recovery(self, phone_number: str, original_text: str, ai_result: dict, lang: str):
         """Smart error recovery with intelligent suggestions"""
         ai_message = ai_result.get("message", "")
@@ -1063,6 +1305,7 @@ https://maps.google.com/?q={lat},{lng}
                     .join(Restaurant, Menu.restaurant_id == Restaurant.id)
                     .where(MenuItem.is_available == True)
                     .where(Restaurant.is_active == True)
+                    .limit(500)
                 )
                 all_items = result.all()
 
@@ -1203,7 +1446,7 @@ https://maps.google.com/?q={lat},{lng}
         
         # Build numbered list (1, 2, 3...)
         lines = [header, ""]
-        for i, r in enumerate(restaurants[:15], 1):  # Max 15 restaurants
+        for i, r in enumerate(restaurants[:5], 1):  # Max 15 restaurants
             lines.append(f"{i}. {r['name']}")
         
         lines.append("")
@@ -1215,7 +1458,7 @@ https://maps.google.com/?q={lat},{lng}
         await redis_service.set_user_state(phone_number, "SELECTING_RESTAURANT_BY_SEARCH", {
             "lang": lang,
             "search_query": product,
-            "restaurants": restaurants[:15]
+            "restaurants": restaurants[:5]
         })
 
     async def _handle_restaurant_search_selection(self, phone_number: str, text: str, lang: str, user_data: dict):
@@ -1617,7 +1860,7 @@ https://maps.google.com/?q={lat},{lng}
                     break
 
         if modifications_made:
-            response = ai_message or "تم! ✅\n" + "\n".join(modifications_made)
+            response = ai_message or ("تم! ✅\n" + "\n".join(modifications_made))
             await whatsapp_service.send_text(phone_number, response)
         else:
             await whatsapp_service.send_text(phone_number, "ما لقيت هالصنف بالسلة 🤔")
@@ -1927,7 +2170,7 @@ https://maps.google.com/?q={lat},{lng}
             return
 
         # Check if input is purely numbers (1 3, 1,3, 1+3, 1 و 3)
-        clean = re.sub(r'[\s,،وw+]+', '', text)
+        clean = re.sub(r'[\s,،و+]+', '', text)
         if clean.isdigit():
             # Pure number input - use direct number matching
             numbers = re.findall(r'\d+', text)
@@ -1959,10 +2202,8 @@ https://maps.google.com/?q={lat},{lng}
         else:
             # Text input (with or without numbers) - use AI to understand intent first
             # Check if user wants to switch restaurants, browse, or order
-            print(f"DEBUG: Classifying intent for text: '{text}'")
             logger.info(f"Classifying intent for text: '{text}'")
             intent = await self._classify_intent(text, lang)
-            print(f"DEBUG: Intent result: {intent}, text was: '{text}'")
             logger.info(f"Intent result: {intent}, text was: '{text}'")
             
             if intent in ["switch_restaurant", "browse", "greeting", "help"]:
@@ -2163,7 +2404,6 @@ https://maps.google.com/?q={lat},{lng}
 
     async def _classify_intent(self, text: str, lang: str) -> str:
         """Use AI to classify user intent when in numbered menu"""
-        print(f"DEBUG: _classify_intent called with: '{text}'")
         try:
             import google.generativeai as genai
             
@@ -2182,8 +2422,7 @@ Possible intents:
 
 Reply with ONLY ONE word from the list above."""
 
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(
+            response = ai_service.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
                     temperature=0.1,
@@ -2665,7 +2904,11 @@ Reply with ONLY ONE word from the list above."""
                 await self._send_main_menu(phone_number, lang)
                 return
 
-            # Clear cart and add items
+            # Warn if cart has items, then clear
+            existing_cart = await redis_service.get_cart(phone_number)
+            if existing_cart:
+                msg = "⚠️ تم استبدال السلة السابقة بالطلب المكرر" if lang == "ar" else "⚠️ Previous cart replaced with reorder items"
+                await whatsapp_service.send_text(phone_number, msg)
             await redis_service.clear_cart(phone_number)
 
             items_text = []

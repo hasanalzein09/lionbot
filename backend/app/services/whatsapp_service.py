@@ -4,6 +4,7 @@ from app.core.exceptions import WhatsAppAPIError
 import logging
 import json
 import asyncio
+import os
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -136,6 +137,37 @@ class WhatsAppService:
                     "sections": sections
                 }
             }
+        })
+
+    async def upload_media(self, file_path: str, mime_type: str) -> Optional[str]:
+        """Upload media file to WhatsApp and return media_id"""
+        if not self.api_token:
+            logger.warning("WhatsApp API Token not set. Skipping media upload.")
+            return None
+
+        upload_url = f"https://graph.facebook.com/v18.0/{self.phone_number_id}/media"
+        headers = {"Authorization": f"Bearer {self.api_token}"}
+
+        try:
+            client = self._get_client()
+            with open(file_path, 'rb') as f:
+                files = {'file': (os.path.basename(file_path), f, mime_type)}
+                data = {'messaging_product': 'whatsapp'}
+                response = await client.post(upload_url, headers=headers, files=files, data=data)
+                response.raise_for_status()
+                result = response.json()
+                media_id = result.get('id')
+                logger.info(f"Media uploaded successfully: {media_id}")
+                return media_id
+        except Exception as e:
+            logger.error(f"Failed to upload media: {e}")
+            return None
+
+    async def send_audio(self, to: str, media_id: str):
+        """Send audio message using a media_id"""
+        return await self.send_message(to, {
+            "type": "audio",
+            "audio": {"id": media_id}
         })
 
 whatsapp_service = WhatsAppService()
