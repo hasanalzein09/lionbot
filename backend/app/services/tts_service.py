@@ -18,10 +18,26 @@ class TTSService:
 
     TTS_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent"
 
+    WELCOME_TEXT = (
+        "Say in a warm, friendly Lebanese Arabic accent: "
+        "أهلا وسهلا ببوت ليون ديليفري بصيدا! "
+        "عنا أكتر من مية مطعم ومحل عصير وحلو وكل شي. "
+        "إذا عزو أي مساعدة بشرية أو في شي ما لقيتو هون، "
+        "تواصلو معنا على الرقم 0 7 6 0 8 2 8 0 4"
+    )
+
+    ORDER_COMPLETE_TEXT = (
+        "Say in a warm, friendly Lebanese Arabic accent: "
+        "ألف صحة وهنا من ليون بوت ديليفري! "
+        "مطرح ما يصير يمري، بدنا نشوفك كل يوم عم تطلب من عنا. "
+        "وإذا في شي ما عجبك، فيك تواصل مع مكتبنا وتشكي عليي."
+    )
+
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
         self._client: Optional[httpx.AsyncClient] = None
         self._welcome_media_id: Optional[str] = None
+        self._order_complete_media_id: Optional[str] = None
         os.makedirs(STATIC_AUDIO_DIR, exist_ok=True)
 
     def _get_client(self) -> httpx.AsyncClient:
@@ -132,41 +148,46 @@ class TTSService:
 
         return media_id
 
+    async def _get_static_media_id(self, name: str, text: str) -> Optional[str]:
+        """Generate and cache a static audio file, return its WhatsApp media_id"""
+        from app.services.whatsapp_service import whatsapp_service
+
+        wav_path = os.path.join(STATIC_AUDIO_DIR, f"{name}.wav")
+        ogg_path = os.path.join(STATIC_AUDIO_DIR, f"{name}.ogg")
+
+        if not os.path.exists(ogg_path):
+            result = await self.generate_wav_file(text, wav_path)
+            if not result:
+                logger.error(f"Failed to generate {name} audio")
+                return None
+            ogg_result = self.wav_to_ogg(wav_path, ogg_path)
+            if not ogg_result:
+                logger.error(f"Failed to convert {name} audio to OGG")
+                return None
+
+        media_id = await whatsapp_service.upload_media(ogg_path, "audio/ogg")
+        if media_id:
+            logger.info(f"{name} audio ready, media_id: {media_id}")
+        return media_id
+
     async def get_welcome_media_id(self) -> Optional[str]:
         """Get or generate the cached welcome audio media_id"""
         if self._welcome_media_id:
             return self._welcome_media_id
-
-        from app.services.whatsapp_service import whatsapp_service
-
-        welcome_wav = os.path.join(STATIC_AUDIO_DIR, "welcome.wav")
-        welcome_ogg = os.path.join(STATIC_AUDIO_DIR, "welcome.ogg")
-
-        if not os.path.exists(welcome_ogg):
-            welcome_text = (
-                "Say in a warm, friendly Lebanese Arabic accent: "
-                "أهلا وسهلا فيك بليون ديليفري! "
-                "عنا أكتر من مية مطعم ومحل بصيدا. "
-                "ليون ديليفري بخدمتك، اطلب يلي بدك ياه ونحنا منوصلك ياه لعندك! "
-                "أطيب أكل بأسرع وقت!"
-            )
-            result = await self.generate_wav_file(welcome_text, welcome_wav)
-            if not result:
-                logger.error("Failed to generate welcome audio")
-                return None
-            ogg_result = self.wav_to_ogg(welcome_wav, welcome_ogg)
-            if not ogg_result:
-                logger.error("Failed to convert welcome audio to OGG")
-                return None
-
-        self._welcome_media_id = await whatsapp_service.upload_media(welcome_ogg, "audio/ogg")
-        if self._welcome_media_id:
-            logger.info(f"Welcome audio ready, media_id: {self._welcome_media_id}")
+        self._welcome_media_id = await self._get_static_media_id("welcome", self.WELCOME_TEXT)
         return self._welcome_media_id
 
-    def invalidate_welcome_cache(self):
-        """Invalidate cached welcome media_id (e.g. after 30 days expiry)"""
+    async def get_order_complete_media_id(self) -> Optional[str]:
+        """Get or generate the cached order completion audio media_id"""
+        if self._order_complete_media_id:
+            return self._order_complete_media_id
+        self._order_complete_media_id = await self._get_static_media_id("order_complete", self.ORDER_COMPLETE_TEXT)
+        return self._order_complete_media_id
+
+    def invalidate_cache(self):
+        """Invalidate all cached media_ids (e.g. after 30 days expiry)"""
         self._welcome_media_id = None
+        self._order_complete_media_id = None
 
     async def close(self):
         if self._client and not self._client.is_closed:

@@ -517,29 +517,11 @@ class BotController:
             logger.error(f"Failed to send welcome audio: {e}")
             # Non-critical: continue without audio
 
-    async def _send_order_completion_audio(self, phone_number: str, cart: list, total: float, lang: str):
-        """Generate and send personalized order completion audio"""
+    async def _send_order_completion_audio(self, phone_number: str):
+        """Send static order completion audio"""
         try:
             from app.services.tts_service import tts_service
-
-            items_names = []
-            for item in cart[:5]:
-                qty = item.get("quantity", 1)
-                name = item.get("name", "")
-                if qty > 1:
-                    items_names.append(f"{qty} {name}")
-                else:
-                    items_names.append(name)
-            items_text = " و".join(items_names)
-
-            tts_text = (
-                f"ألف صحة وهنا! "
-                f"طلبت {items_text}. "
-                f"ليون ديليفري أسرع توصيل بصيدا! "
-                f"يسلمو إيديك وبالعافية!"
-            )
-
-            media_id = await tts_service.generate_and_upload(tts_text)
+            media_id = await tts_service.get_order_complete_media_id()
             if media_id:
                 await whatsapp_service.send_audio(phone_number, media_id)
                 logger.info(f"Order completion audio sent to {phone_number}")
@@ -1017,7 +999,7 @@ class BotController:
             await whatsapp_service.send_text(phone_number, f"🎉 {order_msg}")
 
             # Send order completion audio (TTS)
-            await self._send_order_completion_audio(phone_number, cart, float(total_amount), lang)
+            await self._send_order_completion_audio(phone_number)
 
             # Notify restaurant
             await self._notify_restaurant(order, cart, lat, lng)
