@@ -4,6 +4,7 @@ import struct
 import logging
 import os
 import asyncio
+import subprocess
 from typing import Optional
 from app.core.config import settings
 
@@ -90,21 +91,44 @@ class TTSService:
         logger.info(f"WAV file saved: {output_path} ({len(wav_data)} bytes)")
         return output_path
 
+    @staticmethod
+    def wav_to_ogg(wav_path: str, ogg_path: str) -> Optional[str]:
+        """Convert WAV to OGG Opus using ffmpeg (required for WhatsApp)"""
+        try:
+            result = subprocess.run(
+                ["ffmpeg", "-y", "-i", wav_path, "-c:a", "libopus", "-b:a", "64k", ogg_path],
+                capture_output=True, timeout=30
+            )
+            if result.returncode == 0 and os.path.exists(ogg_path):
+                logger.info(f"Converted to OGG: {ogg_path} ({os.path.getsize(ogg_path)} bytes)")
+                return ogg_path
+            logger.error(f"ffmpeg conversion failed: {result.stderr.decode()}")
+            return None
+        except Exception as e:
+            logger.error(f"WAV to OGG conversion error: {e}")
+            return None
+
     async def generate_and_upload(self, text: str, voice: str = "Leda") -> Optional[str]:
         """Generate TTS audio and upload to WhatsApp, returning media_id"""
         from app.services.whatsapp_service import whatsapp_service
 
-        temp_path = os.path.join(STATIC_AUDIO_DIR, "temp_tts.wav")
-        result = await self.generate_wav_file(text, temp_path, voice)
+        temp_wav = os.path.join(STATIC_AUDIO_DIR, "temp_tts.wav")
+        temp_ogg = os.path.join(STATIC_AUDIO_DIR, "temp_tts.ogg")
+        result = await self.generate_wav_file(text, temp_wav, voice)
         if not result:
             return None
 
-        media_id = await whatsapp_service.upload_media(temp_path, "audio/wav")
+        ogg_path = self.wav_to_ogg(temp_wav, temp_ogg)
+        if not ogg_path:
+            return None
 
-        try:
-            os.remove(temp_path)
-        except Exception:
-            pass
+        media_id = await whatsapp_service.upload_media(ogg_path, "audio/ogg")
+
+        for f in [temp_wav, temp_ogg]:
+            try:
+                os.remove(f)
+            except Exception:
+                pass
 
         return media_id
 
@@ -115,9 +139,10 @@ class TTSService:
 
         from app.services.whatsapp_service import whatsapp_service
 
-        welcome_path = os.path.join(STATIC_AUDIO_DIR, "welcome.wav")
+        welcome_wav = os.path.join(STATIC_AUDIO_DIR, "welcome.wav")
+        welcome_ogg = os.path.join(STATIC_AUDIO_DIR, "welcome.ogg")
 
-        if not os.path.exists(welcome_path):
+        if not os.path.exists(welcome_ogg):
             welcome_text = (
                 "Say in a warm, friendly Lebanese Arabic accent: "
                 "أهلا وسهلا فيك بليون ديليفري! "
@@ -125,12 +150,16 @@ class TTSService:
                 "ليون ديليفري بخدمتك، اطلب يلي بدك ياه ونحنا منوصلك ياه لعندك! "
                 "أطيب أكل بأسرع وقت!"
             )
-            result = await self.generate_wav_file(welcome_text, welcome_path)
+            result = await self.generate_wav_file(welcome_text, welcome_wav)
             if not result:
                 logger.error("Failed to generate welcome audio")
                 return None
+            ogg_result = self.wav_to_ogg(welcome_wav, welcome_ogg)
+            if not ogg_result:
+                logger.error("Failed to convert welcome audio to OGG")
+                return None
 
-        self._welcome_media_id = await whatsapp_service.upload_media(welcome_path, "audio/wav")
+        self._welcome_media_id = await whatsapp_service.upload_media(welcome_ogg, "audio/ogg")
         if self._welcome_media_id:
             logger.info(f"Welcome audio ready, media_id: {self._welcome_media_id}")
         return self._welcome_media_id
