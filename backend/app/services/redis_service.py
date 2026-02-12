@@ -432,5 +432,97 @@ class RedisService:
             "unique_users": users_count or 0
         }
 
+    # ==================== Bot Session Tracking ====================
+    
+    async def track_bot_session_start(self, phone_number: str, source: str = 'whatsapp'):
+        """Track when a user starts a bot session"""
+        session_key = f"bot:active_session:{phone_number}"
+        session_data = {
+            "phone_number": phone_number,
+            "started_at": str(datetime.now()),
+            "source": source,
+            "message_count": 0,
+            "has_cart": False,
+            "cart_value": 0
+        }
+        # Store with 30 minute expiry (session timeout)
+        await self._execute("SET", session_key, json_dumps(session_data), "EX", 1800)
+        
+        # Add to active sessions set
+        await self._execute("SADD", "bot:active_sessions", phone_number)
+        
+        # Increment daily counter
+        today = datetime.now().strftime("%Y-%m-%d")
+        await self._execute("HINCRBY", f"bot:stats:{today}", "sessions_started", 1)
+    
+    async def track_bot_activity(self, phone_number: str):
+        """Update last activity timestamp"""
+        session_key = f"bot:active_session:{phone_number}"
+        session_data = await self._execute("GET", session_key)
+        if session_data:
+            data = json.loads(session_data)
+            data["last_activity"] = str(datetime.now())
+            data["message_count"] = data.get("message_count", 0) + 1
+            # Extend expiry
+            await self._execute("SET", session_key, json_dumps(data), "EX", 1800)
+    
+    async def track_cart_update(self, phone_number: str, cart_total: float, items_count: int):
+        """Update cart info in session"""
+        session_key = f"bot:active_session:{phone_number}"
+        session_data = await self._execute("GET", session_key)
+        if session_data:
+            data = json.loads(session_data)
+            data["has_cart"] = items_count > 0
+            data["cart_value"] = cart_total
+            data["items_count"] = items_count
+            await self._execute("SET", session_key, json_dumps(data), "EX", 1800)
+            
+            # Add to users with cart set
+            if items_count > 0:
+                await self._execute("SADD", "bot:users_with_cart", phone_number)
+    
+    async def get_active_sessions(self) -> list:
+        """Get all currently active sessions"""
+        phone_numbers = await self._execute("SMEMBERS", "bot:active_sessions")
+        sessions = []
+        for phone in phone_numbers:
+            session_data = await self._execute("GET", f"bot:active_session:{phone}")
+            if session_data:
+                data = json.loads(session_data)
+                data["phone_number"] = phone
+                sessions.append(data)
+            else:
+                # Session expired, remove from set
+                await self._execute("SREM", "bot:active_sessions", phone)
+        return sessions
+    
+    async def get_bot_stats(self) -> dict:
+        """Get today's bot statistics"""
+        today = datetime.now().strftime("%Y-%m-%d")
+        stats = await self._execute("HGETALL", f"bot:stats:{today}")
+        
+        # Get current active count
+        active_sessions = await self._execute("SCARD", "bot:active_sessions")
+        users_with_cart = await self._execute("SCARD", "bot:users_with_cart")
+        
+        return {
+            "today": stats or {},
+            "active_now": active_sessions or 0,
+            "with_cart_now": users_with_cart or 0,
+            "date": today
+        }
+    
+    async def end_bot_session(self, phone_number: str, status: str = 'abandoned'):
+        """Mark session as ended"""
+        session_key = f"bot:active_session:{phone_number}"
+        await self._execute("DEL", session_key)
+        await self._execute("SREM", "bot:active_sessions", phone_number)
+        await self._execute("SREM", "bot:users_with_cart", phone_number)
+        
+        # Track conversion if completed
+        if status == 'converted':
+            today = datetime.now().strftime("%Y-%m-%d")
+            await self._execute("HINCRBY", f"bot:stats:{today}", "orders_completed", 1)
+
 
 redis_service = RedisService()
