@@ -17,28 +17,26 @@ from app.models.restaurant import Restaurant, Branch, RestaurantCategory
 from app.models.menu import Menu, MenuItem, Category
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.user import User
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_, desc
 from sqlalchemy.orm import selectinload
 import logging
 import json
 from typing import Optional, Dict, Any
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 class BotController:
     """
     WhatsApp Bot Controller - Handles all incoming messages and manages conversation flow.
-    
+
     States:
     - INIT: Initial state, waiting for first message
     - AWAITING_LANG: Waiting for language selection
     - MAIN_MENU: Main menu displayed
-    - BROWSING_REST_CATEGORIES: User browsing restaurant categories (Shawarma, Pizza, etc.)
     - BROWSING_RESTAURANTS: User browsing restaurants list
-    - BROWSING_CATEGORIES: User browsing menu categories
-    - BROWSING_ITEMS: User browsing menu items in a category
-    - VIEWING_ITEM: User viewing a specific item
-    - AWAITING_QUANTITY: Waiting for quantity input
+    - BROWSING_NUMBERED_MENU: User browsing numbered menu
+    - AWAITING_NUMBERED_QUANTITY: Waiting for numbered menu quantity
     - VIEWING_CART: User viewing their cart
     - EDITING_CART: User editing cart item
     - AWAITING_LOCATION: Waiting for delivery location
@@ -64,6 +62,17 @@ class BotController:
 
         message_type = message_body.get("type")
         logger.debug(f"Message Type: {message_type}")
+        
+        # TRACK: New session if user is in INIT state or no state
+        if state == "INIT":
+            await self._track_session_start(phone_number)
+        
+        # TRACK: All messages
+        await redis_service.track_bot_activity(phone_number)
+        await self._track_event(phone_number, 'message_received', {
+            'message_type': message_type,
+            'state': state
+        })
 
         # Route message to appropriate handler
         if message_type == "text":
@@ -121,7 +130,11 @@ class BotController:
             # If not a valid rating, show main menu
             await self._send_main_menu(phone_number, lang)
 
-        elif state in ["INIT", "MAIN_MENU", "BROWSING_RESTAURANTS", "BROWSING_CATEGORIES", "BROWSING_ITEMS", "BROWSING_REST_CATEGORIES", "BROWSING_ORDERS", "BROWSING_FAVORITES"]:
+        elif state == "SELECTING_RESTAURANT_BY_SEARCH":
+            # User selecting restaurant from search results
+            await self._handle_restaurant_search_selection(phone_number, text, lang, user_data)
+
+        elif state in ["INIT", "MAIN_MENU", "BROWSING_RESTAURANTS", "BROWSING_ORDERS", "BROWSING_FAVORITES"]:
             # Check if user is selecting from suggestions (typing a number)
             if text.strip().isdigit():
                 selection = int(text.strip())
@@ -186,9 +199,6 @@ class BotController:
             await self._send_main_menu(phone_number, lang)
 
         # Main Menu Options
-        elif btn_id == "menu_browse":
-            await self._show_restaurant_categories(phone_number, lang)
-
         elif btn_id == "view_cart":
             await self._show_cart(phone_number, lang)
 
@@ -197,6 +207,13 @@ class BotController:
 
         # Checkout Actions
         elif btn_id == "checkout":
+            # TRACK: Checkout started
+            cart_total = await redis_service.get_cart_total(phone_number)
+            cart_count = await redis_service.get_cart_count(phone_number)
+            await self._track_event(phone_number, 'checkout_started', {
+                'cart_total': float(cart_total),
+                'items_count': cart_count
+            })
             await self._start_checkout(phone_number, lang)
 
         elif btn_id == "use_previous_info":
@@ -212,20 +229,12 @@ class BotController:
             await self._send_main_menu(phone_number, lang)
 
         elif btn_id == "continue_shopping" or btn_id == "add_more":
-            restaurant_id = user_data.get("restaurant_id")
-            if restaurant_id:
-                await self._show_categories(phone_number, restaurant_id, lang)
-            else:
-                await self._show_restaurants(phone_number, lang)
+            await self._send_main_menu(phone_number, lang)
 
         elif btn_id == "edit_cart":
             await self._show_cart_edit_options(phone_number, lang)
 
         # Item Actions
-        elif btn_id.startswith("add_"):
-            item_id = int(btn_id.replace("add_", ""))
-            await self._prompt_quantity(phone_number, item_id, lang, user_data)
-
         elif btn_id.startswith("qty_"):
             # Quick add with quantity (qty_1_itemid, qty_2_itemid, etc.)
             parts = btn_id.split("_")
@@ -233,26 +242,9 @@ class BotController:
             item_id = int(parts[2])
             await self._add_item_to_cart(phone_number, item_id, quantity, lang, user_data)
 
-        elif btn_id.startswith("var_"):
-            # Variant selection (var_variantId_itemId)
-            parts = btn_id.split("_")
-            variant_id = int(parts[1])
-            item_id = int(parts[2])
-            await self._add_variant_to_cart(phone_number, item_id, variant_id, 1, lang, user_data)
-
         # Back Navigation
         elif btn_id == "back_main":
             await self._send_main_menu(phone_number, lang)
-
-        elif btn_id == "back_restaurants":
-            await self._show_restaurants(phone_number, lang)
-
-        elif btn_id == "back_categories":
-            restaurant_id = user_data.get("restaurant_id")
-            if restaurant_id:
-                await self._show_categories(phone_number, restaurant_id, lang)
-            else:
-                await self._show_restaurants(phone_number, lang)
 
         # Support
         elif btn_id == "end_support":
@@ -290,87 +282,16 @@ class BotController:
         elif btn_id == "skip_fav":
             await self._send_main_menu(phone_number, lang)
 
-        # Restaurant selection from menu request
-        elif btn_id.startswith("rest_"):
-            restaurant_id = int(btn_id.split("_")[1])
-            await self._show_categories(phone_number, restaurant_id, lang)
-
-        # Show restaurants list
-        elif btn_id == "show_restaurants":
-            await self._show_restaurants(phone_number, lang)
-
     async def _handle_list_reply(self, phone_number: str, list_id: str, state: str, lang: str, user_data: dict):
         """Handle list item selection"""
         logger.debug(f"List ID: {list_id}, State: {state}")
 
-        # Pagination handlers FIRST (before regular handlers)
-        # Restaurant categories pagination (restcat_page_pageNum)
-        if list_id.startswith("restcat_page_"):
-            page = int(list_id.split("_")[2])
-            await self._show_restaurant_categories(phone_number, lang, page)
-
-        # All restaurants pagination (all_rest_page_pageNum)
-        elif list_id.startswith("all_rest_page_"):
-            page = int(list_id.split("_")[3])
-            await self._show_restaurants(phone_number, lang, page)
-
-        # Menu categories pagination (menucat_page_restId_pageNum)
-        elif list_id.startswith("menucat_page_"):
-            parts = list_id.split("_")
-            restaurant_id = int(parts[2])
-            page = int(parts[3])
-            await self._show_categories(phone_number, restaurant_id, lang, page)
-
-        # Restaurant Category Selection (Shawarma, Pizza, etc.)
-        elif list_id.startswith("restcat_"):
-            category_id = int(list_id.split("_")[1])
-            await self._show_restaurants_by_category(phone_number, category_id, lang)
-
-        # Restaurant Selection
-        elif list_id.startswith("rest_"):
-            restaurant_id = int(list_id.split("_")[1])
-            await self._show_categories(phone_number, restaurant_id, lang)
-
-        # Category Selection
-        elif list_id.startswith("cat_"):
-            category_id = int(list_id.split("_")[1])
-            await self._show_menu_items(phone_number, category_id, lang, user_data)
-
-        # Item Selection
-        elif list_id.startswith("item_"):
-            item_id = int(list_id.split("_")[1])
-            await self._show_item_details(phone_number, item_id, lang, user_data)
-
         # Cart Item Selection for editing
-        elif list_id.startswith("edit_item_"):
+        if list_id.startswith("edit_item_"):
             item_id = int(list_id.split("_")[2])
             await self._show_item_edit_options(phone_number, item_id, lang)
 
-        # Variant Selection (var_variantId_itemId)
-        elif list_id.startswith("var_"):
-            parts = list_id.split("_")
-            variant_id = int(parts[1])
-            item_id = int(parts[2])
-            await self._add_variant_to_cart(phone_number, item_id, variant_id, 1, lang, user_data)
-
-        # More restaurants pagination (more_rest_categoryId_page)
-        elif list_id.startswith("more_rest_"):
-            parts = list_id.split("_")
-            category_id = int(parts[2])
-            page = int(parts[3])
-            await self._show_restaurants_by_category(phone_number, category_id, lang, page)
-
-        # Menu items pagination (menu_page_categoryId_page)
-        elif list_id.startswith("menu_page_"):
-            parts = list_id.split("_")
-            category_id = int(parts[2])
-            page = int(parts[3])
-            await self._show_menu_items(phone_number, category_id, lang, user_data, page)
-
         # Main Menu Options (from list)
-        elif list_id == "menu_browse":
-            await self._show_restaurant_categories(phone_number, lang)
-
         elif list_id == "view_cart":
             await self._show_cart(phone_number, lang)
 
@@ -388,10 +309,17 @@ class BotController:
             order_id = int(list_id.split("_")[1])
             await self._process_reorder(phone_number, order_id, lang)
 
-        # Favorite restaurant selection (fav_restId)
+        # Favorite restaurant selection (fav_restId) - show numbered menu
         elif list_id.startswith("fav_"):
             restaurant_id = int(list_id.split("_")[1])
-            await self._show_categories(phone_number, restaurant_id, lang)
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(select(Restaurant).where(Restaurant.id == restaurant_id))
+                restaurant = result.scalars().first()
+                if restaurant:
+                    rest_name = restaurant.name_ar if lang == 'ar' and restaurant.name_ar else restaurant.name
+                    await self._show_full_menu_numbered(phone_number, restaurant_id, rest_name, lang)
+                else:
+                    await self._send_main_menu(phone_number, lang)
 
         # Quick order from favorites (quickorder_itemId_restId)
         elif list_id.startswith("quickorder_"):
@@ -421,10 +349,10 @@ class BotController:
             item_name = item.name_ar if lang == "ar" and item.name_ar else item.name
             price = float(item.price) if item.price else 0.0
 
-            # Check if item has variants
+            # Check if item has variants - show numbered menu for the restaurant
             if hasattr(item, 'has_variants') and item.has_variants:
-                # Show variants
-                await self._show_item_details(phone_number, item_id, lang, {"restaurant_id": restaurant_id, "lang": lang})
+                rest_name = rest.name_ar if lang == "ar" and rest.name_ar else rest.name
+                await self._show_full_menu_numbered(phone_number, restaurant_id, rest_name, lang)
                 return
 
             # Add directly to cart
@@ -551,11 +479,6 @@ class BotController:
             "title": "القائمة الرئيسية" if lang == "ar" else "Main Menu",
             "rows": [
                 {
-                    "id": "menu_browse",
-                    "title": get_text("btn_menu", lang)[:24],
-                    "description": "تصفح المطاعم والأصناف" if lang == "ar" else "Browse restaurants & items"
-                },
-                {
                     "id": "view_cart",
                     "title": f"{get_text('btn_cart', lang)}{cart_text}"[:24],
                     "description": "عرض سلة المشتريات" if lang == "ar" else "View your cart"
@@ -586,490 +509,6 @@ class BotController:
         )
         await redis_service.set_user_state(phone_number, "MAIN_MENU", {"lang": lang})
 
-    async def _show_restaurant_categories(self, phone_number: str, lang: str, page: int = 0):
-        """Show restaurant categories (Shawarma, Pizza, Snacks, etc.) with pagination"""
-        import asyncio
-        ITEMS_PER_PAGE = 9  # Leave room for navigation
-
-        categories = None
-        for attempt in range(3):
-            try:
-                async with AsyncSessionLocal() as db:
-                    result = await db.execute(
-                        select(RestaurantCategory)
-                        .where(RestaurantCategory.is_active == True)
-                        .order_by(RestaurantCategory.order)
-                    )
-                    categories = result.scalars().all()
-                    break
-            except Exception as e:
-                logger.error(f"DB attempt {attempt+1}/3 failed: {e}")
-                if attempt < 2:
-                    await asyncio.sleep(1)
-                else:
-                    await whatsapp_service.send_text(phone_number, "⚠️ عذراً، في مشكلة. جرب كمان مرة!")
-                    await self._send_main_menu(phone_number, lang)
-                    return
-
-        if not categories:
-            # Fallback to showing all restaurants if no categories exist
-            await self._show_restaurants(phone_number, lang)
-            return
-
-        # Pagination
-        total_categories = len(categories)
-        start_idx = page * ITEMS_PER_PAGE
-        end_idx = start_idx + ITEMS_PER_PAGE
-        categories_to_show = categories[start_idx:end_idx]
-        has_more = total_categories > end_idx
-        has_prev = page > 0
-
-        rows = [
-            {
-                "id": f"restcat_{c.id}",
-                "title": f"{c.icon} {c.name_ar if lang == 'ar' else c.name}"[:24],
-                "description": ""
-            }
-            for c in categories_to_show
-        ]
-
-        # Add navigation buttons
-        if has_prev:
-            rows.append({
-                "id": f"restcat_page_{page - 1}",
-                "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
-                "description": ""
-            })
-
-        if has_more:
-            remaining = total_categories - end_idx
-            rows.append({
-                "id": f"restcat_page_{page + 1}",
-                "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
-                "description": f"{remaining} {'تصنيف آخر' if lang == 'ar' else 'more categories'}"
-            })
-
-        # Build page info
-        total_pages = (total_categories + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
-        page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
-
-        sections = [{
-            "title": f"{get_text('select_category', lang) if lang == 'ar' else 'Select Category'}{page_info}"[:24],
-            "rows": rows
-        }]
-
-        header = "🍽️ اختر نوع المطعم:" if lang == "ar" else "🍽️ Choose restaurant type:"
-
-        await whatsapp_service.send_interactive_list(
-            phone_number,
-            header,
-            get_text("view_restaurants", lang),
-            sections
-        )
-        await redis_service.set_user_state(phone_number, "BROWSING_REST_CATEGORIES", {"lang": lang, "page": page})
-
-    async def _show_restaurants_by_category(self, phone_number: str, category_id: int, lang: str, page: int = 0):
-        """Show restaurants filtered by category with pagination"""
-        async with AsyncSessionLocal() as db:
-            # Get category info
-            cat_result = await db.execute(
-                select(RestaurantCategory).where(RestaurantCategory.id == category_id)
-            )
-            category = cat_result.scalars().first()
-            
-            if not category:
-                await self._show_restaurant_categories(phone_number, lang)
-                return
-
-            # Get all restaurants in this category
-            result = await db.execute(
-                select(Restaurant)
-                .where(Restaurant.is_active == True)
-                .where(Restaurant.category_id == category_id)
-            )
-            all_restaurants = result.scalars().all()
-
-            if not all_restaurants:
-                no_rest_msg = f"لا توجد مطاعم في قسم {category.name_ar}" if lang == "ar" else f"No restaurants in {category.name} category"
-                await whatsapp_service.send_text(phone_number, no_rest_msg)
-                await self._show_restaurant_categories(phone_number, lang)
-                return
-
-            cat_name = category.name_ar if lang == "ar" else category.name
-            
-            # Pagination: 9 items per page (leaving room for "More" option)
-            items_per_page = 9
-            start_idx = page * items_per_page
-            end_idx = start_idx + items_per_page
-            restaurants_to_show = all_restaurants[start_idx:end_idx]
-            has_more = len(all_restaurants) > end_idx
-            
-            rows = [
-                {
-                    "id": f"rest_{r.id}",
-                    "title": (r.name_ar if lang == 'ar' and r.name_ar else r.name)[:24],
-                    "description": ((r.description_ar if lang == 'ar' and r.description_ar else r.description) or "")[:70]
-                }
-                for r in restaurants_to_show
-            ]
-            
-            # Add "More" option if there are more restaurants
-            if has_more:
-                more_text = "المزيد ←" if lang == "ar" else "More →"
-                rows.append({
-                    "id": f"more_rest_{category_id}_{page + 1}",
-                    "title": more_text,
-                    "description": f"{len(all_restaurants) - end_idx} {'مطعم آخر' if lang == 'ar' else 'more restaurants'}"
-                })
-            
-            sections = [{
-                "title": f"{category.icon} {cat_name}"[:24],
-                "rows": rows
-            }]
-
-            await whatsapp_service.send_interactive_list(
-                phone_number,
-                get_text("select_restaurant", lang),
-                get_text("view_restaurants", lang),
-                sections
-            )
-            await redis_service.set_user_state(phone_number, "BROWSING_RESTAURANTS", {"lang": lang, "rest_category_id": category_id, "page": page})
-
-    async def _show_restaurants(self, phone_number: str, lang: str, page: int = 0):
-        """Show available restaurants list with pagination (max 10 items per WhatsApp message)"""
-        ITEMS_PER_PAGE = 9  # Leave room for "More" button
-
-        async with AsyncSessionLocal() as db:
-            result = await db.execute(
-                select(Restaurant)
-                .where(Restaurant.is_active == True)
-            )
-            all_restaurants = result.scalars().all()
-
-            if not all_restaurants:
-                await whatsapp_service.send_text(phone_number, get_text("no_restaurants", lang))
-                await self._send_main_menu(phone_number, lang)
-                return
-
-            # Pagination
-            total_restaurants = len(all_restaurants)
-            start_idx = page * ITEMS_PER_PAGE
-            end_idx = start_idx + ITEMS_PER_PAGE
-            restaurants_to_show = all_restaurants[start_idx:end_idx]
-            has_more = total_restaurants > end_idx
-            has_prev = page > 0
-
-            rows = [
-                {
-                    "id": f"rest_{r.id}",
-                    "title": (r.name_ar if lang == 'ar' and r.name_ar else r.name)[:24],
-                    "description": ((r.description_ar if lang == 'ar' and r.description_ar else r.description) or "")[:70]
-                }
-                for r in restaurants_to_show
-            ]
-
-            # Add navigation buttons
-            if has_prev:
-                rows.append({
-                    "id": f"all_rest_page_{page - 1}",
-                    "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
-                    "description": f"صفحة {page}" if lang == 'ar' else f"Page {page}"
-                })
-
-            if has_more:
-                remaining = total_restaurants - end_idx
-                rows.append({
-                    "id": f"all_rest_page_{page + 1}",
-                    "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
-                    "description": f"{remaining} {'مطعم آخر' if lang == 'ar' else 'more restaurants'}"
-                })
-
-            # Build page info
-            total_pages = (total_restaurants + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
-            page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
-
-            sections = [{
-                "title": f"{get_text('restaurants', lang)}{page_info}"[:24],
-                "rows": rows
-            }]
-
-            await whatsapp_service.send_interactive_list(
-                phone_number,
-                get_text("select_restaurant", lang),
-                get_text("view_restaurants", lang),
-                sections
-            )
-            await redis_service.set_user_state(phone_number, "BROWSING_RESTAURANTS", {"lang": lang, "page": page})
-
-    async def _show_categories(self, phone_number: str, restaurant_id: int, lang: str, page: int = 0):
-        """Show menu categories for a restaurant with pagination (max 10 items per WhatsApp message)"""
-        ITEMS_PER_PAGE = 9  # Leave room for navigation
-
-        async with AsyncSessionLocal() as db:
-            # Get restaurant info
-            rest_result = await db.execute(
-                select(Restaurant).where(Restaurant.id == restaurant_id)
-            )
-            restaurant = rest_result.scalars().first()
-
-            if not restaurant:
-                await whatsapp_service.send_text(phone_number, get_text("restaurant_not_found", lang))
-                await self._show_restaurants(phone_number, lang)
-                return
-
-            # Get categories
-            result = await db.execute(
-                select(Category)
-                .join(Menu)
-                .where(Menu.restaurant_id == restaurant_id)
-                .where(Menu.is_active == True)
-            )
-            categories = result.scalars().all()
-
-            if not categories:
-                await whatsapp_service.send_text(phone_number, get_text("no_menu", lang))
-                await self._show_restaurants(phone_number, lang)
-                return
-
-            # Get display name based on language
-            rest_name = (restaurant.name_ar if lang == 'ar' and restaurant.name_ar else restaurant.name)
-
-            # Pagination
-            total_categories = len(categories)
-            start_idx = page * ITEMS_PER_PAGE
-            end_idx = start_idx + ITEMS_PER_PAGE
-            categories_to_show = categories[start_idx:end_idx]
-            has_more = total_categories > end_idx
-            has_prev = page > 0
-
-            rows = [
-                {
-                    "id": f"cat_{c.id}",
-                    "title": (c.name_ar if lang == 'ar' and c.name_ar else c.name)[:24],
-                    "description": ""
-                }
-                for c in categories_to_show
-            ]
-
-            # Add navigation buttons
-            if has_prev:
-                rows.append({
-                    "id": f"menucat_page_{restaurant_id}_{page - 1}",
-                    "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
-                    "description": ""
-                })
-
-            if has_more:
-                remaining = total_categories - end_idx
-                rows.append({
-                    "id": f"menucat_page_{restaurant_id}_{page + 1}",
-                    "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
-                    "description": f"{remaining} {'فئة أخرى' if lang == 'ar' else 'more categories'}"
-                })
-
-            # Build page info
-            total_pages = (total_categories + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
-            page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
-
-            sections = [{
-                "title": f"{rest_name}{page_info}"[:24],
-                "rows": rows
-            }]
-
-            await whatsapp_service.send_interactive_list(
-                phone_number,
-                f"📋 {rest_name}\n{get_text('select_category', lang)}",
-                get_text("view_menu", lang),
-                sections
-            )
-            await redis_service.set_user_state(phone_number, "BROWSING_CATEGORIES", {
-                "lang": lang,
-                "restaurant_id": restaurant_id,
-                "restaurant_name": rest_name,
-                "page": page
-            })
-
-    async def _show_menu_items(self, phone_number: str, category_id: int, lang: str, user_data: dict, page: int = 0):
-        """Show menu items in a category with pagination (max 10 items per page)"""
-        ITEMS_PER_PAGE = 8  # Leave room for navigation buttons
-
-        async with AsyncSessionLocal() as db:
-            # Get category with items
-            result = await db.execute(
-                select(Category)
-                .options(selectinload(Category.items))
-                .where(Category.id == category_id)
-            )
-            category = result.scalars().first()
-
-            if not category or not category.items:
-                await whatsapp_service.send_text(phone_number, get_text("no_items", lang))
-                return
-
-            # Filter available items
-            available_items = [item for item in category.items if item.is_available]
-
-            if not available_items:
-                await whatsapp_service.send_text(phone_number, get_text("no_items_available", lang))
-                return
-
-            # Calculate pagination
-            total_items = len(available_items)
-            total_pages = (total_items + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
-            start_idx = page * ITEMS_PER_PAGE
-            end_idx = min(start_idx + ITEMS_PER_PAGE, total_items)
-
-            # Get items for current page
-            page_items = available_items[start_idx:end_idx]
-
-            # Get display names based on language
-            cat_name = category.name_ar if lang == 'ar' and category.name_ar else category.name
-
-            def get_item_name(item):
-                return (item.name_ar if lang == 'ar' and item.name_ar else item.name)[:24]
-
-            def get_item_desc(item):
-                desc = item.description_ar if lang == 'ar' and hasattr(item, 'description_ar') and item.description_ar else item.description
-                # Handle variant items with price range
-                if hasattr(item, 'has_variants') and item.has_variants and hasattr(item, 'price_min') and item.price_min:
-                    price_str = f"${item.price_min:.2f}-${item.price_max:.2f}"
-                elif item.price:
-                    price_str = f"${item.price:.2f}"
-                else:
-                    price_str = "$0.00"
-                return f"💰 {price_str}" + (f" | {desc[:30]}" if desc else "")
-
-            # Build rows for current page items
-            rows = [
-                {
-                    "id": f"item_{item.id}",
-                    "title": get_item_name(item),
-                    "description": get_item_desc(item)
-                }
-                for item in page_items
-            ]
-
-            # Add navigation rows
-            if page > 0:
-                rows.append({
-                    "id": f"menu_page_{category_id}_{page - 1}",
-                    "title": "⬅️ السابق" if lang == 'ar' else "⬅️ Previous",
-                    "description": f"صفحة {page}" if lang == 'ar' else f"Page {page}"
-                })
-
-            if page < total_pages - 1:
-                rows.append({
-                    "id": f"menu_page_{category_id}_{page + 1}",
-                    "title": "التالي ➡️" if lang == 'ar' else "Next ➡️",
-                    "description": f"صفحة {page + 2}" if lang == 'ar' else f"Page {page + 2}"
-                })
-
-            # Build section
-            page_info = f" ({page + 1}/{total_pages})" if total_pages > 1 else ""
-            sections = [{
-                "title": f"{cat_name}{page_info}"[:24],
-                "rows": rows
-            }]
-
-            # Build message with page info
-            if total_pages > 1:
-                body_text = f"🍽️ {cat_name}\n📄 {page + 1}/{total_pages} | {total_items} {'صنف' if lang == 'ar' else 'items'}\n{get_text('select_item', lang)}"
-            else:
-                body_text = f"🍽️ {cat_name}\n{get_text('select_item', lang)}"
-
-            await whatsapp_service.send_interactive_list(
-                phone_number,
-                body_text,
-                get_text("view_items", lang),
-                sections
-            )
-
-            user_data["category_id"] = category_id
-            user_data["menu_page"] = page
-            await redis_service.set_user_state(phone_number, "BROWSING_ITEMS", user_data)
-
-    async def _show_item_details(self, phone_number: str, item_id: int, lang: str, user_data: dict):
-        """Show item details with add to cart option"""
-        async with AsyncSessionLocal() as db:
-            result = await db.execute(
-                select(MenuItem).where(MenuItem.id == item_id)
-            )
-            item = result.scalars().first()
-
-            if not item:
-                await whatsapp_service.send_text(phone_number, get_text("item_not_found", lang))
-                return
-
-            # Get display names based on language
-            item_name = item.name_ar if lang == 'ar' and item.name_ar else item.name
-            item_desc = item.description_ar if lang == 'ar' and hasattr(item, 'description_ar') and item.description_ar else item.description
-
-            # Format item details
-            details = f"🍽️ *{item_name}*\n\n"
-            if item_desc:
-                details += f"📝 {item_desc}\n\n"
-            
-            # Check if item has variants (sizes)
-            if hasattr(item, 'has_variants') and item.has_variants:
-                # Get variants from database
-                from app.models.menu import MenuItemVariant
-                variants_result = await db.execute(
-                    select(MenuItemVariant).where(MenuItemVariant.menu_item_id == item_id).order_by(MenuItemVariant.order)
-                )
-                variants = variants_result.scalars().all()
-                
-                if variants:
-                    # Use interactive list to show ALL variants (no 3-button limit)
-                    variant_rows = []
-                    for v in variants:
-                        v_name = v.name_ar if lang == 'ar' and v.name_ar else v.name
-                        variant_rows.append({
-                            "id": f"var_{v.id}_{item.id}",
-                            "title": v_name[:24],
-                            "description": f"💰 ${v.price:.2f}"
-                        })
-                    
-                    sections = [{
-                        "title": get_text('select_size', lang) if lang == 'ar' else 'Select Size',
-                        "rows": variant_rows
-                    }]
-                    
-                    await whatsapp_service.send_interactive_list(
-                        phone_number,
-                        details,
-                        get_text('select_size', lang) if lang == 'ar' else 'Choose Size',
-                        sections
-                    )
-                else:
-                    # Fallback if no variants found
-                    price_str = f"${item.price_min:.2f} - ${item.price_max:.2f}" if item.price_min else "$0.00"
-                    details += f"💰 {get_text('price', lang)}: {price_str}"
-                    await whatsapp_service.send_interactive_buttons(
-                        phone_number,
-                        details,
-                        [
-                            {"id": f"qty_1_{item.id}", "title": get_text("add_one", lang)},
-                            {"id": "back_categories", "title": get_text("back", lang)}
-                        ]
-                    )
-            else:
-                # Regular item without variants
-                price_str = f"${item.price:.2f}" if item.price else "$0.00"
-                details += f"💰 {get_text('price', lang)}: {price_str}"
-                
-                await whatsapp_service.send_interactive_buttons(
-                    phone_number,
-                    details,
-                    [
-                        {"id": f"qty_1_{item.id}", "title": get_text("add_one", lang)},
-                        {"id": f"qty_2_{item.id}", "title": get_text("add_two", lang)},
-                        {"id": "back_categories", "title": get_text("back", lang)}
-                    ]
-                )
-            
-            user_data["viewing_item_id"] = item_id
-            await redis_service.set_user_state(phone_number, "VIEWING_ITEM", user_data)
-
     async def _add_item_to_cart(self, phone_number: str, item_id: int, quantity: int, lang: str, user_data: dict):
         """Add item to cart - uses eager loading to avoid N+1 queries"""
         async with AsyncSessionLocal() as db:
@@ -1098,8 +537,20 @@ class BotController:
 
             await redis_service.add_to_cart(phone_number, cart_item)
 
-            # Confirmation message
+            # TRACK: Item added to cart
+            cart_total = await redis_service.get_cart_total(phone_number)
             cart_count = await redis_service.get_cart_count(phone_number)
+            await self._track_event(phone_number, 'item_added_to_cart', {
+                'item_name': item.name,
+                'price': float(item.price),
+                'quantity': quantity,
+                'cart_total': float(cart_total),
+                'items_count': cart_count,
+                'source': 'menu'
+            })
+            await redis_service.track_cart_update(phone_number, float(cart_total), cart_count)
+
+            # Confirmation message
             confirm_msg = get_text("item_added", lang).format(
                 quantity=quantity,
                 name=item.name,
@@ -1115,89 +566,6 @@ class BotController:
                     {"id": "checkout", "title": get_text("checkout", lang)}
                 ]
             )
-
-    async def _add_variant_to_cart(self, phone_number: str, item_id: int, variant_id: int, quantity: int, lang: str, user_data: dict):
-        """Add item with specific variant/size to cart"""
-        async with AsyncSessionLocal() as db:
-            from app.models.menu import MenuItemVariant
-            
-            # Get the variant
-            variant_result = await db.execute(
-                select(MenuItemVariant).where(MenuItemVariant.id == variant_id)
-            )
-            variant = variant_result.scalars().first()
-            
-            if not variant:
-                await whatsapp_service.send_text(phone_number, get_text("item_not_found", lang))
-                return
-            
-            # Get the menu item
-            result = await db.execute(
-                select(MenuItem)
-                .options(selectinload(MenuItem.category))
-                .where(MenuItem.id == item_id)
-            )
-            item = result.scalars().first()
-            
-            if not item:
-                await whatsapp_service.send_text(phone_number, get_text("item_not_found", lang))
-                return
-            
-            # Get restaurant_id
-            menu_result = await db.execute(
-                select(Menu).where(Menu.id == item.category.menu_id)
-            )
-            menu = menu_result.scalars().first()
-            
-            # Get variant display name
-            variant_name = variant.name_ar if lang == 'ar' and variant.name_ar else variant.name
-            item_name = item.name_ar if lang == 'ar' and item.name_ar else item.name
-            
-            cart_item = {
-                "menu_item_id": item.id,
-                "variant_id": variant.id,
-                "name": f"{item_name} ({variant_name})",
-                "price": variant.price,
-                "quantity": quantity,
-                "restaurant_id": menu.restaurant_id if menu else user_data.get("restaurant_id")
-            }
-            
-            await redis_service.add_to_cart(phone_number, cart_item)
-            
-            # Confirmation message
-            cart_count = await redis_service.get_cart_count(phone_number)
-            confirm_msg = get_text("item_added", lang).format(
-                quantity=quantity,
-                name=f"{item_name} ({variant_name})",
-                cart_count=cart_count
-            )
-            
-            await whatsapp_service.send_interactive_buttons(
-                phone_number,
-                f"✅ {confirm_msg}",
-                [
-                    {"id": "continue_shopping", "title": get_text("continue_shopping", lang)},
-                    {"id": "view_cart", "title": get_text("view_cart", lang)},
-                    {"id": "checkout", "title": get_text("checkout", lang)}
-                ]
-            )
-
-    async def _prompt_quantity(self, phone_number: str, item_id: int, lang: str, user_data: dict):
-        """Prompt user for quantity"""
-        await whatsapp_service.send_text(phone_number, get_text("enter_quantity", lang))
-        user_data["pending_item_id"] = item_id
-        await redis_service.set_user_state(phone_number, "AWAITING_QUANTITY", user_data)
-
-    async def _process_quantity_input(self, phone_number: str, text: str, lang: str, user_data: dict):
-        """Process quantity input"""
-        valid, quantity = validate_quantity(text)
-        if not valid:
-            await whatsapp_service.send_text(phone_number, get_text("invalid_quantity", lang))
-            return
-
-        item_id = user_data.get("pending_item_id")
-        if item_id:
-            await self._add_item_to_cart(phone_number, item_id, quantity, lang, user_data)
 
     async def _show_cart(self, phone_number: str, lang: str):
         """Show cart contents"""
@@ -1436,6 +804,9 @@ class BotController:
             except Exception as e:
                 logger.error(f"Failed to send push notification: {e}")
 
+            # TRACK: Order completed successfully
+            await self._track_order_completed(phone_number, order.id, float(total_amount))
+
             await redis_service.set_user_state(phone_number, "ORDER_PLACED", {
                 "lang": lang,
                 "order_id": order.id,
@@ -1575,7 +946,12 @@ https://maps.google.com/?q={lat},{lng}
 
         # Process with smart AI including conversation context and cart
         ai_result = await ai_service.process_smart_order(
-            text, lang, restaurant_id, user_data, conversation_history, cart_items
+            text=text,
+            language=lang,
+            restaurant_id=restaurant_id,
+            user_data=user_data,
+            conversation_history=conversation_history,
+            cart_items=cart_items
         )
 
         intent = ai_result.get("intent", "error")
@@ -1622,8 +998,9 @@ https://maps.google.com/?q={lat},{lng}
                     ref_restaurant = search_results[reference_position - 1]
                     restaurant_id = ref_restaurant.get("id")
                     if restaurant_id:
-                        # Show categories for this restaurant
-                        await self._show_categories(phone_number, restaurant_id, lang)
+                        # Show numbered menu for this restaurant
+                        rest_name = ref_restaurant.get("name", "")
+                        await self._show_full_menu_numbered(phone_number, restaurant_id, rest_name, lang)
                         return
 
             # Add items to cart
@@ -1752,67 +1129,33 @@ https://maps.google.com/?q={lat},{lng}
                 if len(by_restaurant[rest]) < 3:  # Max 3 per restaurant
                     by_restaurant[rest].append(s)
 
-            # Build interactive list (max 9 rows total for WhatsApp limit)
-            sections = []
-            total_rows = 0
-            MAX_ROWS = 9
-            for rest_name, items in list(by_restaurant.items()):
-                if total_rows >= MAX_ROWS:
-                    break
-                rows = []
-                for item in items:
-                    if total_rows >= MAX_ROWS:
-                        break
-                    price_str = f"${item['price']:.2f}" if item['price'] else ""
-                    rows.append({
-                        "id": f"item_{item['id']}",
-                        "title": item["name"][:24],
-                        "description": f"💰 {price_str}" if price_str else ""
-                    })
-                    total_rows += 1
-                if rows:
-                    sections.append({
-                        "title": rest_name[:24],
-                        "rows": rows
-                    })
-
+            # Build text suggestions
             header = f"🤔 ما لقيت '{original_text}' بالضبط\n\n"
             header += "💡 بس ممكن تقصد:" if lang == "ar" else "Did you mean:"
+            lines = [header, ""]
+            for rest_name, items in list(by_restaurant.items())[:5]:
+                lines.append(f"🏪 *{rest_name}*")
+                for item in items:
+                    price_str = f" - ${item['price']:.2f}" if item['price'] else ""
+                    lines.append(f"  • {item['name']}{price_str}")
+            lines.append("")
+            lines.append("✏️ اكتب اسم الصنف أو *menu* + اسم المطعم" if lang == "ar" else "Type item name or *menu* + restaurant name")
 
             # Store suggestions in context
             await redis_service.update_conversation_context(phone_number, {
                 "suggestions": suggestions[:5]
             })
 
-            await whatsapp_service.send_interactive_list(
-                phone_number,
-                header,
-                "اختار 👆" if lang == "ar" else "Select",
-                sections
-            )
+            await whatsapp_service.send_text(phone_number, "\n".join(lines))
 
         elif restaurants_found:
-            # Found matching restaurants
-            header = f"🔍 لقيت مطاعم قريبة من '{original_text}':"
-
-            sections = [{
-                "title": "🏪 مطاعم" if lang == "ar" else "Restaurants",
-                "rows": [
-                    {
-                        "id": f"rest_{r['id']}",
-                        "title": r["name"][:24],
-                        "description": "عرض المانيو" if lang == "ar" else "View menu"
-                    }
-                    for r in restaurants_found[:5]
-                ]
-            }]
-
-            await whatsapp_service.send_interactive_list(
-                phone_number,
-                header,
-                "اختار 👆" if lang == "ar" else "Select",
-                sections
-            )
+            # Found matching restaurants - show as text
+            lines = [f"🔍 لقيت مطاعم قريبة من '{original_text}':", ""]
+            for r in restaurants_found[:5]:
+                lines.append(f"🏪 {r['name']}")
+            lines.append("")
+            lines.append("✏️ اكتب *menu* + اسم المطعم لعرض المانيو")
+            await whatsapp_service.send_text(phone_number, "\n".join(lines))
 
         else:
             # Nothing found - provide helpful message
@@ -1844,44 +1187,134 @@ https://maps.google.com/?q={lat},{lng}
             await self._send_main_menu(phone_number, lang)
 
     async def _handle_product_search(self, phone_number: str, ai_result: dict, lang: str):
-        """Handle search_product intent - show restaurants with this product"""
+        """Handle search_product intent - show restaurants with this product (numbered list)"""
         restaurants = ai_result.get("matching_restaurants", [])
         product = ai_result.get("product_query", "")
         ai_message = ai_result.get("message", "")
         
         if not restaurants:
-            no_result = ai_message or f"ما لقيت {product} بالمطاعم 😕 جرب شي ثاني!"
+            no_result = ai_message or f"ما لقيت {product} 😕"
             await whatsapp_service.send_text(phone_number, no_result)
-            await self._show_restaurant_categories(phone_number, lang)
+            await self._send_main_menu(phone_number, lang)
             return
         
-        # Build header message
-        header = ai_message or f"🔥 لقيتلك {len(restaurants)} مطعم عندهم {product}!"
+        # Build numbered list message
+        header = ai_message or f"{len(restaurants)} مطاعم:"
         
-        # Build interactive list (max 9 rows for WhatsApp limit)
-        sections = [{
-            "title": f"🏪 مطاعم فيها {product}"[:24] if lang == "ar" else f"Restaurants with {product}"[:24],
-            "rows": [
-                {
-                    "id": f"rest_{r['id']}",
-                    "title": r['name'][:24],
-                    "description": f"{r.get('items_count', '')} أصناف متوفرة" if r.get('items_count') else ""
-                }
-                for r in restaurants[:9]
-            ]
-        }]
+        # Build numbered list (1, 2, 3...)
+        lines = [header, ""]
+        for i, r in enumerate(restaurants[:15], 1):  # Max 15 restaurants
+            lines.append(f"{i}. {r['name']}")
         
-        await whatsapp_service.send_interactive_list(
-            phone_number,
-            header,
-            "🔍 اختار مطعم" if lang == "ar" else "Choose Restaurant",
-            sections
-        )
+        lines.append("")
+        lines.append("✏️ رقم أو اسم المطعم:")
         
-        await redis_service.set_user_state(phone_number, "BROWSING_RESTAURANTS", {
+        await whatsapp_service.send_text(phone_number, "\n".join(lines))
+        
+        # Save restaurants list for selection
+        await redis_service.set_user_state(phone_number, "SELECTING_RESTAURANT_BY_SEARCH", {
             "lang": lang,
-            "search_query": product
+            "search_query": product,
+            "restaurants": restaurants[:15]
         })
+
+    async def _handle_restaurant_search_selection(self, phone_number: str, text: str, lang: str, user_data: dict):
+        """Handle user selecting restaurant from search results by number or name"""
+        restaurants = user_data.get("restaurants", [])
+        
+        if not restaurants:
+            await whatsapp_service.send_text(phone_number, "انتهت الجلسة 🔍" if lang == "ar" else "Session expired")
+            await self._send_main_menu(phone_number, lang)
+            return
+        
+        selected_restaurant = None
+        
+        # Check if input is a number
+        if text.strip().isdigit():
+            selection = int(text.strip())
+            if 1 <= selection <= len(restaurants):
+                selected_restaurant = restaurants[selection - 1]
+        else:
+            # Check if input matches a restaurant name (partial match)
+            text_lower = text.lower().strip()
+            for r in restaurants:
+                if text_lower in r['name'].lower() or r['name'].lower() in text_lower:
+                    selected_restaurant = r
+                    break
+        
+        if selected_restaurant:
+            # Show numbered menu directly (all items from all categories)
+            await self._show_full_menu_numbered(phone_number, selected_restaurant['id'], selected_restaurant['name'], lang)
+        else:
+            # Invalid selection
+            error_msg = f"❌ رقم من 1 لـ {len(restaurants)} أو اسم المطعم"
+            await whatsapp_service.send_text(phone_number, error_msg)
+
+    async def _show_full_menu_numbered(self, phone_number: str, restaurant_id: int, restaurant_name: str, lang: str):
+        """Show all menu items from all categories as a numbered list"""
+        async with AsyncSessionLocal() as db:
+            # Get all items from all categories for this restaurant
+            result = await db.execute(
+                select(MenuItem, Category)
+                .join(Category, MenuItem.category_id == Category.id)
+                .join(Menu, Category.menu_id == Menu.id)
+                .where(Menu.restaurant_id == restaurant_id)
+                .where(MenuItem.is_available == True)
+                .order_by(Category.id, MenuItem.id)
+            )
+            rows = result.all()
+            
+            if not rows:
+                await whatsapp_service.send_text(phone_number, "لا يوجد أصناف متاحة حالياً 😕" if lang == "ar" else "No items available 😕")
+                return
+            
+            # Build numbered menu
+            lines = [f"📋 {restaurant_name}", ""]
+            items_map = {}
+            current_cat = None
+            item_num = 1
+            
+            for item, category in rows:
+                # Show category header when it changes
+                cat_name = category.name_ar if lang == 'ar' and category.name_ar else category.name
+                if cat_name != current_cat:
+                    lines.append(f"🔸 {cat_name}")
+                    current_cat = cat_name
+                
+                # Item name and price
+                item_name = item.name_ar if lang == 'ar' and item.name_ar else item.name
+                price = float(item.price) if item.price else 0.0
+                
+                lines.append(f"{item_num}. {item_name} - ${price:.2f}")
+                
+                # Store in map for selection
+                items_map[str(item_num)] = {
+                    "menu_item_id": item.id,
+                    "name": item_name,
+                    "price": price,
+                    "restaurant_id": restaurant_id
+                }
+                item_num += 1
+            
+            lines.append("")
+            lines.append("✏️ أرقامك (مثلاً: 1 3):")
+            
+            # Split message if too long (WhatsApp limit ~4096 chars)
+            full_message = "\n".join(lines)
+            if len(full_message) > 4000:
+                # Send in parts
+                await whatsapp_service.send_text(phone_number, "\n".join(lines[:len(lines)//2]))
+                await whatsapp_service.send_text(phone_number, "\n".join(lines[len(lines)//2:]))
+            else:
+                await whatsapp_service.send_text(phone_number, full_message)
+            
+            # Save state for numbered menu selection
+            await redis_service.set_user_state(phone_number, "BROWSING_NUMBERED_MENU", {
+                "lang": lang,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+                "items_map": items_map
+            })
 
     async def _handle_category_discovery(self, phone_number: str, ai_result: dict, lang: str):
         """Handle discover_category intent - show restaurants in category"""
@@ -1892,31 +1325,26 @@ https://maps.google.com/?q={lat},{lng}
         if not restaurants:
             no_result = ai_message or f"ما في مطاعم ب{category} هلق 😕"
             await whatsapp_service.send_text(phone_number, no_result)
-            await self._show_restaurant_categories(phone_number, lang)
+            await self._send_main_menu(phone_number, lang)
             return
         
         header = ai_message or f"🍽️ عنا {len(restaurants)} مطعم ب{category}!"
-        
-        sections = [{
-            "title": f"🏪 {category}"[:24],
-            "rows": [
-                {
-                    "id": f"rest_{r['id']}",
-                    "title": r['name'][:24],
-                    "description": ""
-                }
-                for r in restaurants[:9]
-            ]
-        }]
-        
-        await whatsapp_service.send_interactive_list(
-            phone_number,
-            header,
-            "🔍 اختار مطعم" if lang == "ar" else "Choose Restaurant",
-            sections
-        )
-        
-        await redis_service.set_user_state(phone_number, "BROWSING_RESTAURANTS", {"lang": lang})
+
+        # Build text list of restaurants
+        lines = [header, ""]
+        for i, r in enumerate(restaurants[:9], 1):
+            lines.append(f"{i}. {r['name']}")
+        lines.append("")
+        lines.append("✏️ اكتب *menu* + اسم المطعم لعرض المانيو" if lang == "ar" else "Type *menu* + restaurant name to view menu")
+
+        await whatsapp_service.send_text(phone_number, "\n".join(lines))
+
+        # Save restaurants for selection
+        await redis_service.set_user_state(phone_number, "SELECTING_RESTAURANT_BY_SEARCH", {
+            "lang": lang,
+            "search_query": category,
+            "restaurants": restaurants[:9]
+        })
 
     async def _handle_order_intent(self, phone_number: str, ai_result: dict, lang: str, user_data: dict):
         """Handle order_item intent - add to cart and suggest upsells"""
@@ -1933,7 +1361,7 @@ https://maps.google.com/?q={lat},{lng}
             else:
                 error = "ما لقيت الصنف، اختار من القائمة! 🍽️"
                 await whatsapp_service.send_text(phone_number, error)
-                await self._show_restaurant_categories(phone_number, lang)
+                await self._send_main_menu(phone_number, lang)
             return
 
         # Validate items - must have menu_item_id and price > 0
@@ -1959,7 +1387,7 @@ https://maps.google.com/?q={lat},{lng}
                 await self._handle_product_search(phone_number, ai_result, lang)
             else:
                 await whatsapp_service.send_text(phone_number, f"⚠️ ما لقيت '{product_query}' بأي مطعم 🤔\nجرب شي تاني!")
-                await self._show_restaurant_categories(phone_number, lang)
+                await self._send_main_menu(phone_number, lang)
             return
 
         # Add only valid items to cart
@@ -2386,7 +1814,7 @@ https://maps.google.com/?q={lat},{lng}
             else:
                 error = "ما لقيت الصنف، اختار من القائمة! 🍽️"
                 await whatsapp_service.send_text(phone_number, error)
-                await self._show_restaurant_categories(phone_number, lang)
+                await self._send_main_menu(phone_number, lang)
             return
 
         # Find restaurant
@@ -2405,7 +1833,7 @@ https://maps.google.com/?q={lat},{lng}
                 await self._handle_product_search(phone_number, ai_result, lang)
             else:
                 await whatsapp_service.send_text(phone_number, "ما لقيت المطعم 🤔 اختار من القائمة!")
-                await self._show_restaurant_categories(phone_number, lang)
+                await self._send_main_menu(phone_number, lang)
             return
 
         # Match items with menu
@@ -2414,7 +1842,7 @@ https://maps.google.com/?q={lat},{lng}
 
         if not matched_items:
             await whatsapp_service.send_text(phone_number, "ما لقيت هالأصناف بهالمطعم 🤔")
-            await self._show_categories(phone_number, restaurant_id, lang)
+            await self._send_main_menu(phone_number, lang)
             return
 
         # Clear cart and add items
@@ -2477,6 +1905,7 @@ https://maps.google.com/?q={lat},{lng}
     # ==================== Numbered Menu Ordering ====================
     async def _handle_numbered_menu_input(self, phone_number: str, text: str, lang: str, user_data: dict):
         """Handle text input when user is browsing a numbered menu"""
+        import re
         items_map = user_data.get("items_map", {})
         restaurant_id = user_data.get("restaurant_id")
         restaurant_name = user_data.get("restaurant_name", "")
@@ -2487,13 +1916,17 @@ https://maps.google.com/?q={lat},{lng}
             await self._show_cart(phone_number, lang)
             return
 
-        # Check for restart commands
-        if text.lower() in ["start", "restart", "بداية", "ابدأ", "0", "menu", "قائمة"]:
+        # Check for restart commands - go to language selection
+        if text.lower().strip() in ["start", "restart", "بداية", "ابدأ", "0"]:
             await self._send_language_selection(phone_number)
             return
 
+        # Check for simple menu command - go to main menu
+        if text.lower().strip() in ["menu", "menhi", "منيو", "قائمة"]:
+            await self._send_main_menu(phone_number, lang)
+            return
+
         # Check if input is purely numbers (1 3, 1,3, 1+3, 1 و 3)
-        import re
         clean = re.sub(r'[\s,،وw+]+', '', text)
         if clean.isdigit():
             # Pure number input - use direct number matching
@@ -2524,7 +1957,20 @@ https://maps.google.com/?q={lat},{lng}
                     else f"⚠️ Numbers {', '.join(invalid_nums)} not found, skipped"
                 )
         else:
-            # Text input (with or without numbers) - use AI to match against menu
+            # Text input (with or without numbers) - use AI to understand intent first
+            # Check if user wants to switch restaurants, browse, or order
+            print(f"DEBUG: Classifying intent for text: '{text}'")
+            logger.info(f"Classifying intent for text: '{text}'")
+            intent = await self._classify_intent(text, lang)
+            print(f"DEBUG: Intent result: {intent}, text was: '{text}'")
+            logger.info(f"Intent result: {intent}, text was: '{text}'")
+            
+            if intent in ["switch_restaurant", "browse", "greeting", "help"]:
+                # User wants to do something else - pass to general AI
+                await self._process_ai_order(phone_number, text, lang, user_data)
+                return
+            
+            # User likely wants to order from current menu - match against menu
             ai_result = await self._match_menu_with_ai(text, items_map, restaurant_name, lang)
 
             if ai_result.get("action") == "order" and ai_result.get("items"):
@@ -2540,22 +1986,16 @@ https://maps.google.com/?q={lat},{lng}
                         valid_selections.append(item_data)
 
                 if not valid_selections:
-                    await whatsapp_service.send_text(
-                        phone_number,
-                        "ما لقيت هالصنف بالمنيو 🤔\nاكتب رقم الصنف أو اسمو" if lang == "ar"
-                        else "Couldn't find that item 🤔\nType the item number or name"
-                    )
+                    # AI couldn't match - pass to general AI for broader understanding
+                    await self._process_ai_order(phone_number, text, lang, user_data)
                     return
             elif ai_result.get("action") == "leave":
                 # User wants to leave menu - pass to general AI
                 await self._process_ai_order(phone_number, text, lang, user_data)
                 return
             else:
-                await whatsapp_service.send_text(
-                    phone_number,
-                    "ما لقيت هالصنف بالمنيو 🤔\nاكتب رقم الصنف أو اسمو" if lang == "ar"
-                    else "Couldn't find that item 🤔\nType the item number or name"
-                )
+                # AI couldn't understand - pass to general AI
+                await self._process_ai_order(phone_number, text, lang, user_data)
                 return
 
         # Check if AI provided quantities - add directly without asking
@@ -2721,6 +2161,49 @@ https://maps.google.com/?q={lat},{lng}
                 "items_map": items_map
             })
 
+    async def _classify_intent(self, text: str, lang: str) -> str:
+        """Use AI to classify user intent when in numbered menu"""
+        print(f"DEBUG: _classify_intent called with: '{text}'")
+        try:
+            import google.generativeai as genai
+            
+            prompt = f"""Classify the user's intent based on their message.
+            
+User message: "{text}"
+
+Possible intents:
+- "switch_restaurant": User wants to browse a different restaurant (e.g., "menu sub marine", "بدي منيو بروستد", "مطعم تاني", "restaurant broasted", "show me pizza places", etc.)
+- "browse": User wants to browse/categories (e.g., "show restaurants", "مطاعم", "شو في مطاعم")
+- "order": User wants to order items from current menu (e.g., "I want 2 zaatar", "بدي 3 مناقيش", item names, numbers)
+- "cart": User wants to view cart (e.g., "cart", "سلة", "طلب", "order")
+- "greeting": User said hi/hello (e.g., "hi", "hello", "مرحبا", "اهلا")
+- "help": User needs help or is confused
+- "checkout": User wants to checkout (e.g., "done", "finish", "تم", "خلص")
+
+Reply with ONLY ONE word from the list above."""
+
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.1,
+                    max_output_tokens=20
+                )
+            )
+            
+            intent = response.text.strip().lower()
+            logger.info(f"Classified intent for '{text}': {intent}")
+            valid_intents = ["switch_restaurant", "browse", "order", "cart", "greeting", "help", "checkout"]
+            
+            if intent in valid_intents:
+                return intent
+            logger.warning(f"Unknown intent '{intent}', defaulting to order")
+            return "order"  # Default to order if unclear
+            
+        except Exception as e:
+            logger.error(f"Error classifying intent: {e}")
+            return "order"  # Default to order on error
+
     async def _match_menu_with_ai(self, text: str, items_map: dict, restaurant_name: str, lang: str) -> dict:
         """Match user text to items in the current numbered menu using AI"""
         try:
@@ -2834,7 +2317,7 @@ https://maps.google.com/?q={lat},{lng}
                 phone_number,
                 "أي مطعم بدك تشوف المانيو تبعه؟ 🤔" if lang == "ar" else "Which restaurant's menu would you like to see?"
             )
-            await self._show_restaurants(phone_number, lang)
+            await self._send_main_menu(phone_number, lang)
             return
 
         # Find restaurant by name
@@ -2864,7 +2347,7 @@ https://maps.google.com/?q={lat},{lng}
                 f"ما لقيت مطعم باسم '{restaurant_name}' 🤔\nاختار من القائمة:" if lang == "ar"
                 else f"Couldn't find restaurant '{restaurant_name}'\nChoose from the list:"
             )
-            await self._show_restaurants(phone_number, lang)
+            await self._send_main_menu(phone_number, lang)
             return
 
         # Get full menu
@@ -2877,7 +2360,7 @@ https://maps.google.com/?q={lat},{lng}
 
             if not restaurant:
                 await whatsapp_service.send_text(phone_number, "المطعم غير موجود 🤔")
-                await self._show_restaurants(phone_number, lang)
+                await self._send_main_menu(phone_number, lang)
                 return
 
             rest_name = restaurant.name_ar if lang == "ar" and restaurant.name_ar else restaurant.name
@@ -3095,45 +2578,22 @@ https://maps.google.com/?q={lat},{lng}
                     by_restaurant[rest] = []
                 by_restaurant[rest].append(item)
 
-            # Build interactive list (max 9 rows total for WhatsApp limit)
-            sections = []
-            total_rows = 0
-            MAX_ROWS = 9
-            for rest_name, items in list(by_restaurant.items()):
-                if total_rows >= MAX_ROWS:
-                    break
-                rows = []
-                for item in items:
-                    if total_rows >= MAX_ROWS:
-                        break
-                    price_str = f"${item['price']:.2f}" if item['price'] else ""
-                    rows.append({
-                        "id": f"item_{item['id']}",
-                        "title": item["name"][:24],
-                        "description": f"💰 {price_str}" if price_str else ""
-                    })
-                    total_rows += 1
-                if rows:
-                    sections.append({
-                        "title": rest_name[:24],
-                        "rows": rows
-                    })
-
-            if sections:
-                await whatsapp_service.send_interactive_list(
-                    phone_number,
-                    response.strip(),
-                    "اختار 👆" if lang == "ar" else "Select",
-                    sections
-                )
-            else:
-                await whatsapp_service.send_text(phone_number, response)
+            # Build text list of matching items
+            lines = [response.strip(), ""]
+            for rest_name, items in list(by_restaurant.items())[:5]:
+                lines.append(f"🏪 *{rest_name}*")
+                for item in items[:3]:
+                    price_str = f" - ${item['price']:.2f}" if item['price'] else ""
+                    lines.append(f"  • {item['name']}{price_str}")
+            lines.append("")
+            lines.append("✏️ اكتب اسم الصنف للطلب أو *menu* + اسم المطعم" if lang == "ar" else "Type item name to order or *menu* + restaurant name")
+            await whatsapp_service.send_text(phone_number, "\n".join(lines))
         else:
             await whatsapp_service.send_text(
                 phone_number,
                 f"ما لقيت شي بهالوصف 🤔\nجرب تقلي شو بدك بالضبط!"
             )
-            await self._show_restaurant_categories(phone_number, lang)
+            await self._send_main_menu(phone_number, lang)
 
     # ==================== Reorder Feature ====================
     async def _show_previous_orders(self, phone_number: str, lang: str):
@@ -3479,7 +2939,7 @@ https://maps.google.com/?q={lat},{lng}
                 for fav, rest in favorites:
                     rest_name = (rest.name_ar if lang == "ar" and rest.name_ar else rest.name)[:24]
                     rest_rows.append({
-                        "id": f"rest_{rest.id}",
+                        "id": f"fav_{rest.id}",
                         "title": f"🏪 {rest_name}",
                         "description": "عرض المانيو" if lang == "ar" else "View menu"
                     })
@@ -3710,6 +3170,180 @@ https://maps.google.com/?q={lat},{lng}
             formatted.append(f"{role}: {msg['content']}")
 
         return "\n".join(formatted)
+
+    # ==================== Tracking & Analytics ====================
+    
+    async def _track_session_start(self, phone_number: str):
+        """Track when a user starts a new bot session"""
+        try:
+            # Track in Redis
+            await redis_service.track_bot_session_start(phone_number, source='whatsapp')
+            
+            # Track in DB
+            async with AsyncSessionLocal() as db:
+                from app.models.bot_tracking import BotSession, BotEvent
+                
+                # Check if there's already an active session
+                result = await db.execute(
+                    select(BotSession).where(
+                        and_(
+                            BotSession.phone_number == phone_number,
+                            BotSession.status == 'active'
+                        )
+                    ).order_by(desc(BotSession.session_started_at))
+                )
+                existing = result.scalars().first()
+                
+                if existing:
+                    # Update existing session
+                    existing.last_activity_at = datetime.utcnow()
+                else:
+                    # Create new session
+                    session = BotSession(
+                        phone_number=phone_number,
+                        session_started_at=datetime.utcnow(),
+                        last_activity_at=datetime.utcnow(),
+                        status='active',
+                        source='whatsapp'
+                    )
+                    db.add(session)
+                    await db.flush()  # Get the ID
+                    
+                    # Log event
+                    event = BotEvent(
+                        session_id=session.id,
+                        phone_number=phone_number,
+                        event_type='session_started',
+                        event_data={'source': 'whatsapp'},
+                        created_at=datetime.utcnow()
+                    )
+                    db.add(event)
+                
+                await db.commit()
+        except Exception as e:
+            logger.error(f"Failed to track session start: {e}")
+    
+    async def _track_event(self, phone_number: str, event_type: str, event_data: dict = None):
+        """Track a bot event"""
+        try:
+            async with AsyncSessionLocal() as db:
+                from app.models.bot_tracking import BotSession, BotEvent
+                
+                # Find active session
+                result = await db.execute(
+                    select(BotSession).where(
+                        and_(
+                            BotSession.phone_number == phone_number,
+                            BotSession.status == 'active'
+                        )
+                    ).order_by(desc(BotSession.session_started_at))
+                )
+                session = result.scalars().first()
+                
+                # Create event
+                event = BotEvent(
+                    session_id=session.id if session else None,
+                    phone_number=phone_number,
+                    event_type=event_type,
+                    event_data=event_data or {},
+                    created_at=datetime.utcnow()
+                )
+                db.add(event)
+                
+                # Update session stats
+                if session:
+                    session.last_activity_at = datetime.utcnow()
+                    if event_type == 'message_received':
+                        session.total_messages += 1
+                    elif event_type == 'item_added_to_cart':
+                        session.items_in_cart = event_data.get('items_count', 0) if event_data else 0
+                        session.cart_total = event_data.get('cart_total', 0) if event_data else 0
+                
+                await db.commit()
+        except Exception as e:
+            logger.error(f"Failed to track event {event_type}: {e}")
+    
+    async def _track_order_completed(self, phone_number: str, order_id: int, cart_total: float):
+        """Track when a user completes an order"""
+        try:
+            # Update Redis
+            await redis_service.end_bot_session(phone_number, status='converted')
+            
+            async with AsyncSessionLocal() as db:
+                from app.models.bot_tracking import BotSession, BotEvent
+                
+                # Find and update session
+                result = await db.execute(
+                    select(BotSession).where(
+                        and_(
+                            BotSession.phone_number == phone_number,
+                            BotSession.status == 'active'
+                        )
+                    ).order_by(desc(BotSession.session_started_at))
+                )
+                session = result.scalars().first()
+                
+                if session:
+                    session.status = 'converted'
+                    session.order_id = order_id
+                    session.session_ended_at = datetime.utcnow()
+                    
+                    # Log event
+                    event = BotEvent(
+                        session_id=session.id,
+                        phone_number=phone_number,
+                        event_type='order_completed',
+                        event_data={'order_id': order_id, 'total': cart_total},
+                        created_at=datetime.utcnow()
+                    )
+                    db.add(event)
+                    
+                    await db.commit()
+        except Exception as e:
+            logger.error(f"Failed to track order completion: {e}")
+    
+    async def _track_cart_abandonment(self, phone_number: str):
+        """Track abandoned cart"""
+        try:
+            async with AsyncSessionLocal() as db:
+                from app.models.bot_tracking import BotSession, AbandonedCart
+                
+                # Find active session with items in cart
+                result = await db.execute(
+                    select(BotSession).where(
+                        and_(
+                            BotSession.phone_number == phone_number,
+                            BotSession.status == 'active',
+                            BotSession.items_in_cart > 0
+                        )
+                    ).order_by(desc(BotSession.session_started_at))
+                )
+                session = result.scalars().first()
+                
+                if session:
+                    # Mark session as abandoned
+                    session.status = 'abandoned'
+                    session.session_ended_at = datetime.utcnow()
+                    
+                    # Create abandoned cart record
+                    # Get cart from Redis
+                    cart = await redis_service.get_cart(phone_number)
+                    if cart:
+                        cart_total = await redis_service.get_cart_total(phone_number)
+                        
+                        abandoned = AbandonedCart(
+                            phone_number=phone_number,
+                            session_id=session.id,
+                            cart_items=cart,
+                            cart_total=cart_total,
+                            abandoned_at=datetime.utcnow(),
+                            status='abandoned'
+                        )
+                        db.add(abandoned)
+                    
+                    await db.commit()
+        except Exception as e:
+            logger.error(f"Failed to track cart abandonment: {e}")
 
 
 bot_controller = BotController()
