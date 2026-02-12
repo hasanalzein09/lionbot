@@ -13,9 +13,9 @@ STATIC_AUDIO_DIR = os.path.join(os.path.dirname(__file__), "../../static/audio")
 
 
 class TTSService:
-    """Text-to-Speech service using Gemini 2.5 Flash TTS API"""
+    """Text-to-Speech service using Gemini 2.5 Pro TTS API"""
 
-    TTS_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent"
+    TTS_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent"
 
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
@@ -28,7 +28,7 @@ class TTSService:
             self._client = httpx.AsyncClient(timeout=60.0)
         return self._client
 
-    async def generate_audio(self, text: str, voice: str = "Kore") -> Optional[bytes]:
+    async def generate_audio(self, text: str, voice: str = "Leda") -> Optional[bytes]:
         """Generate audio from text using Gemini TTS. Returns raw PCM16 bytes."""
         if not self.api_key:
             logger.warning("GEMINI_API_KEY not set, TTS disabled")
@@ -77,7 +77,7 @@ class TTSService:
         )
         return header + pcm_data
 
-    async def generate_wav_file(self, text: str, output_path: str, voice: str = "Kore") -> Optional[str]:
+    async def generate_wav_file(self, text: str, output_path: str, voice: str = "Leda") -> Optional[str]:
         """Generate and save a WAV audio file. Returns file path or None."""
         pcm_data = await self.generate_audio(text, voice)
         if not pcm_data:
@@ -90,7 +90,7 @@ class TTSService:
         logger.info(f"WAV file saved: {output_path} ({len(wav_data)} bytes)")
         return output_path
 
-    async def generate_and_upload(self, text: str, voice: str = "Kore") -> Optional[str]:
+    async def generate_and_upload(self, text: str, voice: str = "Leda") -> Optional[str]:
         """Generate TTS audio and upload to WhatsApp, returning media_id"""
         from app.services.whatsapp_service import whatsapp_service
 
@@ -119,6 +119,7 @@ class TTSService:
 
         if not os.path.exists(welcome_path):
             welcome_text = (
+                "Say in a warm, friendly Lebanese Arabic accent: "
                 "أهلا وسهلا فيك بليون ديليفري! "
                 "عنا أكتر من مية مطعم ومحل بصيدا. "
                 "ليون ديليفري بخدمتك، اطلب يلي بدك ياه ونحنا منوصلك ياه لعندك! "

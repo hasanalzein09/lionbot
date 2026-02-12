@@ -498,19 +498,21 @@ class BotController:
         await redis_service.set_user_state(phone_number, "CONFIRMING_INFO", user_data)
 
     async def _send_welcome_audio(self, phone_number: str):
-        """Send welcome audio only to first-time customers"""
+        """Send welcome audio once per day per customer (not every message, not once per lifetime)"""
         try:
-            async with AsyncSessionLocal() as db:
-                result = await db.execute(select(User).where(User.phone_number == phone_number))
-                user = result.scalars().first()
-                if user:
-                    return  # Returning user, skip welcome audio
+            # Check if welcome was already sent today using Redis key with 24h TTL
+            welcome_key = f"welcome_sent:{phone_number}"
+            already_sent = await redis_service._execute("GET", welcome_key)
+            if already_sent:
+                return  # Already sent today, skip
 
             from app.services.tts_service import tts_service
             media_id = await tts_service.get_welcome_media_id()
             if media_id:
                 await whatsapp_service.send_audio(phone_number, media_id)
-                logger.info(f"Welcome audio sent to new user {phone_number}")
+                # Mark as sent for 24 hours (86400 seconds)
+                await redis_service._execute("SETEX", welcome_key, 86400, "1")
+                logger.info(f"Welcome audio sent to {phone_number} (daily)")
         except Exception as e:
             logger.error(f"Failed to send welcome audio: {e}")
             # Non-critical: continue without audio
@@ -1278,7 +1280,7 @@ https://maps.google.com/?q={lat},{lng}
         # Handle sentiment AFTER intent (so it doesn't appear before results)
         sentiment = ai_result.get("sentiment", "neutral")
         if sentiment == "negative":
-            sorry_msg = "نعتذر عن أي إزعاج! 🙏 إذا بدك تحكي مع الإدارة اتصل على 71234567" if lang == "ar" else "We apologize for any inconvenience! 🙏 Contact management at 71234567"
+            sorry_msg = "نعتذر عن أي إزعاج! 🙏 إذا بدك تحكي مع الإدارة اتصل على +961 76 082 804" if lang == "ar" else "We apologize for any inconvenience! 🙏 Contact management at +961 76 082 804"
             await whatsapp_service.send_text(phone_number, sorry_msg)
         elif sentiment == "positive":
             thanks_msg = "شكراً لطيبتك! 😊🦁" if lang == "ar" else "Thank you! 😊🦁"
